@@ -9,6 +9,6 @@ import json
 #
 
 
-# for q in slotbaza.loaditemsinarea(3):
-#     print(q)
+for q in slotbaza.loaditemsinarea(3):
+    print(q)
 
