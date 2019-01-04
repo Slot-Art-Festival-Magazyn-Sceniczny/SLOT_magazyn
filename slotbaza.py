@@ -47,15 +47,15 @@ class Item(ModelBazy):
 
 
 class User(ModelBazy):
-    usertype = CharField()
-    firstname = CharField()
-    secondname = CharField()
-    shortname = CharField()
+    usertype = CharField(default='user')
+    firstname = CharField(default='')
+    secondname = CharField(default='')
+    shortname = CharField(default='')
     login = CharField(unique=True)
     password = CharField()
     joindate = DateTimeField()
-    lastlogindate = DateTimeField()
-    lastlogoutdate = DateTimeField()
+    lastlogindate = DateTimeField(default='')
+    lastlogoutdate = DateTimeField(default='')
 
 
 class Orchestra(ModelBazy):
@@ -300,3 +300,83 @@ def loaditemsinarea(areaid):
         itemdictlist.append(itemdict)
         itemdict = {}
     return itemdictlist
+
+
+# stworzenie nowego użytkownika
+def createuser(usertype, login, password):
+    if isuserexist(login):
+        pass
+    else:
+        User.create(usertype=usertype, login=login, password=password, joindate=datetime.datetime.now())
+
+
+# wczytanie danych użytkownika
+def loaduser(login):
+    if isuserexist(login):
+        user = User.get(User.login == login)
+        userdict = {}
+        userdict['usertype'] = user.usertype
+        userdict['firstname'] = user.firstname
+        userdict['secondname'] = user.secondname
+        userdict['shortname'] = user.shortname
+        userdict['login'] = user.login
+        userdict['password'] = user.password
+        userdict['joindate'] = user.joindate
+        userdict['lastlogindate'] = user.lastlogindate
+        userdict['lastlogoutdate'] = user.lastlogoutdate
+        return userdict
+    else:
+        pass
+
+
+# zapisanie danych uzytkownika
+def saveuser(userdict):
+    if isuserexist(userdict['login']):
+        user = User.get(User.login == userdict['login'])
+        user.usertype = userdict['usertype']
+        user.firstname = userdict['firstname']
+        user.secondname = userdict['secondname']
+        user.shortname = userdict['shortname']
+        user.login = userdict['login']
+        user.password = userdict['password']
+        user.joindate = userdict['joindate']
+        user.lastlogindate = userdict['lastlogindate']
+        user.lastlogoutdate = userdict['lastlogoutdate']
+        user.save()
+    else:
+        pass
+
+
+# sprawdzenie czy uzytkownik o podanym loginie istnieje w bazie
+def isuserexist(login):
+    try:
+        User.get(User.login == login)
+        return True
+    except:
+        return False
+
+
+def loginvalidate(login, password):
+    if isuserexist(login):
+        user = User.get(User.login == login)
+        if user.password == password:
+            status = {'login': True, 'usertype': user.usertype}
+        else:
+            status = {'login': False, 'usertype': None}
+    else:
+        status = {'login': False, 'usertype': None}
+    return status
+
+
+# pobranie listy uzytkownikow
+def userlist():
+    userdict = {}
+    userdictlist = []
+    for user in User.select():
+        userdict['login'] = user.login
+        userdict['firstname'] = user.firstname
+        userdict['secondname'] = user.secondname
+        userdict['shortname'] = user.shortname
+        userdictlist.append(userdict)
+        userdict = {}
+    return userdictlist
