@@ -1,9 +1,12 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtGui import QFont, QLinearGradient, QColor, QPolygonF, QBrush, QPen
+
 from PyQt5.QtCore import Qt, QPoint
-from gui import UI_widget
+from PyQt5.QtGui import QFont, QLinearGradient, QColor, QPolygonF, QBrush, QPen
+from PyQt5.QtWidgets import QApplication
+
 import slotbaza
+from gui import UI_widget, LoginDialog, Dialog
+
 
 class Magazyn(UI_widget):
 
@@ -18,15 +21,27 @@ class Magazyn(UI_widget):
         self.btn_addarea.clicked.connect(self.rysujobszary)
         self.btn_areaedit.clicked.connect(self.wyczyscscene)
 
-
     def logowanie(self):
-        sender=self.sender()
-        if sender.objectName()=='btn_login':
-            self.loginstatus = True
-            self.logstatus.setText("<FONT COLOR=\'#44FF44\'> Zalogowany")
-        elif sender.objectName()=='btn_logout':
-            self.loginstatus = False
-            self.logstatus.setText("<FONT COLOR=\'#FF4444\'> Niezalogowany")
+        sender = self.sender()
+        if sender.objectName() == 'btn_login':
+            login, haslo, ok = LoginDialog.getloginhaslo(self)
+            if ok:
+                if slotbaza.isuserexist(login):
+                    self.loginstatus = True
+                    print(login)
+                    self.logstatus.setText("<FONT COLOR=\'#44FF44\'> Zalogowany")
+                else:
+                    Dialog.komunikat('warn', 'Użytkownik o podanym loginie nie istnieje.', self)
+
+            else:
+                pass
+        elif sender.objectName() == 'btn_logout':
+            if self.loginstatus:
+                Dialog.komunikat(self, 'ok', 'Pomyślnie wylogowano z systemu')
+            else:
+                Dialog.komunikat('warn', 'Nie można się wylogować nie będąc wcześniej zalogowanym', self)
+                self.loginstatus = False
+                self.logstatus.setText("<FONT COLOR=\'#FF4444\'> Niezalogowany")
 
     def rysujobszary(self):
         self.wyczyscscene()
@@ -35,13 +50,15 @@ class Magazyn(UI_widget):
         font.setPixelSize(18)
         font.setBold(True)
         for obszar in obszary:
-            a=self.scena.addRect(obszar['posx'],obszar['posy'],obszar['sizex'],obszar['sizey'])
-            b=self.scena.addText(str(obszar['areaid']))
+            a = self.scena.addRect(obszar['posx'], obszar['posy'], obszar['sizex'], obszar['sizey'])
+            b = self.scena.addText(str(obszar['areaid']))
             b.setDefaultTextColor(Qt.white)
             b.setFont(font)
             br = b.boundingRect()
-            b.setPos(obszar['posx']+obszar['sizex']/2-br.width()/2,obszar['posy']+obszar['sizey']/2-br.height()/2)
-            gradient = QLinearGradient(QPoint(obszar['posx'], obszar['posy']), QPoint(obszar['posx'], obszar['posy']+obszar['sizey']))
+            b.setPos(obszar['posx'] + obszar['sizex'] / 2 - br.width() / 2,
+                     obszar['posy'] + obszar['sizey'] / 2 - br.height() / 2)
+            gradient = QLinearGradient(QPoint(obszar['posx'], obszar['posy']),
+                                       QPoint(obszar['posx'], obszar['posy'] + obszar['sizey']))
             gradient.setColorAt(0, QColor('#AA0087FF'))
             gradient.setColorAt(1, QColor('#CC0048FF'))
             a.setBrush(gradient)
@@ -52,14 +69,19 @@ class Magazyn(UI_widget):
 
     def pomieszczeniedosceny(self):
         # self.scena.setBackgroundBrush(Qt.darkGray)
-        pomieszczenie_poly=QPolygonF([QPoint(0,100),QPoint(700,100),QPoint(700,0),QPoint(900,0),QPoint(900,100),QPoint(1000,100), QPoint(1000,850), QPoint(880,850),QPoint(880,950),QPoint(630,950),QPoint(630,850),QPoint(370,850),QPoint(370,950),QPoint(120,950),QPoint(120,850),QPoint(0,850)])
-        pomieszczenie=self.scena.addPolygon(pomieszczenie_poly)
+        pomieszczenie_poly = QPolygonF(
+            [QPoint(0, 100), QPoint(700, 100), QPoint(700, 0), QPoint(900, 0), QPoint(900, 100), QPoint(1000, 100),
+             QPoint(1000, 850), QPoint(880, 850), QPoint(880, 950), QPoint(630, 950), QPoint(630, 850),
+             QPoint(370, 850), QPoint(370, 950), QPoint(120, 950), QPoint(120, 850), QPoint(0, 850)])
+        pomieszczenie = self.scena.addPolygon(pomieszczenie_poly)
         pomieszczenie.setBrush(QBrush(Qt.white))
-        pen=QPen()
+        pen = QPen()
         pen.setWidth(4)
         pomieszczenie.setPen(pen)
+
 
 if __name__ == '__main__':
     app = QApplication([])
     magazyn = Magazyn()
     sys.exit(app.exec_())
+()

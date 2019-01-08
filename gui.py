@@ -1,7 +1,84 @@
-from PyQt5.QtWidgets import QMainWindow, QFrame, QDesktopWidget, QWidget, QGroupBox, QStatusBar, QPushButton, QVBoxLayout, QHBoxLayout, QLabel, QAction, QMenu, QMenuBar, QGraphicsView, QGraphicsScene
-from PyQt5.QtCore import QRect, Qt, QSize, QPoint
-from PyQt5.QtGui import QFont, QPixmap, QBrush, QPolygonF, QPen
-import sys, random
+from PyQt5.QtCore import QRect, Qt, QSize
+from PyQt5.QtGui import QFont, QPixmap
+from PyQt5.QtWidgets import QMainWindow, QFrame, QDesktopWidget, QWidget, QGroupBox, QStatusBar, QPushButton, \
+    QVBoxLayout, QHBoxLayout, QLabel, QAction, QMenu, QMenuBar, QGraphicsView, QGraphicsScene, QDialog, QLineEdit, \
+    QGridLayout
+
+
+def button_stylesheet(color):
+    if color == 'red':
+        stylesheet = "QPushButton {\n" \
+                     "Font: Bold 10pt Arial ; color: white; \n" \
+                     "border-style: solid; border-color: #222222; border-width: 1px; border-radius: 12px; \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #AD2D2D, stop:1 #842222)}\n" \
+                     "QPushButton:hover { \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #BF3737, stop:1 #AD2D2D)}\n" \
+                     "QPushButton:pressed { \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #842222, stop:1 #AD2D2D)}"
+    elif color == 'yellow':
+        stylesheet = "QPushButton {\n" \
+                     "Font: Bold 10pt Arial ; color: white; \n" \
+                     "border-style: solid; border-color: #222222; border-width: 1px; border-radius: 12px; \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #D39A37, stop:1 #A1752A)}\n" \
+                     "QPushButton:hover { \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #DDB043, stop:1 #D39A37)}\n" \
+                     "QPushButton:pressed { \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #A1752A, stop:1 #D39A37)}"
+    elif color == 'green':
+        stylesheet = "QPushButton {\n" \
+                     "Font: Bold 10pt Arial ; color: white; \n" \
+                     "border-style: solid; border-color: #222222; border-width: 1px; border-radius: 12px; \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #2A8E25, stop:1 #206C1C)}\n" \
+                     "QPushButton:hover { \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #33A72D, stop:1 #2A8E25)}\n" \
+                     "QPushButton:pressed { \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #206C1C, stop:1 #2A8E25)}"
+    elif color == 'blue':
+        stylesheet = "QPushButton {\n" \
+                     "Font: Bold 10pt Arial ; color: white; \n" \
+                     "border-style: solid; border-color: #222222; border-width: 1px; border-radius: 12px; \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #355ACC, stop:1 #28449C)}\n" \
+                     "QPushButton:hover { \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #416ED7, stop:1 #355ACC)}\n" \
+                     "QPushButton:pressed { \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #28449C, stop:1 #355ACC)}"
+    elif color == 'violet':
+        stylesheet = "QPushButton {\n" \
+                     "Font: Bold 10pt Arial ; color: white; \n" \
+                     "border-style: solid; border-color: #222222; border-width: 1px; border-radius: 12px; \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #8931BC, stop:1 #68258F)}\n" \
+                     "QPushButton:hover { \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #A33CCB, stop:1 #8931BC)}\n" \
+                     "QPushButton:pressed { \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #68258F, stop:1 #8931BC)}"
+    else:
+        stylesheet = "QPushButton {\n" \
+                     "Font: Bold 10pt Arial ; color: white; \n" \
+                     "border-style: solid; border-color: #222222; border-width: 1px; border-radius: 12px; \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #444444, stop:1 #343434)}\n" \
+                     "QPushButton:hover { \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #535353, stop:1 #444444)}\n" \
+                     "QPushButton:pressed { \n" \
+                     "background-color: qlineargradient(\n" \
+                     "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #343434, stop:1 #444444)}"
+    return stylesheet
 
 
 class UI_widget(QMainWindow):
@@ -12,11 +89,14 @@ class UI_widget(QMainWindow):
         self.setFixedSize(self.size())
         self.center()
         self.setWindowTitle('Magazyn Sceniczny')
+        # self.setWindowFlags(Qt.FramelessWindowHint)
+        # self.setWindowFlags(Qt.CustomizeWindowHint)
+        # self.setWindowFlags(Qt.Tool)
         self.setStyleSheet("background-color: #555555; color: white\n")
         self.centralwidget = QWidget(self)
         self.centralwidget.setStyleSheet("")
         self.centralwidget.setObjectName("centralwidget")
-        self.centralwidget.setGeometry(0,21,1200,859)
+        self.centralwidget.setGeometry(0, 21, 1200, 859)
         self.setframes()
         self.setmenus()
         self.setlogo()
@@ -29,7 +109,7 @@ class UI_widget(QMainWindow):
         # self.showFullScreen()
 
     def setframes(self):
-        self.frame_logo=QFrame(self.centralwidget)
+        self.frame_logo = QFrame(self.centralwidget)
         self.frame_logo.setGeometry(QRect(0, 0, 250, 150))
         self.frame_logo.setFrameShape(QFrame.StyledPanel)
         self.frame_logo.setFrameShadow(QFrame.Raised)
@@ -66,7 +146,6 @@ class UI_widget(QMainWindow):
         self.logging.setObjectName("logging")
         self.logging.setTitle('Logowanie')
 
-
         self.areaoperations = QGroupBox(self.frame_menu)
         self.areaoperations.setGeometry(QRect(10, 135, 221, 171))
         font = QFont()
@@ -95,7 +174,6 @@ class UI_widget(QMainWindow):
         font.setPointSize(14)
         self.itemoperations.setFont(font)
         self.itemoperations.setAutoFillBackground(False)
-        self.itemoperations.setStyleSheet("")
         self.itemoperations.setAlignment(Qt.AlignCenter)
         self.itemoperations.setFlat(False)
         self.itemoperations.setCheckable(False)
@@ -130,68 +208,68 @@ class UI_widget(QMainWindow):
 
         self.btn_login = QPushButton(self.logging)
         self.btn_login.setGeometry(QRect(10, 40, 91, 41))
-        self.btn_login.setStyleSheet(self.button_stylesheet(''))
+        self.btn_login.setStyleSheet(button_stylesheet(''))
         self.btn_login.setObjectName("btn_login")
         self.btn_login.setText('Zaloguj')
 
         self.btn_logout = QPushButton(self.logging)
         self.btn_logout.setGeometry(QRect(120, 40, 91, 41))
-        self.btn_logout.setStyleSheet(self.button_stylesheet(''))
+        self.btn_logout.setStyleSheet(button_stylesheet(''))
         self.btn_logout.setObjectName("btn_logout")
         self.btn_logout.setText('Wyloguj')
 
         self.btn_listofareas = QPushButton(self.areaoperations)
         self.btn_listofareas.setMinimumSize(QSize(0, 40))
-        self.btn_listofareas.setStyleSheet(self.button_stylesheet(''))
+        self.btn_listofareas.setStyleSheet(button_stylesheet(''))
         self.btn_listofareas.setObjectName("btn_listofareas")
         self.btn_listofareas.setText('Lista obszarów')
         self.verticalLayout.addWidget(self.btn_listofareas)
 
         self.btn_areaedit = QPushButton(self.areaoperations)
         self.btn_areaedit.setMinimumSize(QSize(0, 40))
-        self.btn_areaedit.setStyleSheet(self.button_stylesheet(''))
+        self.btn_areaedit.setStyleSheet(button_stylesheet(''))
         self.btn_areaedit.setObjectName("btn_areaedit")
         self.btn_areaedit.setText('Edytuj obszar')
         self.verticalLayout.addWidget(self.btn_areaedit)
 
         self.btn_addarea = QPushButton(self.areaoperations)
         self.btn_addarea.setMinimumSize(QSize(0, 40))
-        self.btn_addarea.setStyleSheet(self.button_stylesheet(''))
+        self.btn_addarea.setStyleSheet(button_stylesheet(''))
         self.btn_addarea.setObjectName("btn_addarea")
         self.btn_addarea.setText('Dodaj obszar')
         self.verticalLayout.addWidget(self.btn_addarea)
 
         self.btn_searchitem = QPushButton(self.searching)
         self.btn_searchitem.setMinimumSize(QSize(0, 40))
-        self.btn_searchitem.setStyleSheet(self.button_stylesheet('blue'))
+        self.btn_searchitem.setStyleSheet(button_stylesheet('blue'))
         self.btn_searchitem.setObjectName("btn_searchitem")
         self.btn_searchitem.setText('Wyszukaj przedmiot')
         self.verticalLayout_3.addWidget(self.btn_searchitem)
 
         self.btn_takealookinside = QPushButton(self.itemoperations)
         self.btn_takealookinside.setMinimumSize(QSize(0, 40))
-        self.btn_takealookinside.setStyleSheet(self.button_stylesheet('yellow'))
+        self.btn_takealookinside.setStyleSheet(button_stylesheet('yellow'))
         self.btn_takealookinside.setObjectName("btn_takealookinside")
         self.btn_takealookinside.setText('Zajrzyj do środka')
         self.verticalLayout_2.addWidget(self.btn_takealookinside)
 
         self.btn_comein = QPushButton(self.itemoperations)
         self.btn_comein.setMinimumSize(QSize(0, 40))
-        self.btn_comein.setStyleSheet(self.button_stylesheet('green'))
+        self.btn_comein.setStyleSheet(button_stylesheet('green'))
         self.btn_comein.setObjectName("btn_comein")
         self.btn_comein.setText('Przyjmij przedmiot')
         self.verticalLayout_2.addWidget(self.btn_comein)
 
         self.btn_comeout = QPushButton(self.itemoperations)
         self.btn_comeout.setMinimumSize(QSize(0, 40))
-        self.btn_comeout.setStyleSheet(self.button_stylesheet('red'))
+        self.btn_comeout.setStyleSheet(button_stylesheet('red'))
         self.btn_comeout.setObjectName("btn_comoeout")
         self.btn_comeout.setText('Wydaj przedmiot')
         self.verticalLayout_2.addWidget(self.btn_comeout)
 
         self.btn_orchestra = QPushButton(self.other_modules)
         self.btn_orchestra.setMinimumSize(QSize(0, 40))
-        self.btn_orchestra.setStyleSheet(self.button_stylesheet('violet'))
+        self.btn_orchestra.setStyleSheet(button_stylesheet('violet'))
         self.btn_orchestra.setObjectName("btn_orchestra")
         self.btn_orchestra.setText('SLOT Orkiestra')
         self.verticalLayout_4.addWidget(self.btn_orchestra)
@@ -204,84 +282,9 @@ class UI_widget(QMainWindow):
         self.logstatus.setAlignment(Qt.AlignCenter)
         self.logstatus.setObjectName("logstatus")
 
-    def button_stylesheet(self, color):
-        if color=='red':
-            stylesheet = "QPushButton {\n"\
-                            "Font: Bold 10pt Arial ; color: white; \n"\
-                            "border-style: solid; border-color: #222222; border-width: 1px; border-radius: 12px; \n"\
-                            "background-color: qlineargradient(\n"\
-                            "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #AD2D2D, stop:1 #842222)}\n"\
-                            "QPushButton:hover { \n"\
-                            "background-color: qlineargradient(\n"\
-                            "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #BF3737, stop:1 #AD2D2D)}\n"\
-                            "QPushButton:pressed { \n"\
-                            "background-color: qlineargradient(\n"\
-                            "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #842222, stop:1 #AD2D2D)}"
-        elif color == 'yellow':
-            stylesheet = "QPushButton {\n" \
-                           "Font: Bold 10pt Arial ; color: white; \n" \
-                           "border-style: solid; border-color: #222222; border-width: 1px; border-radius: 12px; \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #D39A37, stop:1 #A1752A)}\n" \
-                           "QPushButton:hover { \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #DDB043, stop:1 #D39A37)}\n" \
-                           "QPushButton:pressed { \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #A1752A, stop:1 #D39A37)}"
-        elif color == 'green':
-            stylesheet = "QPushButton {\n" \
-                           "Font: Bold 10pt Arial ; color: white; \n" \
-                           "border-style: solid; border-color: #222222; border-width: 1px; border-radius: 12px; \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #2A8E25, stop:1 #206C1C)}\n" \
-                           "QPushButton:hover { \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #33A72D, stop:1 #2A8E25)}\n" \
-                           "QPushButton:pressed { \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #206C1C, stop:1 #2A8E25)}"
-        elif color == 'blue':
-            stylesheet = "QPushButton {\n" \
-                           "Font: Bold 10pt Arial ; color: white; \n" \
-                           "border-style: solid; border-color: #222222; border-width: 1px; border-radius: 12px; \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #355ACC, stop:1 #28449C)}\n" \
-                           "QPushButton:hover { \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #416ED7, stop:1 #355ACC)}\n" \
-                           "QPushButton:pressed { \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #28449C, stop:1 #355ACC)}"
-        elif color == 'violet':
-            stylesheet = "QPushButton {\n" \
-                           "Font: Bold 10pt Arial ; color: white; \n" \
-                           "border-style: solid; border-color: #222222; border-width: 1px; border-radius: 12px; \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #8931BC, stop:1 #68258F)}\n" \
-                           "QPushButton:hover { \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #A33CCB, stop:1 #8931BC)}\n" \
-                           "QPushButton:pressed { \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #68258F, stop:1 #8931BC)}"
-        else:
-            stylesheet = "QPushButton {\n" \
-                           "Font: Bold 10pt Arial ; color: white; \n" \
-                           "border-style: solid; border-color: #222222; border-width: 1px; border-radius: 12px; \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #444444, stop:1 #343434)}\n" \
-                           "QPushButton:hover { \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #535353, stop:1 #444444)}\n" \
-                           "QPushButton:pressed { \n" \
-                           "background-color: qlineargradient(\n" \
-                           "spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #343434, stop:1 #444444)}"
-        return stylesheet
-
     def setlogo(self):
-        label=QLabel(self.frame_logo)
-        pixmap=QPixmap('images/LOGO.png')
+        label = QLabel(self.frame_logo)
+        pixmap = QPixmap('images/LOGO.png')
         label.setPixmap(pixmap)
         pass
 
@@ -334,18 +337,17 @@ class UI_widget(QMainWindow):
         self.actionLista_u_ytkownik_w.setText("Lista użytkowników")
 
     def setscena(self):
-        self.scena=QGraphicsScene()
-        self.scena.setSceneRect(0,0,1000,950)
+        self.scena = QGraphicsScene()
+        self.scena.setSceneRect(0, 0, 1000, 950)
 
     def setviewer(self):
-        self.viewer=QGraphicsView(self.frame_drawer)
-        self.viewer.setGeometry(0,0,910,772)
+        self.viewer = QGraphicsView(self.frame_drawer)
+        self.viewer.setGeometry(0, 0, 910, 772)
         self.viewer.setScene(self.scena)
-        scale=0.75
-        self.viewer.scale(scale,scale)
+        scale = 0.75
+        self.viewer.scale(scale, scale)
         self.viewer.setFrameShape(QFrame.StyledPanel)
         self.viewer.setFrameShadow(QFrame.Raised)
-
 
     def center(self):
         screen = QDesktopWidget().screenGeometry()
@@ -354,3 +356,137 @@ class UI_widget(QMainWindow):
                   (screen.height() - size.height()) / 2)
 
 
+class LoginDialog(QDialog):
+    """ Okno dialogowe logowania """
+
+    def __init__(self, parent=None):
+        super(LoginDialog, self).__init__(parent)
+
+        # etykiety, pola edycyjne i przyciski ###
+        loginlbl = QLabel('Login')
+        haslolbl = QLabel('Hasło')
+        self.login = QLineEdit()
+        self.login.setStyleSheet('border-style: solid; border-color: #FFFFFF; border-width: 1px; border-radius: 5px;')
+        self.haslo = QLineEdit()
+        self.haslo.setStyleSheet('border-style: solid; border-color: #FFFFFF; border-width: 1px; border-radius: 5px;')
+        self.haslo.setEchoMode(QLineEdit.Password)
+        # układ główny ###
+
+        self.buttonok = QPushButton(self)
+        self.buttonok.setText('OK')
+        self.buttonok.setFocus()
+        self.buttoncancel = QPushButton(self)
+        self.buttoncancel.setText('Anuluj')
+        self.buttonok.clicked.connect(self.accept)
+        self.buttoncancel.clicked.connect(self.reject)
+        self.buttonok.setStyleSheet(button_stylesheet('green').replace('border-radius: 12px', 'border-radius: 5px'))
+        self.buttoncancel.setStyleSheet(button_stylesheet('red').replace('border-radius: 12px', 'border-radius: 5px'))
+
+        self.inputwidget = QWidget(self)
+        self.buttonswidget = QWidget(self)
+        self.inputgrid = QGridLayout(self.inputwidget)
+        self.inputgrid.addWidget(loginlbl, 0, 0)
+        self.inputgrid.addWidget(self.login, 0, 1)
+        self.inputgrid.addWidget(haslolbl, 1, 0)
+        self.inputgrid.addWidget(self.haslo, 1, 1)
+
+        self.buttonslayout = QHBoxLayout(self.buttonswidget)
+        self.buttonslayout.addWidget(self.buttonok)
+        self.buttonslayout.addWidget(self.buttoncancel)
+
+        self.verticallayout = QVBoxLayout(self)
+        self.verticallayout.addWidget(self.inputwidget)
+        self.verticallayout.addWidget(self.buttonswidget)
+
+        # właściwości widżetu ###
+        # self.setModal(True)
+        self.setWindowFlags(Qt.Popup)
+        self.setWindowTitle('Logowanie')
+
+    def loginHaslo(self):
+        return (self.login.text().strip(),
+                self.haslo.text().strip())
+
+    # metoda statyczna, tworzy dialog i zwraca (login, haslo, ok)
+    @staticmethod
+    def getloginhaslo(parent=None):
+        dialog = LoginDialog(parent)
+        dialog.login.setFocus()
+        ok = dialog.exec_()
+        login, haslo = dialog.loginHaslo()
+        return login, haslo, ok == QDialog.Accepted
+
+
+class Dialog(QDialog):
+
+    def __init__(self, typ, tekst, parent=None):
+        super(Dialog, self).__init__(parent)
+        # Definicja kształtu okna
+        self.setMinimumWidth(200)
+        self.setMaximumWidth(600)
+        # Dodanie przycisku
+
+        self.przycisk = QPushButton(self)
+        self.przycisk.setText('OK')
+
+        self.przycisk.setMinimumWidth(100)
+        self.przycisk.setMinimumHeight(20)
+        self.przycisk.clicked.connect(self.reject)
+
+        # Wstawienie grafiki
+        self.grafika = QLabel(self)
+        if typ == 'ok':
+            obrazek = QPixmap('images/ok.png')
+            self.przycisk.setStyleSheet(button_stylesheet('green').replace('border-radius: 12px', 'border-radius: 5px'))
+        elif typ == 'warn':
+            obrazek = QPixmap('images/warn.png')
+            self.przycisk.setStyleSheet(
+                button_stylesheet('yellow').replace('border-radius: 12px', 'border-radius: 5px'))
+        elif typ == 'error':
+            obrazek = QPixmap('images/error.png')
+            self.przycisk.setStyleSheet(button_stylesheet('red').replace('border-radius: 12px', 'border-radius: 5px'))
+        elif typ == 'info':
+            obrazek = QPixmap('images/info.png')
+            self.przycisk.setStyleSheet(button_stylesheet('blue').replace('border-radius: 12px', 'border-radius: 5px'))
+        else:
+            obrazek = QPixmap('images/info.png')
+            self.przycisk.setStyleSheet(button_stylesheet('blue').replace('border-radius: 12px', 'border-radius: 5px'))
+        self.grafika.setPixmap(obrazek)
+
+        # Wstawienie etykiety
+        self.txtlabel = QLabel(self)
+        self.txtlabel.setText(tekst)
+        self.txtlabel.setWordWrap(True)
+
+        # Ustalenie layoutu okna
+        self.przyciskwidget = QWidget(self)
+        self.przycisklayout = QHBoxLayout(self.przyciskwidget)
+        self.przycisklayout.addStretch()
+        self.przycisklayout.addWidget(self.przycisk)
+        self.przycisklayout.addStretch()
+        # self.przyciskwidget.setFixedHeight(30)
+        self.przycisklayout.setContentsMargins(0, 0, 0, 0)
+
+        self.msgwidget = QWidget(self)
+        self.msglayout = QHBoxLayout(self.msgwidget)
+        self.msglayout.addWidget(self.grafika)
+        self.msglayout.addWidget(self.txtlabel)
+        # self.msgwidget.setFixedHeight(80)
+        self.msglayout.setContentsMargins(0, 0, 0, 0)
+
+        self.verticallayout = QVBoxLayout(self)
+        self.verticallayout.addWidget(self.msgwidget)
+        self.verticallayout.addWidget(self.przyciskwidget)
+        self.verticallayout.setAlignment(Qt.AlignHCenter)
+
+        # # Kolorowanie dla celów testowych
+        # self.przyciskwidget.setStyleSheet('background-color: yellow')
+        # self.msgwidget.setStyleSheet('background-color: red')
+
+        self.setWindowFlags(Qt.Popup)
+        self.setWindowTitle('Komunikat')
+
+    @staticmethod
+    def komunikat(typ, tekst, parent=None):
+        dialog = Dialog(typ, tekst, parent)
+        ok = dialog.exec_()
