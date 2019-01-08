@@ -1,3 +1,4 @@
+import hashlib
 import sys
 
 from PyQt5.QtCore import Qt, QPoint
@@ -8,12 +9,18 @@ import slotbaza
 from gui import UI_widget, LoginDialog, Dialog
 
 
+def hashpassword(password):
+    code = hashlib.md5(password.encode('utf-8')).hexdigest()
+    return code
+
+
 class Magazyn(UI_widget):
 
     def __init__(self):
         super().__init__()
         self.setupUI()
         self.loginstatus = False
+        self.usertype = 'user'
         self.logstatus.setText("<FONT COLOR=\'#FF4444\'> Niezalogowany")
         self.rysujobszary()
         self.btn_login.clicked.connect(self.logowanie)
@@ -21,27 +28,34 @@ class Magazyn(UI_widget):
         self.btn_addarea.clicked.connect(self.rysujobszary)
         self.btn_areaedit.clicked.connect(self.wyczyscscene)
 
+    # Moduł logowania do programu
     def logowanie(self):
         sender = self.sender()
+        # jeśli wysyłającym jest przycisk ZALOGUJ
         if sender.objectName() == 'btn_login':
             login, haslo, ok = LoginDialog.getloginhaslo(self)
             if ok:
                 if slotbaza.isuserexist(login):
-                    self.loginstatus = True
-                    print(login)
-                    self.logstatus.setText("<FONT COLOR=\'#44FF44\'> Zalogowany")
+                    if slotbaza.loginvalidate(login, hashpassword(haslo))['login']:
+                        self.loginstatus = True
+                        self.usertype = slotbaza.loginvalidate(login, hashpassword(haslo))['usertpe']
+                        self.logstatus.setText("<FONT COLOR=\'#44FF44\'> Zalogowany")
+                        Dialog.komunikat('ok', 'Pomyślnie zalogowano do systemu', self)
+                    else:
+                        Dialog.komunikat('warn', 'Logowanie nieudane! Niepoprawne hasło.', self)
                 else:
                     Dialog.komunikat('warn', 'Użytkownik o podanym loginie nie istnieje.', self)
-
             else:
                 pass
+        # jeśli wysyłającym jest przycisk WYLOGUJ
         elif sender.objectName() == 'btn_logout':
             if self.loginstatus:
-                Dialog.komunikat(self, 'ok', 'Pomyślnie wylogowano z systemu')
+                self.loginstatus = False
+                self.usertype = 'user'
+                self.logstatus.setText("<FONT COLOR=\'#FF4444\'> Niezalogowany")
+                Dialog.komunikat('ok', 'Pomyślnie wylogowano z systemu', self)
             else:
                 Dialog.komunikat('warn', 'Nie można się wylogować nie będąc wcześniej zalogowanym', self)
-                self.loginstatus = False
-                self.logstatus.setText("<FONT COLOR=\'#FF4444\'> Niezalogowany")
 
     def rysujobszary(self):
         self.wyczyscscene()
@@ -84,4 +98,3 @@ if __name__ == '__main__':
     app = QApplication([])
     magazyn = Magazyn()
     sys.exit(app.exec_())
-()
