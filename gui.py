@@ -544,16 +544,17 @@ class InputDialog(QDialog):
         self.setWindowFlags(Qt.Popup)
         self.setWindowTitle('Komunikat')
 
-    def output(self):
-        return self.input.text().strip()
+    def inputtext(self):
+        return self.input.text()
 
     @staticmethod
     def komunikat(typ, tekst, parent=None):
         dialog = InputDialog(typ, tekst, parent)
         dialog.input.setFocus()
-        output = InputDialog.output
         ok = dialog.exec_()
+        output = dialog.inputtext()
         return output, ok == QDialog.Accepted
+
 
 
 class QuestionDialog(QDialog):
