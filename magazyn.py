@@ -6,12 +6,64 @@ from PyQt5.QtGui import QFont, QLinearGradient, QColor, QPolygonF, QBrush, QPen
 from PyQt5.QtWidgets import QApplication
 
 import slotbaza
-from gui import UI_widget, LoginDialog, Dialog
+from gui import UI_widget, LoginDialog, Dialog, InputDialog, QuestionDialog
+
+settings = {}
+with open('data/settings.cfg') as settingsfile:
+    for line in settingsfile:
+        try:
+            (key, val) = line.split('=')
+            key = key.strip()
+            val = val.strip()
+            settings[key] = val
+        except ValueError:
+            pass
 
 
 def hashpassword(password):
     code = hashlib.md5(password.encode('utf-8')).hexdigest()
     return code
+
+
+def barcodetoid(barcode, typ):
+    codetxt = barcode[-2:]
+    try:
+        code = int(codetxt)
+        if typ == 'int':
+            return code
+        elif typ == 'string':
+            codetxt2 = str(code)
+            return codetxt2
+        else:
+            pass
+    except:
+        pass
+
+
+def idtobarcode(code, typ):
+    year = settings['year']
+    if typ == 'area':
+        typcode = '10'
+    elif typ == 'item':
+        typcode = '20'
+    elif typ == 'orch':
+        typcode = '30'
+    elif typ == 'user':
+        typcode = '40'
+    else:
+        pass
+    try:
+        stringid = str(code)
+    except:
+        try:
+            int(code)
+            stringid = code
+        except:
+            pass
+    elementcode = stringid.zfill(3)
+    barcode = year + typcode + elementcode
+    return barcode
+    pass
 
 
 class Magazyn(UI_widget):
@@ -23,10 +75,14 @@ class Magazyn(UI_widget):
         self.usertype = 'user'
         self.logstatus.setText("<FONT COLOR=\'#FF4444\'> Niezalogowany")
         self.rysujobszary()
+
+        # Połączenie przycisków z odpowiednimi funkcjami
         self.btn_login.clicked.connect(self.logowanie)
         self.btn_logout.clicked.connect(self.logowanie)
         self.btn_addarea.clicked.connect(self.rysujobszary)
         self.btn_areaedit.clicked.connect(self.wyczyscscene)
+        self.btn_comein.clicked.connect(self.comein)
+        self.btn_comeout.clicked.connect(self.comeout)
 
     # Moduł logowania do programu
     def logowanie(self):
@@ -38,7 +94,7 @@ class Magazyn(UI_widget):
                 if slotbaza.isuserexist(login):
                     if slotbaza.loginvalidate(login, hashpassword(haslo))['login']:
                         self.loginstatus = True
-                        self.usertype = slotbaza.loginvalidate(login, hashpassword(haslo))['usertpe']
+                        # self.usertype = slotbaza.loginvalidate(login, hashpassword(haslo))['usertype']
                         self.logstatus.setText("<FONT COLOR=\'#44FF44\'> Zalogowany")
                         Dialog.komunikat('ok', 'Pomyślnie zalogowano do systemu', self)
                     else:
@@ -56,6 +112,16 @@ class Magazyn(UI_widget):
                 Dialog.komunikat('ok', 'Pomyślnie wylogowano z systemu', self)
             else:
                 Dialog.komunikat('warn', 'Nie można się wylogować nie będąc wcześniej zalogowanym', self)
+
+    def comein(self):
+        kodobszaru, ok = InputDialog.komunikat('code', 'Wprowadź kod obszaru', self)
+        barcodeobsaru = idtobarcode(kodobszaru, 'area')
+        print(barcodeobsaru)
+        idobszaru = barcodetoid(barcodeobsaru, 'string')
+        print(idobszaru)
+
+    def comeout(self):
+        QuestionDialog.pytanie('Czy na pewno chcesz usunąć obszar?', self)
 
     def rysujobszary(self):
         self.wyczyscscene()
