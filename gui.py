@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QRect, Qt, QSize
-from PyQt5.QtGui import QFont, QPixmap
+from PyQt5.QtGui import QFont, QPixmap, QIcon
 from PyQt5.QtWidgets import QMainWindow, QFrame, QDesktopWidget, QWidget, QGroupBox, QStatusBar, QPushButton, \
     QVBoxLayout, QHBoxLayout, QLabel, QAction, QMenu, QMenuBar, QGraphicsView, QGraphicsScene, QDialog, QLineEdit, \
     QGridLayout
@@ -89,6 +89,7 @@ class UI_widget(QMainWindow):
         self.setFixedSize(self.size())
         self.center()
         self.setWindowTitle('Magazyn Sceniczny')
+        self.setWindowIcon(QIcon('images/slot.png'))
         # self.setWindowFlags(Qt.FramelessWindowHint)
         # self.setWindowFlags(Qt.CustomizeWindowHint)
         # self.setWindowFlags(Qt.Tool)
@@ -490,3 +491,122 @@ class Dialog(QDialog):
     def komunikat(typ, tekst, parent=None):
         dialog = Dialog(typ, tekst, parent)
         ok = dialog.exec_()
+
+
+class InputDialog(QDialog):
+    def __init__(self, typ, tekst, parent=None):
+        super(InputDialog, self).__init__(parent)
+        # Definicja kształtu okna
+        self.setMinimumWidth(200)
+        self.setMaximumWidth(600)
+
+        self.grafika = QLabel(self)
+        if typ == 'txt':
+            obrazek = QPixmap('images/txt.png')
+        elif typ == 'code':
+            obrazek = QPixmap('images/code.png')
+        self.grafika.setPixmap(obrazek)
+
+        self.buttonok = QPushButton(self)
+        self.buttonok.setText('OK')
+        self.buttonok.setFocus()
+        self.buttoncancel = QPushButton(self)
+        self.buttoncancel.setText('Anuluj')
+        self.buttonok.clicked.connect(self.accept)
+        self.buttoncancel.clicked.connect(self.reject)
+        self.buttonok.setStyleSheet(button_stylesheet('green').replace('border-radius: 12px', 'border-radius: 5px'))
+        self.buttoncancel.setStyleSheet(button_stylesheet('red').replace('border-radius: 12px', 'border-radius: 5px'))
+
+        self.text = QLabel(tekst)
+        self.input = QLineEdit()
+        self.input.setStyleSheet('border-style: solid; border-color: #FFFFFF; border-width: 1px; border-radius: 5px;')
+
+        self.topwidget = QWidget(self)
+        self.textwidget = QWidget(self)
+        self.buttonwidget = QWidget(self)
+        self.toplayout = QHBoxLayout(self.topwidget)
+        self.toplayout.addWidget(self.grafika)
+        self.toplayout.addWidget(self.textwidget)
+        self.buttonlayout = QHBoxLayout(self.buttonwidget)
+        self.buttonlayout.addWidget(self.buttonok)
+        self.buttonlayout.addWidget(self.buttoncancel)
+        self.textlayout = QVBoxLayout(self.textwidget)
+        self.textlayout.addWidget(self.text)
+        self.textlayout.addWidget(self.input)
+        self.verticallayout = QVBoxLayout(self)
+        self.verticallayout.addWidget(self.topwidget)
+        self.verticallayout.addWidget(self.buttonwidget)
+        self.textlayout.setContentsMargins(0, 0, 0, 0)
+        # self.verticallayout.setContentsMargins(0, 0, 0, 0)
+        self.buttonlayout.setContentsMargins(0, 10, 0, 0)
+        self.toplayout.setContentsMargins(0, 0, 0, 0)
+
+        self.setWindowFlags(Qt.Popup)
+        self.setWindowTitle('Komunikat')
+
+    def output(self):
+        return self.input.text().strip()
+
+    @staticmethod
+    def komunikat(typ, tekst, parent=None):
+        dialog = InputDialog(typ, tekst, parent)
+        dialog.input.setFocus()
+        output = InputDialog.output
+        ok = dialog.exec_()
+        return output, ok == QDialog.Accepted
+
+
+class QuestionDialog(QDialog):
+    def __init__(self, tekst, parent=None):
+        super(QuestionDialog, self).__init__(parent)
+        # Definicja kształtu okna
+        self.setMinimumWidth(200)
+        self.setMaximumWidth(600)
+
+        self.grafika = QLabel(self)
+        obrazek = QPixmap('images/question.png')
+        self.grafika.setPixmap(obrazek)
+
+        self.buttonok = QPushButton(self)
+        self.buttonok.setText('OK')
+        self.buttonok.setFocus()
+        self.buttoncancel = QPushButton(self)
+        self.buttoncancel.setText('Anuluj')
+        self.buttonok.clicked.connect(self.accept)
+        self.buttoncancel.clicked.connect(self.reject)
+        self.buttonok.setStyleSheet(button_stylesheet('green').replace('border-radius: 12px', 'border-radius: 5px'))
+        self.buttoncancel.setStyleSheet(button_stylesheet('red').replace('border-radius: 12px', 'border-radius: 5px'))
+
+        self.text = QLabel(tekst)
+
+        self.topwidget = QWidget(self)
+        self.textwidget = QWidget(self)
+        self.buttonwidget = QWidget(self)
+        self.toplayout = QHBoxLayout(self.topwidget)
+        self.toplayout.addWidget(self.grafika)
+        self.toplayout.addWidget(self.textwidget)
+        self.buttonlayout = QHBoxLayout(self.buttonwidget)
+        self.buttonlayout.addWidget(self.buttonok)
+        self.buttonlayout.addWidget(self.buttoncancel)
+        self.textlayout = QVBoxLayout(self.textwidget)
+        self.textlayout.addWidget(self.text)
+        self.verticallayout = QVBoxLayout(self)
+        self.verticallayout.addWidget(self.topwidget)
+        self.verticallayout.addWidget(self.buttonwidget)
+        self.textlayout.setContentsMargins(0, 0, 0, 0)
+        # self.verticallayout.setContentsMargins(0, 0, 0, 0)
+        self.buttonlayout.setContentsMargins(0, 10, 0, 0)
+        self.toplayout.setContentsMargins(0, 0, 0, 0)
+
+        self.setWindowFlags(Qt.Popup)
+        self.setWindowTitle('Komunikat')
+
+    @staticmethod
+    def pytanie(tekst, parent=None):
+        dialog = QuestionDialog(tekst, parent)
+        ok = dialog.exec_()
+        return ok == QDialog.Accepted
+
+## Input okno dla tworzenia nowego obszaru
+## i ewentualnie edycji - przemyśleć jeszcze jak to rozwiązać
+## fajnie by było dodać kolor - rozwijana lista i kilka do wyboru
