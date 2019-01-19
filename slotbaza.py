@@ -356,6 +356,7 @@ def isuserexist(login):
         return False
 
 
+# funkcja weryfikująca logowanie użytkonika
 def loginvalidate(login, password):
     if isuserexist(login):
         user = User.get(User.login == login)
