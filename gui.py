@@ -499,11 +499,17 @@ class InputDialog(QDialog):
         # Definicja kształtu okna
         self.setMinimumWidth(200)
         self.setMaximumWidth(600)
+        self.setStyleSheet('background-color: #AA000000')
+        # self.setWindowFlags(Qt.Popup)
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.show()
+
 
         self.grafika = QLabel(self)
         if typ == 'txt':
             obrazek = QPixmap('images/txt.png')
-        elif typ == 'code':
+        elif typ == 'barcode':
             obrazek = QPixmap('images/code.png')
         self.grafika.setPixmap(obrazek)
 
@@ -541,7 +547,7 @@ class InputDialog(QDialog):
         self.buttonlayout.setContentsMargins(0, 10, 0, 0)
         self.toplayout.setContentsMargins(0, 0, 0, 0)
 
-        self.setWindowFlags(Qt.Popup)
+
         self.setWindowTitle('Komunikat')
 
     def inputtext(self):
@@ -554,7 +560,6 @@ class InputDialog(QDialog):
         ok = dialog.exec_()
         output = dialog.inputtext()
         return output, ok == QDialog.Accepted
-
 
 
 class QuestionDialog(QDialog):
