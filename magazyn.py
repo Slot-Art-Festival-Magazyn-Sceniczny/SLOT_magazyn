@@ -7,7 +7,7 @@ from PyQt5.QtGui import QFont, QLinearGradient, QColor, QPolygonF, QBrush, QPen
 from PyQt5.QtWidgets import QApplication
 
 import slotbaza
-from gui import UI_widget, LoginDialog, Dialog, InputDialog, QuestionDialog
+from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog
 
 settings = {}
 with open('data/settings.cfg') as settingsfile:
@@ -100,7 +100,7 @@ def barcodevalcheck(code, typ):
     return (status, statustxt)
 
 
-class Magazyn(UI_widget):
+class Magazyn(MainWindow):
 
     def __init__(self):
         super().__init__()
@@ -115,15 +115,17 @@ class Magazyn(UI_widget):
         self.btn_login.clicked.connect(self.logowanie)
         self.btn_logout.clicked.connect(self.logowanie)
         self.btn_addarea.clicked.connect(self.rysujobszary)
-        self.btn_areaedit.clicked.connect(self.wyczyscscene)
+        self.btn_editarea.clicked.connect(self.wyczyscscene)
         self.btn_comein.clicked.connect(self.comein)
         self.btn_comeout.clicked.connect(self.comeout)
+        self.btn_exit.clicked.connect(self.close)
 
     # Moduł logowania do programu
     def logowanie(self):
         sender = self.sender()
         # jeśli wysyłającym jest przycisk ZALOGUJ
         if sender.objectName() == 'btn_login':
+            self.blurwindow()
             login, haslo, ok = LoginDialog.getloginhaslo(self)
             if ok:
                 if slotbaza.isuserexist(login):
@@ -132,23 +134,31 @@ class Magazyn(UI_widget):
                         # self.usertype = slotbaza.loginvalidate(login, hashpassword(haslo))['usertype']
                         self.logstatus.setText("<FONT COLOR=\'#44FF44\'> Zalogowany")
                         Dialog.komunikat('ok', 'Pomyślnie zalogowano do systemu', self)
+                        self.unblurwindow()
                     else:
                         Dialog.komunikat('warn', 'Logowanie nieudane! Niepoprawne hasło.', self)
+                        self.unblurwindow()
                 else:
                     Dialog.komunikat('warn', 'Użytkownik o podanym loginie nie istnieje.', self)
+                    self.unblurwindow()
             else:
-                pass
+                self.unblurwindow()
         # jeśli wysyłającym jest przycisk WYLOGUJ
         elif sender.objectName() == 'btn_logout':
             if self.loginstatus:
                 self.loginstatus = False
                 self.usertype = 'user'
                 self.logstatus.setText("<FONT COLOR=\'#FF4444\'> Niezalogowany")
+                self.blurwindow()
                 Dialog.komunikat('ok', 'Pomyślnie wylogowano z systemu', self)
+                self.unblurwindow()
             else:
+                self.blurwindow()
                 Dialog.komunikat('warn', 'Nie można się wylogować nie będąc wcześniej zalogowanym', self)
+                self.unblurwindow()
 
     def comein(self):
+        self.blurwindow()
         areabarcode, areaok = InputDialog.komunikat('barcode', 'Wczytaj kod obszaru:', self)
         if areaok:
             areastatus, areastatustxt = barcodevalcheck(areabarcode, 'area')
@@ -168,6 +178,7 @@ class Magazyn(UI_widget):
                                     if przedmiot['itemstate']:
                                         Dialog.komunikat('error', 'Ten przedmiot jest już przyjęty na stan magazynu! '
                                                                   'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!', self)
+                                        self.unblurwindow()
                                     else:
                                         istniejacyprzedmiotok = QuestionDialog.pytanie('Ten przedmiot znajduje się '
                                                                                        'w bazie:\nNazwa przedmiotu: '
@@ -188,6 +199,7 @@ class Magazyn(UI_widget):
                                         else:
                                             Dialog.komunikat('warn', 'Przerwano proces przyjmowania przedmiotu.'
                                                                      '\nPrzedmiot nie został przyjęty', self)
+                                            self.unblurwindow()
                                 else:
                                     nowyprzedmiotok = QuestionDialog.pytanie(
                                         'Wprowadzony przedmiot nie znajduje się na żadnym obszarze. '
@@ -220,25 +232,32 @@ class Magazyn(UI_widget):
                                                              'Przerwano proces dodawania przedmiotu. '
                                                              'Przedmiot nie został dodany.',
                                                              self)
+                                            self.unblurwindow()
                                         pass
                                     else:
                                         Dialog.komunikat('error',
                                                          'W takim razie albo zeskanowałeś zły kod, '
                                                          'albo coś się popsuło...\nWezwij szefa ekipy.',
                                                          self)
+                                        self.unblurwindow()
                             else:
                                 Dialog.komunikat('warn', itemstatustxt, self)
+                                self.unblurwindow()
                         else:
                             pass
+                    self.unblurwindow()
                 else:
                     Dialog.komunikat('warn', 'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
                                              'do niego przedmioty.', self)
+                    self.unblurwindow()
             else:
                 Dialog.komunikat('warn', areastatustxt, self)
+                self.unblurwindow()
         else:
-            pass
+            self.unblurwindow()
 
     def comeout(self):
+        self.blurwindow()
         areabarcode, areaok = InputDialog.komunikat('barcode', 'Wczytaj kod obszaru:', self)
         if areaok:
             areastatus, areastatustxt = barcodevalcheck(areabarcode, 'area')
@@ -274,27 +293,34 @@ class Magazyn(UI_widget):
                                                              'Przerwano proces wydawania przedmiotu.'
                                                              '\nPrzedmiot nie został wydany',
                                                              self)
+                                            self.unblurwindow()
                                     else:
                                         Dialog.komunikat('error',
                                                          'Ten przedmiot jest już wydany z magazynu! '
                                                          'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
                                                          self)
+                                        self.unblurwindow()
                                 else:
                                     Dialog.komunikat('error',
                                                      'Próbujesz wydać przedmiot, który nie znajduje się w bazie! '
                                                      'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
                                                      self)
+                                    self.unblurwindow()
                             else:
                                 Dialog.komunikat('warn', itemstatustxt, self)
+                                self.unblurwindow()
                         else:
-                            pass
+                            self.unblurwindow()
+                    self.unblurwindow()
                 else:
                     Dialog.komunikat('warn', 'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
                                              'do niego przedmioty.', self)
+                    self.unblurwindow()
             else:
                 Dialog.komunikat('warn', areastatustxt, self)
+                self.unblurwindow()
         else:
-            pass
+            self.unblurwindow()
 
     def rysujobszary(self):
         self.wyczyscscene()
@@ -327,10 +353,12 @@ class Magazyn(UI_widget):
              QPoint(1000, 850), QPoint(880, 850), QPoint(880, 950), QPoint(630, 950), QPoint(630, 850),
              QPoint(370, 850), QPoint(370, 950), QPoint(120, 950), QPoint(120, 850), QPoint(0, 850)])
         pomieszczenie = self.scena.addPolygon(pomieszczenie_poly)
-        pomieszczenie.setBrush(QBrush(Qt.white))
+        pomieszczenie.setBrush(QBrush(QColor('#22000000')))
         pen = QPen()
         pen.setWidth(4)
         pomieszczenie.setPen(pen)
+        self.viewer.fitInView(self.scena.sceneRect(), Qt.KeepAspectRatio)
+        self.viewer.scale(0.9,0.9)
 
 
 if __name__ == '__main__':
