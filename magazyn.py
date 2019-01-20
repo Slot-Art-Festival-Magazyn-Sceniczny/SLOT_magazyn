@@ -1,13 +1,15 @@
+# -*- coding: utf-8 -*-
+
 import datetime
 import hashlib
 import sys
 
-from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtCore import Qt, QPoint, QRectF
 from PyQt5.QtGui import QFont, QLinearGradient, QColor, QPolygonF, QBrush, QPen
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem
 
 import slotbaza
-from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog
+from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall
 
 # Wczytanie pliku z ustawieniami
 settings = {}
@@ -124,7 +126,8 @@ class Magazyn(MainWindow):
         self.btn_login.clicked.connect(self.logowanie)
         self.btn_logout.clicked.connect(self.logowanie)
         self.btn_addarea.clicked.connect(self.rysujobszary)
-        self.btn_editarea.clicked.connect(self.wyczyscscene)
+        self.btn_listofareas.clicked.connect(self.listofareas)
+        self.btn_editarea.clicked.connect(self.editarea)
         self.btn_comein.clicked.connect(self.comein)
         self.btn_comeout.clicked.connect(self.comeout)
         self.btn_exit.clicked.connect(self.close)
@@ -140,8 +143,8 @@ class Magazyn(MainWindow):
                 if slotbaza.isuserexist(login):
                     if slotbaza.loginvalidate(login, hashpassword(haslo))['login']:
                         self.loginstatus = True
-                        # self.usertype = slotbaza.loginvalidate(login, hashpassword(haslo))['usertype']
-                        self.logstatus.setText("<FONT COLOR=\'#44FF44\'> Zalogowany")
+                        self.usertype = slotbaza.loginvalidate(login, hashpassword(haslo))['usertype']
+                        self.logstatus.setText("<FONT COLOR=\'#44FF44\'> Zalogowany jako " + login)
                         Dialog.komunikat('ok', 'Pomyślnie zalogowano do systemu', self)
                         self.unblurwindow()
                     else:
@@ -333,6 +336,36 @@ class Magazyn(MainWindow):
         else:
             self.unblurwindow()
 
+    # Wyświetlenie listy wszystkich obszarów
+    def listofareas(self):
+        pass
+
+    # Edycja wybranego na liście obszaru
+    def editarea(self):
+        obszary = slotbaza.loadallareas()
+        self.blurwindow()
+        areaid, ok = AreaListSmall.showlist(obszary, self)
+        if ok:
+            if areaid == 0:
+                self.unblurwindow()
+            else:
+                if slotbaza.isareaexist(areaid):
+                    obszar = slotbaza.loadarea(areaid)
+                    nowyobszar, ok = AreaEditDialog.editarea(obszar, self)
+                    if ok:
+                        slotbaza.savearea(nowyobszar)
+                        Dialog.komunikat('ok', 'Poprawnie dodano / zmodyfikowano obszar.', self)
+                        self.unblurwindow()
+                    else:
+                        Dialog.komunikat('warn', 'Przerwano proces edycji obszaru! Zmiany nie zostały zapisane.', self)
+                        self.unblurwindow()
+                else:
+                    Dialog.komunikat('warn', 'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
+                                             'do niego przedmioty.', self)
+                    self.unblurwindow()
+        else:
+            self.unblurwindow()
+
     # Funkcja rysująca obszary, po wcześniejszym wyczyszczeniu sceny
     def rysujobszary(self):
         self.wyczyscscene()
@@ -341,18 +374,20 @@ class Magazyn(MainWindow):
         font.setPixelSize(18)
         font.setBold(True)
         for obszar in obszary:
-            a = self.scena.addRect(obszar['posx'], obszar['posy'], obszar['sizex'], obszar['sizey'])
-            b = self.scena.addText(str(obszar['areaid']))
-            b.setDefaultTextColor(Qt.white)
-            b.setFont(font)
-            br = b.boundingRect()
-            b.setPos(obszar['posx'] + obszar['sizex'] / 2 - br.width() / 2,
-                     obszar['posy'] + obszar['sizey'] / 2 - br.height() / 2)
+            prosto = QGraphicsRectItem(QRectF(obszar['posx'], obszar['posy'], obszar['sizex'], obszar['sizey']))
+            prosto.setFlag(QGraphicsItem.ItemIsMovable, True)
+            prostokat = self.scena.addItem(prosto)
+            etykieta = self.scena.addText(str(obszar['areaid']))
+            etykieta.setDefaultTextColor(Qt.white)
+            etykieta.setFont(font)
+            br = etykieta.boundingRect()
+            etykieta.setPos(obszar['posx'] + obszar['sizex'] / 2 - br.width() / 2,
+                            obszar['posy'] + obszar['sizey'] / 2 - br.height() / 2)
             gradient = QLinearGradient(QPoint(obszar['posx'], obszar['posy']),
                                        QPoint(obszar['posx'], obszar['posy'] + obszar['sizey']))
-            gradient.setColorAt(0, QColor('#AA0087FF'))
-            gradient.setColorAt(1, QColor('#CC0048FF'))
-            a.setBrush(gradient)
+            gradient.setColorAt(0, QColor('#220087FF'))
+            gradient.setColorAt(1, QColor('#440048FF'))
+            prosto.setBrush(gradient)
 
     # Funkcja czyszcząca scenę i rysująca pomieszczenie
     def wyczyscscene(self):

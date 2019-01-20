@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import QRect, Qt, QSize, QMetaObject, QTimer, QPropertyAnimation, QEasingCurve
+from PyQt5.QtCore import QRect, Qt, QSize, QMetaObject, QPropertyAnimation, QEasingCurve, QPoint, pyqtSignal
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QPainter
-from PyQt5.QtWidgets import QMainWindow, QFrame, QDesktopWidget, QWidget, QGroupBox, QStatusBar, QPushButton, \
-    QVBoxLayout, QHBoxLayout, QLabel, QAction, QMenu, QMenuBar, QGraphicsView, QGraphicsScene, QDialog, QLineEdit, \
-    QGridLayout, QSizePolicy, QSpacerItem, QLayout, QGraphicsBlurEffect
+from PyQt5.QtWidgets import QMainWindow, QFrame, QWidget, QPushButton, \
+    QVBoxLayout, QHBoxLayout, QLabel, QGraphicsView, QGraphicsScene, QDialog, QLineEdit, \
+    QGridLayout, QSizePolicy, QSpacerItem, QLayout, QGraphicsBlurEffect, QRubberBand, QPlainTextEdit, QListWidget
 
 
 def mainstylesheet():
@@ -134,11 +134,31 @@ def dialogstylesheet():
                  "{background-color: #AA00AE37}\n" \
                  "\n" \
                  "QPushButton:hover#buttoncancel\n" \
-                 "{background-color: #AAC60018}"
+                 "{background-color: #AAC60018}\n " \
+                 "QLineEdit\n" \
+                 "{background-color: #22FFFFFF; color: white; selection-background-color: darkgray; " \
+                 "border-style: none; border-color: #FFFFFF; border-width: 1px; border-radius: 5px;}" \
+                 "QPlainTextEdit\n" \
+                 "{background-color: #22FFFFFF; color: white; selection-background-color: darkgray; " \
+                 "border-style: none; border-color: #FFFFFF; border-width: 1px; border-radius: 5px;}" \
+                 "QListWidget\n" \
+                 "{background-color: #00000000; color: white; selection-color: white; " \
+                 "border-style: none; border-color: #AA000000; border-width: 0px; border-radius: 5px;}\n" \
+                 "QListWidget::item:hover\n" \
+                 "{background: #22FFFFFF}\n" \
+                 "QListWidget::item:selected\n" \
+                 "{background: #66FFFFFF}\n"
     return stylesheet
 
 
+class _QGraphicsScene(QGraphicsScene):
+    def __init__(self, parent):
+        super(_QGraphicsScene, self).__init__(parent)
+
+
 class _QGraphicsView(QGraphicsView):
+    rectChanged = pyqtSignal(QRect)
+
     def __init__(self, parent):
         super(_QGraphicsView, self).__init__(parent)
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
@@ -146,6 +166,10 @@ class _QGraphicsView(QGraphicsView):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self._zoom = 0
+        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
+        self.setMouseTracking(True)
+        self.origin = QPoint()
+        self.changeRubberBand = False
 
     def wheelEvent(self, event):
         if event.angleDelta().y() > 0:
@@ -162,6 +186,25 @@ class _QGraphicsView(QGraphicsView):
         else:
             self.scale(factor, factor)
 
+    def mousePressEvent(self, event):
+        self.origin = event.pos()
+        self.rubberBand.setGeometry(QRect(self.origin, QSize()))
+        self.rectChanged.emit(self.rubberBand.geometry())
+        self.rubberBand.show()
+        self.changeRubberBand = True
+        QGraphicsView.mousePressEvent(self, event)
+
+    def mouseMoveEvent(self, event):
+        if self.changeRubberBand:
+            self.rubberBand.setGeometry(QRect(self.origin, event.pos()).normalized())
+            self.rectChanged.emit(self.rubberBand.geometry())
+        QGraphicsView.mouseMoveEvent(self, event)
+
+    def mouseReleaseEvent(self, event):
+        self.changeRubberBand = False
+        self.rubberBand.hide()
+        QGraphicsView.mouseReleaseEvent(self, event)
+
 
 class MainWindow(QMainWindow):
     def setupUI(self):
@@ -172,8 +215,6 @@ class MainWindow(QMainWindow):
         self.setwidgets()
         self.settext()
         self.setcentralwidget()
-
-
 
         QMetaObject.connectSlotsByName(self)
         self.setWindowTitle("Magazyn Sceniczny")
@@ -246,8 +287,8 @@ class MainWindow(QMainWindow):
         self.frm_login.setObjectName("frm_login")
 
         self.frm_loginbuttons = QFrame(self.frm_login)
-        self.frm_loginbuttons.setFrameShape(QFrame.StyledPanel)
-        self.frm_loginbuttons.setFrameShadow(QFrame.Raised)
+        self.frm_loginbuttons.setFrameShape(QFrame.NoFrame)
+        self.frm_loginbuttons.setFrameShadow(QFrame.Plain)
         self.frm_loginbuttons.setObjectName("frm_loginbuttons")
 
         self.login_line = QFrame(self.frm_loginbuttons)
@@ -534,7 +575,7 @@ class MainWindow(QMainWindow):
             self.unblurwindow()
 
     def setscena(self):
-        self.scena = QGraphicsScene()
+        self.scena = _QGraphicsScene(self)
         self.scena.setSceneRect(0, 0, 1000, 950)
 
     def setviewer(self):
@@ -612,8 +653,8 @@ class SlotDialog(QDialog):
         sizePolicy.setVerticalStretch(0)
 
         self.fr_top.setSizePolicy(sizePolicy)
-        self.fr_top.setFrameShape(QFrame.StyledPanel)
-        self.fr_top.setFrameShadow(QFrame.Raised)
+        self.fr_top.setFrameShape(QFrame.NoFrame)
+        self.fr_top.setFrameShadow(QFrame.Plain)
         self.fr_top.setLineWidth(0)
         self.fr_top.setObjectName("fr_top")
 
@@ -711,6 +752,7 @@ class Dialog(SlotDialog):
         dialog = Dialog(typ, tekst, parent)
         ok = dialog.exec_()
         # parent.unblurwindow()
+
 
 class QuestionDialog(SlotDialog):
     def __init__(self, tekst, parent=None):
@@ -856,3 +898,424 @@ class LoginDialog(SlotDialog):
         # parent.unblurwindow()
         login, haslo = dialog.loginHaslo()
         return login, haslo, ok == QDialog.Accepted
+
+
+class AreaEditDialog(QDialog):
+    def __init__(self, obszar, parent=None):
+        super(AreaEditDialog, self).__init__(parent)
+        self.obszar = obszar
+        self.setwindow()
+        self.setcentralwidget()
+        self.setframes()
+        self.setlayouts()
+        self.setbuttons()
+        self.setlabels()
+        self.setedits()
+        self.filledits()
+
+        self.line = QFrame(self.centralwidget)
+        self.line.setFrameShadow(QFrame.Plain)
+        self.line.setFrameShape(QFrame.HLine)
+        self.line.setObjectName("line")
+
+        self.setmainlabel()
+
+        self.addwidgets()
+
+        self.buttonok.clicked.connect(self.accept)
+        self.buttoncancel.clicked.connect(self.reject)
+
+    def setwindow(self):
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(100)
+        sizePolicy.setVerticalStretch(5)
+        self.setSizePolicy(sizePolicy)
+        self.setMinimumSize(QSize(300, 400))
+        self.setMaximumSize(QSize(300, 400))
+        self.setSizeIncrement(QSize(0, 0))
+        self.setStyleSheet(
+            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #B721FF, stop:1 #21D4FD)")
+        self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_NoSystemBackground, True)
+
+    def setcentralwidget(self):
+        self.centralwidget = QWidget(self)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.centralwidget.setSizePolicy(sizePolicy)
+        self.centralwidget.setStyleSheet(dialogstylesheet())
+        self.centralwidget.setObjectName("centralwidget")
+
+    def setframes(self):
+        self.fr_top = QFrame(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.fr_top.setSizePolicy(sizePolicy)
+        self.fr_top.setFrameShape(QFrame.NoFrame)
+        self.fr_top.setFrameShadow(QFrame.Plain)
+        self.fr_top.setLineWidth(0)
+        self.fr_top.setObjectName("fr_top")
+
+        self.fr_label = QFrame(self.fr_top)
+        self.fr_label.setMaximumSize(QSize(16777215, 50))
+        self.fr_label.setFrameShape(QFrame.NoFrame)
+        self.fr_label.setFrameShadow(QFrame.Plain)
+        self.fr_label.setLineWidth(0)
+        self.fr_label.setObjectName("fr_label")
+
+        self.fr_content = QFrame(self.fr_top)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.fr_content.setSizePolicy(sizePolicy)
+        self.fr_content.setFrameShape(QFrame.NoFrame)
+        self.fr_content.setFrameShadow(QFrame.Plain)
+        self.fr_content.setLineWidth(0)
+        self.fr_content.setObjectName("fr_content")
+
+        self.fr_bottom = QFrame(self.centralwidget)
+        self.fr_bottom.setMaximumSize(QSize(16777215, 50))
+        self.fr_bottom.setFrameShape(QFrame.NoFrame)
+        self.fr_bottom.setFrameShadow(QFrame.Plain)
+        self.fr_bottom.setLineWidth(0)
+        self.fr_bottom.setObjectName("fr_bottom")
+
+    def setlayouts(self):
+        self.lt_dialog = QGridLayout(self)
+        self.lt_dialog.setObjectName("lt_dialog")
+        self.lt_dialog.setContentsMargins(0, 0, 0, 0)
+        self.lt_central = QVBoxLayout(self.centralwidget)
+        self.lt_central.setContentsMargins(0, 0, 0, 0)
+        self.lt_central.setSpacing(0)
+        self.lt_central.setObjectName("lt_central")
+
+        self.lt_bottom = QHBoxLayout(self.fr_bottom)
+        self.lt_bottom.setContentsMargins(0, 0, 0, 0)
+        self.lt_bottom.setSpacing(0)
+        self.lt_bottom.setObjectName("lt_bottom")
+
+        self.lt_top = QVBoxLayout(self.fr_top)
+        self.lt_top.setContentsMargins(0, 20, 0, 10)
+        self.lt_top.setSpacing(20)
+        self.lt_top.setObjectName("lt_top")
+
+        self.lt_label = QGridLayout(self.fr_label)
+        self.lt_label.setObjectName("lt_label")
+        self.lt_label.setContentsMargins(0, 0, 0, 0)
+
+        self.lt_content = QGridLayout(self.fr_content)
+        self.lt_content.setObjectName("lt_content")
+        self.lt_content.setContentsMargins(20, 0, 20, 0)
+        self.lt_content.setSpacing(9)
+
+    def setbuttons(self):
+        self.buttonok = QPushButton(self.fr_bottom)
+        self.buttonok.setText('OK')
+        self.buttonok.setFocus()
+        self.buttonok.setMinimumWidth(100)
+        self.buttonok.setMinimumHeight(50)
+        self.buttonok.setObjectName('buttonok')
+        self.buttoncancel = QPushButton(self.fr_bottom)
+        self.buttoncancel.setText('Anuluj')
+        self.buttoncancel.setMinimumWidth(100)
+        self.buttoncancel.setMinimumHeight(50)
+        self.buttoncancel.setObjectName('buttoncancel')
+
+    def setlabels(self):
+        self.label_areaname = QLabel(self.fr_content)
+        self.label_person1 = QLabel(self.fr_content)
+        self.label_person2 = QLabel(self.fr_content)
+        self.label_person3 = QLabel(self.fr_content)
+        self.label_tel1 = QLabel(self.fr_content)
+        self.label_tel2 = QLabel(self.fr_content)
+        self.label_tel3 = QLabel(self.fr_content)
+        self.label_comments = QLabel(self.fr_content)
+
+        self.label_areaname.setText('Nazwa obszaru')
+        self.label_person1.setText('Osoba kontaktowa')
+        self.label_person2.setText('Osoba kontaktowa')
+        self.label_person3.setText('Osoba kontaktowa')
+        self.label_tel1.setText('Telefon')
+        self.label_tel2.setText('Telefon')
+        self.label_tel3.setText('Telefon')
+        self.label_comments.setText('Uwagi')
+
+        self.label_areaname.setAlignment(Qt.AlignRight)
+        self.label_person1.setAlignment(Qt.AlignRight)
+        self.label_person2.setAlignment(Qt.AlignRight)
+        self.label_person3.setAlignment(Qt.AlignRight)
+        self.label_tel1.setAlignment(Qt.AlignRight)
+        self.label_tel2.setAlignment(Qt.AlignRight)
+        self.label_tel3.setAlignment(Qt.AlignRight)
+        self.label_comments.setAlignment(Qt.AlignRight)
+
+    def setedits(self):
+        self.edit_areaname = QLineEdit(self.fr_content)
+        self.edit_person1 = QLineEdit(self.fr_content)
+        self.edit_person2 = QLineEdit(self.fr_content)
+        self.edit_person3 = QLineEdit(self.fr_content)
+        self.edit_tel1 = QLineEdit(self.fr_content)
+        self.edit_tel2 = QLineEdit(self.fr_content)
+        self.edit_tel3 = QLineEdit(self.fr_content)
+        self.edit_comments = QPlainTextEdit(self.fr_content)
+        self.edit_comments.setMaximumHeight(50)
+        self.edit_comments.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+    def setmainlabel(self):
+        font = QFont()
+        font.setFamily("Arial")
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+
+        self.mainlabel = QLabel(self.fr_label)
+        mainlabel = str(self.obszar['areaid']) + ' - ' + str(self.obszar['areaname'])
+        self.mainlabel.setText(mainlabel)
+        self.mainlabel.setFont(font)
+        self.mainlabel.setAlignment(Qt.AlignCenter)
+
+    def addwidgets(self):
+        self.lt_bottom.addWidget(self.buttonok)
+        self.lt_bottom.addWidget(self.buttoncancel)
+
+        self.lt_label.addWidget(self.mainlabel, 0, 0, 1, 1)
+
+        self.lt_content.addWidget(self.label_areaname, 0, 0, 1, 1)
+        self.lt_content.addWidget(self.label_person1, 1, 0, 1, 1)
+        self.lt_content.addWidget(self.label_person2, 2, 0, 1, 1)
+        self.lt_content.addWidget(self.label_person3, 3, 0, 1, 1)
+        self.lt_content.addWidget(self.label_tel1, 4, 0, 1, 1)
+        self.lt_content.addWidget(self.label_tel2, 5, 0, 1, 1)
+        self.lt_content.addWidget(self.label_tel3, 6, 0, 1, 1)
+        self.lt_content.addWidget(self.label_comments, 7, 0, 1, 1)
+
+        self.lt_content.addWidget(self.edit_areaname, 0, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_person1, 1, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_person2, 2, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_person3, 3, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_tel1, 4, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_tel2, 5, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_tel3, 6, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_comments, 7, 1, 1, 1)
+
+        self.lt_top.addWidget(self.fr_label)
+        self.lt_top.addWidget(self.fr_content)
+        self.lt_central.addWidget(self.fr_top)
+        self.lt_central.addWidget(self.line)
+        self.lt_central.addWidget(self.fr_bottom)
+        self.lt_dialog.addWidget(self.centralwidget, 0, 0, 1, 1)
+
+    def filledits(self):
+        self.edit_areaname.setText(self.obszar['areaname'])
+        self.edit_person1.setText(self.obszar['person1'])
+        self.edit_person2.setText(self.obszar['person2'])
+        self.edit_person3.setText(self.obszar['person3'])
+        self.edit_tel1.setText(self.obszar['tel1'])
+        self.edit_tel2.setText(self.obszar['tel2'])
+        self.edit_tel3.setText(self.obszar['tel3'])
+        self.edit_comments.setPlainText(self.obszar['comments'])
+
+    def nowyobszar(self, obszar):
+        obszar['areaname'] = self.edit_areaname.text().strip()
+        obszar['person1'] = self.edit_person1.text().strip()
+        obszar['person2'] = self.edit_person2.text().strip()
+        obszar['person3'] = self.edit_person3.text().strip()
+        obszar['tel1'] = self.edit_tel1.text().strip()
+        obszar['tel2'] = self.edit_tel2.text().strip()
+        obszar['tel3'] = self.edit_tel3.text().strip()
+        obszar['comments'] = self.edit_comments.toPlainText().strip()
+        return obszar
+
+    # metoda statyczna, tworzy dialog i zwraca słownik z nowymi danymi obszaru
+    @staticmethod
+    def editarea(obszar, parent=None):
+        dialog = AreaEditDialog(obszar, parent)
+        ok = dialog.exec_()
+        nowyobszar = dialog.nowyobszar(obszar)
+        return nowyobszar, ok == QDialog.Accepted
+
+
+class AreaListSmall(QDialog):
+    def __init__(self, parent=None):
+        super(AreaListSmall, self).__init__(parent)
+
+    def __init__(self, obszary, parent=None):
+        super(AreaListSmall, self).__init__(parent)
+        self.obszary = obszary
+
+        self.setwindow()
+        self.setcentralwidget()
+        self.setframes()
+        self.setlayouts()
+        self.setbuttons()
+        self.setmainlabel()
+        self.setlist()
+
+        self.line = QFrame(self.centralwidget)
+        self.line.setFrameShadow(QFrame.Plain)
+        self.line.setFrameShape(QFrame.HLine)
+        self.line.setObjectName("line")
+
+        self.addwidgets()
+
+        self.buttonok.clicked.connect(self.accept)
+        self.buttoncancel.clicked.connect(self.reject)
+
+    def setwindow(self):
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(100)
+        sizePolicy.setVerticalStretch(5)
+        self.setSizePolicy(sizePolicy)
+        self.setMinimumSize(QSize(300, 500))
+        self.setMaximumSize(QSize(300, 800))
+        self.setSizeIncrement(QSize(0, 0))
+        self.setStyleSheet(
+            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #B721FF, stop:1 #21D4FD)")
+        self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_NoSystemBackground, True)
+
+    def setcentralwidget(self):
+        self.centralwidget = QWidget(self)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.centralwidget.setSizePolicy(sizePolicy)
+        self.centralwidget.setStyleSheet(dialogstylesheet())
+        self.centralwidget.setObjectName("centralwidget")
+
+    def setframes(self):
+        self.fr_top = QFrame(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.fr_top.setSizePolicy(sizePolicy)
+        self.fr_top.setFrameShape(QFrame.NoFrame)
+        self.fr_top.setFrameShadow(QFrame.Plain)
+        self.fr_top.setLineWidth(0)
+        self.fr_top.setObjectName("fr_top")
+
+        self.fr_label = QFrame(self.fr_top)
+        self.fr_label.setMaximumSize(QSize(16777215, 50))
+        self.fr_label.setFrameShape(QFrame.NoFrame)
+        self.fr_label.setFrameShadow(QFrame.Plain)
+        self.fr_label.setLineWidth(0)
+        self.fr_label.setObjectName("fr_label")
+
+        self.fr_content = QFrame(self.fr_top)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.fr_content.setSizePolicy(sizePolicy)
+        self.fr_content.setFrameShape(QFrame.NoFrame)
+        self.fr_content.setFrameShadow(QFrame.Plain)
+        self.fr_content.setLineWidth(0)
+        self.fr_content.setObjectName("fr_content")
+
+        self.fr_bottom = QFrame(self.centralwidget)
+        self.fr_bottom.setMaximumSize(QSize(16777215, 50))
+        self.fr_bottom.setFrameShape(QFrame.NoFrame)
+        self.fr_bottom.setFrameShadow(QFrame.Plain)
+        self.fr_bottom.setLineWidth(0)
+        self.fr_bottom.setObjectName("fr_bottom")
+
+    def setlayouts(self):
+        self.lt_dialog = QGridLayout(self)
+        self.lt_dialog.setObjectName("lt_dialog")
+        self.lt_dialog.setContentsMargins(0, 0, 0, 0)
+        self.lt_central = QVBoxLayout(self.centralwidget)
+        self.lt_central.setContentsMargins(0, 0, 0, 0)
+        self.lt_central.setSpacing(0)
+        self.lt_central.setObjectName("lt_central")
+
+        self.lt_bottom = QHBoxLayout(self.fr_bottom)
+        self.lt_bottom.setContentsMargins(0, 0, 0, 0)
+        self.lt_bottom.setSpacing(0)
+        self.lt_bottom.setObjectName("lt_bottom")
+
+        self.lt_top = QVBoxLayout(self.fr_top)
+        self.lt_top.setContentsMargins(0, 20, 0, 10)
+        self.lt_top.setSpacing(20)
+        self.lt_top.setObjectName("lt_top")
+
+        self.lt_label = QGridLayout(self.fr_label)
+        self.lt_label.setObjectName("lt_label")
+        self.lt_label.setContentsMargins(0, 0, 0, 0)
+
+        self.lt_content = QGridLayout(self.fr_content)
+        self.lt_content.setObjectName("lt_content")
+        self.lt_content.setContentsMargins(20, 0, 20, 0)
+        self.lt_content.setSpacing(9)
+
+    def setbuttons(self):
+        self.buttonok = QPushButton(self.fr_bottom)
+        self.buttonok.setText('OK')
+        self.buttonok.setFocus()
+        self.buttonok.setMinimumWidth(100)
+        self.buttonok.setMinimumHeight(50)
+        self.buttonok.setObjectName('buttonok')
+        self.buttoncancel = QPushButton(self.fr_bottom)
+        self.buttoncancel.setText('Anuluj')
+        self.buttoncancel.setMinimumWidth(100)
+        self.buttoncancel.setMinimumHeight(50)
+        self.buttoncancel.setObjectName('buttoncancel')
+
+    def setmainlabel(self):
+        font = QFont()
+        font.setFamily("Arial")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+
+        self.mainlabel = QLabel(self.fr_label)
+        self.mainlabel.setText('Wybierz obszar, który chcesz edytować')
+        self.mainlabel.setFont(font)
+        self.mainlabel.setAlignment(Qt.AlignCenter)
+
+    def setlist(self):
+        lista = []
+        self.lista = QListWidget(self.fr_content)
+        for obszar in self.obszary:
+            obszartekst = str(obszar['areaid']) + ' - ' + str(obszar['areaname'])
+            lista.append(obszartekst)
+        self.lista.addItems(lista)
+        self.lista.setFrameShape(QFrame.NoFrame)
+        self.lista.setFrameShadow(QFrame.Plain)
+        self.lista.setLineWidth(0)
+        self.lista.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+    def addwidgets(self):
+        self.lt_bottom.addWidget(self.buttonok)
+        self.lt_bottom.addWidget(self.buttoncancel)
+
+        self.lt_label.addWidget(self.mainlabel, 0, 0, 1, 1)
+
+        self.lt_content.addWidget(self.lista, 0, 0, 1, 1)
+
+        self.lt_top.addWidget(self.fr_label)
+        self.lt_top.addWidget(self.fr_content)
+        self.lt_central.addWidget(self.fr_top)
+        self.lt_central.addWidget(self.line)
+        self.lt_central.addWidget(self.fr_bottom)
+
+        self.lt_dialog.addWidget(self.centralwidget, 0, 0, 1, 1)
+
+    def ktoryobszar(self, obszary):
+        try:
+            obiekt = self.lista.currentItem().text()
+            obiektnum = obiekt[:obiekt.find(' ')]
+            obiektnum = int(obiektnum)
+        except:
+            obiektnum = 0
+        return obiektnum
+
+    # metoda statyczna, tworzy dialog i wybrany ID, ok
+    @staticmethod
+    def showlist(obszary, parent=None):
+        dialog = AreaListSmall(obszary, parent)
+        ok = dialog.exec_()
+        wybranyID = dialog.ktoryobszar(obszary)
+        return wybranyID, ok == QDialog.Accepted
