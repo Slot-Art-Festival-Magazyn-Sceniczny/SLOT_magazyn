@@ -1,6 +1,6 @@
+import datetime
 import hashlib
 import sys
-import datetime
 
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QFont, QLinearGradient, QColor, QPolygonF, QBrush, QPen
@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QApplication
 import slotbaza
 from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog
 
+# Wczytanie pliku z ustawieniami
 settings = {}
 with open('data/settings.cfg') as settingsfile:
     for line in settingsfile:
@@ -21,11 +22,13 @@ with open('data/settings.cfg') as settingsfile:
             pass
 
 
+# Funkcja haszująca hasła (MD5)
 def hashpassword(password):
     code = hashlib.md5(password.encode('utf-8')).hexdigest()
     return code
 
 
+# Zamiana kodu kreskowego na ID
 def barcodetoid(barcode, typ):
     codetxt = barcode[-3:]
     try:
@@ -41,6 +44,7 @@ def barcodetoid(barcode, typ):
         pass
 
 
+# Zamiana ID na kod kreskowy
 def idtobarcode(code, typ):
     year = settings['year']
     if typ == 'area':
@@ -67,6 +71,7 @@ def idtobarcode(code, typ):
     pass
 
 
+# Walidacja wprowadzonego kodu kreskowego, zwraca kody błędów z zakresu 0-4
 def barcodevalcheck(code, typ):
     year = settings['year']
     if typ == 'area':
@@ -100,16 +105,20 @@ def barcodevalcheck(code, typ):
     return (status, statustxt)
 
 
+# Klasa opisująca główne okno programu
 class Magazyn(MainWindow):
 
+    # Konstruktor klasy
     def __init__(self):
         super().__init__()
         self.setupUI()
+        self.rysujobszary()
+
+        # Domyślnie po włączeniu programu nikt nie jest zalogowany
         self.loginstatus = False
-        self.username = 'user'
+        self.username = ''
         self.usertype = 'user'
         self.logstatus.setText("<FONT COLOR=\'#FF4444\'> Niezalogowany")
-        self.rysujobszary()
 
         # Połączenie przycisków z odpowiednimi funkcjami
         self.btn_login.clicked.connect(self.logowanie)
@@ -157,6 +166,7 @@ class Magazyn(MainWindow):
                 Dialog.komunikat('warn', 'Nie można się wylogować nie będąc wcześniej zalogowanym', self)
                 self.unblurwindow()
 
+    # Obsługa przyjmowania przedmiotów
     def comein(self):
         self.blurwindow()
         areabarcode, areaok = InputDialog.komunikat('barcode', 'Wczytaj kod obszaru:', self)
@@ -256,6 +266,7 @@ class Magazyn(MainWindow):
         else:
             self.unblurwindow()
 
+    # Obsługa wydawania przedmiotów
     def comeout(self):
         self.blurwindow()
         areabarcode, areaok = InputDialog.komunikat('barcode', 'Wczytaj kod obszaru:', self)
@@ -322,6 +333,7 @@ class Magazyn(MainWindow):
         else:
             self.unblurwindow()
 
+    # Funkcja rysująca obszary, po wcześniejszym wyczyszczeniu sceny
     def rysujobszary(self):
         self.wyczyscscene()
         obszary = slotbaza.getareageometries()
@@ -342,10 +354,12 @@ class Magazyn(MainWindow):
             gradient.setColorAt(1, QColor('#CC0048FF'))
             a.setBrush(gradient)
 
+    # Funkcja czyszcząca scenę i rysująca pomieszczenie
     def wyczyscscene(self):
         self.scena.clear()
         self.pomieszczeniedosceny()
 
+    # Funkcja rysująca pomieszczenia
     def pomieszczeniedosceny(self):
         # self.scena.setBackgroundBrush(Qt.darkGray)
         pomieszczenie_poly = QPolygonF(
@@ -358,7 +372,7 @@ class Magazyn(MainWindow):
         pen.setWidth(4)
         pomieszczenie.setPen(pen)
         self.viewer.fitInView(self.scena.sceneRect(), Qt.KeepAspectRatio)
-        self.viewer.scale(0.9,0.9)
+        self.viewer.scale(0.9, 0.9)
 
 
 if __name__ == '__main__':
