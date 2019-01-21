@@ -9,7 +9,8 @@ from PyQt5.QtGui import QFont, QLinearGradient, QColor, QPolygonF, QBrush, QPen
 from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem
 
 import slotbaza
-from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall
+from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall, \
+    AreaList
 
 # Wczytanie pliku z ustawieniami
 settings = {}
@@ -123,6 +124,10 @@ class Magazyn(MainWindow):
         self.logstatus.setText("<FONT COLOR=\'#FF4444\'> Niezalogowany")
 
         # Połączenie przycisków z odpowiednimi funkcjami
+        self.connectbuttons()
+
+    # Połączenie przycisków z odpowiednimi funkcjami
+    def connectbuttons(self):
         self.btn_login.clicked.connect(self.logowanie)
         self.btn_logout.clicked.connect(self.logowanie)
         self.btn_addarea.clicked.connect(self.rysujobszary)
@@ -338,7 +343,10 @@ class Magazyn(MainWindow):
 
     # Wyświetlenie listy wszystkich obszarów
     def listofareas(self):
-        pass
+        self.blurwindow()
+        model = slotbaza.getqareamodel()
+        AreaList.showtable(model)
+        self.unblurwindow()
 
     # Edycja wybranego na liście obszaru
     def editarea(self):
@@ -354,7 +362,7 @@ class Magazyn(MainWindow):
                     nowyobszar, ok = AreaEditDialog.editarea(obszar, self)
                     if ok:
                         slotbaza.savearea(nowyobszar)
-                        Dialog.komunikat('ok', 'Poprawnie dodano / zmodyfikowano obszar.', self)
+                        Dialog.komunikat('ok', 'Poprawnie zmodyfikowano obszar.', self)
                         self.unblurwindow()
                     else:
                         Dialog.komunikat('warn', 'Przerwano proces edycji obszaru! Zmiany nie zostały zapisane.', self)

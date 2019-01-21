@@ -1,10 +1,19 @@
-import os
 import datetime
+
+from PyQt5.Qt import QSqlTableModel, QSqlDatabase
+from PyQt5.QtCore import Qt
 from peewee import *
 
 db_filename = 'test.db'
 
 baza = SqliteDatabase(db_filename)
+qbaza = QSqlDatabase("QSQLITE")
+qbaza.setDatabaseName(db_filename)
+
+if qbaza.open():
+    print('Udalo sie połączyć z bazą')
+else:
+    print('Nie udało sie połączyć z bazą')
 
 
 class ModelBazy(Model):
@@ -381,3 +390,43 @@ def userlist():
         userdictlist.append(userdict)
         userdict = {}
     return userdictlist
+
+
+# Klasa pomocnicza - wyłączona edycji niektórych kolumn
+class AreaQSqlTableModel(QSqlTableModel):
+    def __init__(self, parent=None, db=QSqlDatabase()):
+        super(AreaQSqlTableModel, self).__init__(parent, db)
+
+    def flags(self, index):
+        if (index.column() == 0):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 1):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 7):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 8):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        else:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+
+
+# funkcja zwracająca model tablicy 'area' zgodny z Qt
+def getqareamodel():
+    model = AreaQSqlTableModel(None, qbaza)
+    model.setTable('area')
+    model.setHeaderData(0, Qt.Horizontal, 'No')
+    model.setHeaderData(1, Qt.Horizontal, 'Kod kreskowy')
+    model.setHeaderData(2, Qt.Horizontal, 'Nazwa')
+    model.setHeaderData(7, Qt.Horizontal, 'Kto stworzył')
+    model.setHeaderData(8, Qt.Horizontal, 'Kiedy stworzony')
+    model.setHeaderData(9, Qt.Horizontal, 'Osoba kontaktowa')
+    model.setHeaderData(10, Qt.Horizontal, 'Osoba kontaktowa')
+    model.setHeaderData(11, Qt.Horizontal, 'Osoba kontaktowa')
+    model.setHeaderData(12, Qt.Horizontal, 'Telefon')
+    model.setHeaderData(13, Qt.Horizontal, 'Telefon')
+    model.setHeaderData(14, Qt.Horizontal, 'Telefon')
+    model.setHeaderData(15, Qt.Horizontal, 'Uwagi')
+    model.select()
+    model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+
+    return model
