@@ -1,0 +1,25 @@
+Kody kreskowe używane w aplikacji mają następującą budowę:
+
+YYYYTTXXX
+
+ZAWSZE jest to kod składający się z 9 znaków.
+
+YYYY- Rok w postaci np. 2018, 2019
+
+TT - Typ kodu, odpowiednio:
+	10 - kod obszaru
+	20 - kod przedmiotu
+	30 - SLOT Orkiestra
+	40 - Użytkownik (future)
+
+XXX - Numer porządkowy
+	001 ... 100 dla kodów obszaru
+	001 ... 500 dla przedmiotów
+	001 ... 200 dla SLOT Orkiestry
+
+
+Przykłady:
+
+201810034 - Kod kreskowy z 2018 roku, identyfukujący obszar (10) o numerze 34 (034)
+201920348 - Kod kreskowy z 2019 roku, identyfukujący przedmiot (20) o numerze 348
+198430005 - Kod kreskowy z 1984 roku, identyfukujący osobę/przedmiot z SLOT Orkiestry (30) o numerze 5 (005)
