@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+# Główny plik programu do obsługi Magazynu Scenicznego.
+# W pliku tym przywołane jest główne okno programu, a także wszystkie okna dialogowe.
+# Przywołanie to następuje z pliku "clear_gui" (ostatnia linia importu)
+
 import datetime
 import hashlib
 import sys
@@ -12,7 +16,19 @@ import slotbaza
 from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall, \
     AreaList
 
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# Poniżej znajduje się część kodu wykonywana przed uruchomieniem głównego okna programu
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 # Wczytanie pliku z ustawieniami
+# Plik ten zawiera podstawowe ustawienia programu w formacie klucz = wartość
+# Poniżej znajduje się prosty parser tego pliku, który tworzy zmienną "settings", która zawiera wartości przypisane
+# do odpowiednich kluczy.
+# Podstawową wartością przechowywaną w pliku settings jest rok (klucz: year).
+# Pozwala to w dalszej części programu na poprawne odczytywanie kodów kreskowych
 settings = {}
 with open('data/settings.cfg') as settingsfile:
     for line in settingsfile:
@@ -25,13 +41,23 @@ with open('data/settings.cfg') as settingsfile:
             pass
 
 
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# Poniżej napisano kilka przydatnych funkcji, które wykorzystywane są w dalszych częściach programu
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 # Funkcja haszująca hasła (MD5)
+# W bazie danych nie chcemy przechowywać haseł, a jedynie ich hasze.
 def hashpassword(password):
     code = hashlib.md5(password.encode('utf-8')).hexdigest()
     return code
 
 
 # Zamiana kodu kreskowego na ID
+# W programie bardzo często pojawia się potrzeba zamiany kodu kreskowego np. obszaru na ID obszaru
+# dlatego postanowiono stworzyć do tego funkcję. Funkcja przyjmuje wartość kodu kreskowego w postaci stringa
+# oraz typ - określający czy funkcja ma zwrócić ID w postaci stringa, czy integera
 def barcodetoid(barcode, typ):
     codetxt = barcode[-3:]
     try:
@@ -48,6 +74,9 @@ def barcodetoid(barcode, typ):
 
 
 # Zamiana ID na kod kreskowy
+# W programie bardzo często pojawia się potrzeba zamiany ID np. obszaru na wartość kodu kreskowego obszaru
+# dlatego postanowiono stworzyć do tego funkcję. Funkcja przyjmuje ID w postaci stringa lub integera
+# oraz typ - określający czy jest to obszar, przedmiot, orkiestra, czy user (user aktualnie niewykorzystywany)
 def idtobarcode(code, typ):
     year = settings['year']
     if typ == 'area':
@@ -75,6 +104,9 @@ def idtobarcode(code, typ):
 
 
 # Walidacja wprowadzonego kodu kreskowego, zwraca kody błędów z zakresu 0-4
+# Żeby zapobiec "głupim zabawom" oraz omyłkowym zeskoanowaniem niepoprawnego kod kreskowego funkcja ta sprawdza, czy
+# kod kreskowy ma 9 cyfr, czy pierwsze 4 cyfry zawierają rok, czy kolejne 2 cyfry odpowiadają typowi kodu.
+# W przypadku, gdy kod jest właściwy, funkcja zwraca kod 0, kody 1-4 zarezerwowane są dla błędów.
 def barcodevalcheck(code, typ):
     year = settings['year']
     if typ == 'area':
@@ -106,6 +138,13 @@ def barcodevalcheck(code, typ):
             status = 2
             statustxt = 'Wprowadzono niewłaściwy kod!'
     return (status, statustxt)
+
+
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# Główna część programu
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 # Klasa opisująca główne okno programu
@@ -418,6 +457,14 @@ class Magazyn(MainWindow):
         self.viewer.scale(0.9, 0.9)
 
 
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# Wykonywalna część programu
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+# Uruchomienie programu, stoworzenie instancji klasy Magazyn
 if __name__ == '__main__':
     app = QApplication([])
     magazyn = Magazyn()
