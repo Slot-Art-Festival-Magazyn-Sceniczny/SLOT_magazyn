@@ -12,10 +12,3 @@ Wszystkie informacje o obszarach, przedmiotach, użytkownikach są przechowywane
 ### Wymagane biblioteki
 Do poprawnego działania programu niezbędny jest Python w wersji 3.x. 
 Ponad to wymagane są nstępujące biblioteki: PyQt 5.x, peewee, hashlib, sqlite3.
-
-### TO-DO
-- Moduł tworzenia obszaru (głównie rysowanie)
-- SLOT Orkiestra (hehe...)
-- Ustawienia programu (np. kolor tła)
-- Komunikaty dźwiękowe
-- Obsługa dla admina - dodawanie / edycja użytkowników
