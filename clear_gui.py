@@ -237,16 +237,19 @@ class MainWindow(QMainWindow):
         self.showFullScreen()
 
     def blurwindow(self):
-        self.blur = QGraphicsBlurEffect()
-        self.blur.setBlurHints(QGraphicsBlurEffect.PerformanceHint)
-        self.setGraphicsEffect(self.blur)
-        self.blur.setBlurRadius(0)
-        self.anim = QPropertyAnimation(self.blur, b'blurRadius')
-        self.anim.setDuration(1000)
-        self.anim.setStartValue(self.blur.blurRadius())
-        self.anim.setEndValue(10)
-        self.anim.setEasingCurve(QEasingCurve.InQuad)
-        self.anim.start()
+        try:
+            self.blur.blurRadius() == 0
+        except:
+            self.blur = QGraphicsBlurEffect()
+            self.blur.setBlurHints(QGraphicsBlurEffect.PerformanceHint)
+            self.setGraphicsEffect(self.blur)
+            self.blur.setBlurRadius(0)
+            self.anim = QPropertyAnimation(self.blur, b'blurRadius')
+            self.anim.setDuration(1000)
+            self.anim.setStartValue(self.blur.blurRadius())
+            self.anim.setEndValue(10)
+            self.anim.setEasingCurve(QEasingCurve.InQuad)
+            self.anim.start()
 
     def unblurwindow(self):
         self.anim = QPropertyAnimation(self.blur, b'blurRadius')
