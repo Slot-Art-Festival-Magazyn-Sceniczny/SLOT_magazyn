@@ -172,6 +172,7 @@ class Magazyn(MainWindow):
         self.btn_addarea.clicked.connect(self.rysujobszary)
         self.btn_listofareas.clicked.connect(self.listofareas)
         self.btn_editarea.clicked.connect(self.editarea)
+        self.btn_finditem.clicked.connect(self.finditem)
         self.btn_lookinside.clicked.connect(self.lookinside)
         self.btn_comein.clicked.connect(self.comein)
         self.btn_comeout.clicked.connect(self.comeout)
@@ -213,6 +214,42 @@ class Magazyn(MainWindow):
                 self.blurwindow()
                 Dialog.komunikat('warn', 'Nie można się wylogować nie będąc wcześniej zalogowanym', self)
                 self.unblurwindow()
+
+    # Wyszukiwanie przedmiotów
+    def finditem(self):
+        self.blurwindow()
+        itembarcode, itemok = InputDialog.komunikat('barcode', 'Wczytaj kod przedmiotu:', self)
+        if itemok:
+            itemstatus, itemstatustxt = barcodevalcheck(itembarcode, 'item')
+            if itemstatus == 0:
+                itemid = barcodetoid(itembarcode, 'int')
+                if slotbaza.isitemexist(itemid):
+                    przedmiot = slotbaza.loaditem(itemid)
+                    if przedmiot['itemstate']:
+                        stan = 'przyjęty'
+                    else:
+                        stan = 'wydany'
+                    areaid = przedmiot['areaass']
+                    area = slotbaza.loadarea(areaid)
+                    Dialog.komunikat('ok', 'Znaleziono przedmiot!\n' +
+                                     '\nID przedmiotu: ' + str(przedmiot['itemid']) +
+                                     '\nNazwa przedmiotu: ' + przedmiot['itemname'] +
+                                     '\n' +
+                                     '\nID obszaru: ' + str(areaid) +
+                                     '\nNazwa obszaru: ' + area['areaname'] +
+                                     '\n' +
+                                     '\nStan: ' + stan)
+                    self.unblurwindow()
+                else:
+                    Dialog.komunikat('error', 'Wczytany przedmiot nie znajduje się w bazie. '
+                                              'Jeśli nie wiesz dlaczego, skontaktuj się z szefem ekipy', self)
+                    self.unblurwindow()
+            else:
+                Dialog.komunikat('warn', itemstatustxt, self)
+                self.unblurwindow()
+        else:
+            self.unblurwindow()
+        pass
 
     # Moduł zaglądania do obszarów
     def lookinside(self):
