@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem
 
 import slotbaza
 from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall, \
-    AreaList
+    AreaList, ItemList
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,6 +172,7 @@ class Magazyn(MainWindow):
         self.btn_addarea.clicked.connect(self.rysujobszary)
         self.btn_listofareas.clicked.connect(self.listofareas)
         self.btn_editarea.clicked.connect(self.editarea)
+        self.btn_lookinside.clicked.connect(self.lookinside)
         self.btn_comein.clicked.connect(self.comein)
         self.btn_comeout.clicked.connect(self.comeout)
         self.btn_exit.clicked.connect(self.close)
@@ -212,6 +213,30 @@ class Magazyn(MainWindow):
                 self.blurwindow()
                 Dialog.komunikat('warn', 'Nie można się wylogować nie będąc wcześniej zalogowanym', self)
                 self.unblurwindow()
+
+    # Moduł zaglądania do obszarów
+    def lookinside(self):
+        obszary = slotbaza.loadallareas()
+        self.blurwindow()
+        areaid, ok = AreaListSmall.showlist(obszary, self)
+        if ok:
+            if areaid == 0:
+                self.unblurwindow()
+            else:
+                if slotbaza.isareaexist(areaid):
+                    self.itemlist(areaid)
+                else:
+                    Dialog.komunikat('warn', 'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
+                                             'do niego przedmioty.', self)
+                    self.unblurwindow()
+        else:
+            self.unblurwindow()
+
+    # Wyświetlenie listy przedmiotów w obszarze od zadanym ID
+    def itemlist(self, areaid):
+        model = slotbaza.getqitemmodel(areaid)
+        ItemList.showtable(model)
+        self.unblurwindow()
 
     # Obsługa przyjmowania przedmiotów
     def comein(self):

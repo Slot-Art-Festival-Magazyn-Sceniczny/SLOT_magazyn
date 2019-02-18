@@ -410,6 +410,35 @@ class AreaQSqlTableModel(QSqlTableModel):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
 
 
+class ItemQSqlTableModel(QSqlTableModel):
+    def __init__(self, parent=None, db=QSqlDatabase()):
+        super(ItemQSqlTableModel, self).__init__(parent, db)
+
+    def flags(self, index):
+        if (index.column() == 0):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 1):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 7):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 8):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 9):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 10):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 11):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 12):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 13):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 15):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        else:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+
+
 # funkcja zwracająca model tablicy 'area' zgodny z Qt
 def getqareamodel():
     model = AreaQSqlTableModel(None, qbaza)
@@ -426,6 +455,50 @@ def getqareamodel():
     model.setHeaderData(13, Qt.Horizontal, 'Telefon')
     model.setHeaderData(14, Qt.Horizontal, 'Telefon')
     model.setHeaderData(15, Qt.Horizontal, 'Uwagi')
+    model.select()
+    model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+
+    return model
+
+
+def getqitemmodel(areaid):
+    model = ItemQSqlTableModel(None, qbaza)
+    model.setTable('item')
+    query = 'areaass_id = ' + str(areaid)
+    model.setFilter(query)
+    model.setHeaderData(0, Qt.Horizontal, 'No')
+    model.setHeaderData(1, Qt.Horizontal, 'Kod kreskowy')
+    model.setHeaderData(2, Qt.Horizontal, 'Nazwa')
+    model.setHeaderData(3, Qt.Horizontal, 'Na magazynie?')
+    model.setHeaderData(4, Qt.Horizontal, 'Kiedy stworzony')
+    model.setHeaderData(5, Qt.Horizontal, 'Kto stworzył')
+    model.setHeaderData(6, Qt.Horizontal, 'Ostatnio przyjęty')
+    model.setHeaderData(7, Qt.Horizontal, 'Ostatnio przyjął')
+    model.setHeaderData(8, Qt.Horizontal, 'Ostatnio wydany')
+    model.setHeaderData(9, Qt.Horizontal, 'Ostatnio wydał')
+    model.setHeaderData(10, Qt.Horizontal, 'Uwagi')
+    model.setHeaderData(11, Qt.Horizontal, 'Obszar')
+    model.select()
+    model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+
+    return model
+
+
+def getqitemsmodel():
+    model = ItemQSqlTableModel(None, qbaza)
+    model.setTable('item')
+    model.setHeaderData(0, Qt.Horizontal, 'No')
+    model.setHeaderData(1, Qt.Horizontal, 'Kod kreskowy')
+    model.setHeaderData(2, Qt.Horizontal, 'Nazwa')
+    model.setHeaderData(7, Qt.Horizontal, 'Na magazynie?')
+    model.setHeaderData(8, Qt.Horizontal, 'Kiedy stworzony')
+    model.setHeaderData(9, Qt.Horizontal, 'Kto stworzył')
+    model.setHeaderData(10, Qt.Horizontal, 'Ostatnio przyjęty')
+    model.setHeaderData(11, Qt.Horizontal, 'Ostatnio przyjął')
+    model.setHeaderData(12, Qt.Horizontal, 'Ostatnio wydany')
+    model.setHeaderData(13, Qt.Horizontal, 'Ostatnio wydał')
+    model.setHeaderData(14, Qt.Horizontal, 'Uwagi')
+    model.setHeaderData(15, Qt.Horizontal, 'Obszar')
     model.select()
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
 
