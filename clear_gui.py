@@ -380,11 +380,11 @@ class MainWindow(QMainWindow):
 
     def setwidgets(self):
         spacerItem = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Maximum)
-        spacerItem1 = QSpacerItem(20, 60, QSizePolicy.Minimum, QSizePolicy.Maximum)
+        spacerItem1 = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Maximum)
         spacerItem2 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Maximum)
         spacerItem3 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Maximum)
         spacerItem4 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Maximum)
-        spacerItem5 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        spacerItem5 = QSpacerItem(0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         spacerItem6 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)
         spacerItem7 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)
 
