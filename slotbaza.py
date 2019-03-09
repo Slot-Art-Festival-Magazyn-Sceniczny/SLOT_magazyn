@@ -1,6 +1,6 @@
 import datetime
 
-from PyQt5.Qt import QSqlTableModel, QSqlDatabase
+from PyQt5.QtSql import QSqlTableModel, QSqlDatabase
 from PyQt5.QtCore import Qt
 from peewee import *
 
