@@ -112,11 +112,11 @@ def isitemexist(itemid):
 
 
 # Stworenie obszaru
-def createarea(areaid, areabarcode, posx, posy, sizex, sizey, user):
+def createarea(areaid, areabarcode, areaname, posx, posy, sizex, sizey, user):
     if isareaexist(areaid):
         pass
     else:
-        Area.create(areaid=areaid, areabarcode=areabarcode, posx=posx, posy=posy, sizex=sizex, sizey=sizey,
+        Area.create(areaid=areaid, areabarcode=areabarcode, areaname = areaname,posx=posx, posy=posy, sizex=sizex, sizey=sizey,
                     dateofcreation=datetime.datetime.now(), userofcreation=user)
 
 

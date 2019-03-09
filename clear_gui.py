@@ -167,6 +167,8 @@ def dialogstylesheet():
 
 
 class _QGraphicsScene(QGraphicsScene):
+    rectChanged = pyqtSignal(QRect)
+
     def __init__(self, parent):
         super(_QGraphicsScene, self).__init__(parent)
 
@@ -185,7 +187,20 @@ class _QGraphicsView(QGraphicsView):
         self.setMouseTracking(True)
         self.origin = QPoint()
         self.changeRubberBand = False
+        # self.setDragMode(QGraphicsView.ScrollHandDrag)
+        self.setInteractive(False)  # Wyłączenie funkcji interaktywnych - np. przesuwania obszarów
+        self.mode = 'normal'  # deklaracja normalnego trybu pracy
 
+    # Przełączenie na tryb rysowania nowego obszaru
+    def addareamode(self):
+        self.setInteractive(False)
+        self.mode = 'addarea'
+
+    # Przełączenie na tryb normalny
+    def normalmode(self):
+        self.mode = 'normal'
+
+    # obsługa przybliżania i oddalania - funkcja eksperymentalna
     def wheelEvent(self, event):
         if event.angleDelta().y() > 0:
             factor = 1.25
@@ -201,24 +216,35 @@ class _QGraphicsView(QGraphicsView):
         else:
             self.scale(factor, factor)
 
+    # Rozpoczęcie rysowania nowego obszaru
     def mousePressEvent(self, event):
-        self.origin = event.pos()
-        self.rubberBand.setGeometry(QRect(self.origin, QSize()))
-        self.rectChanged.emit(self.rubberBand.geometry())
-        self.rubberBand.show()
-        self.changeRubberBand = True
-        QGraphicsView.mousePressEvent(self, event)
+        if self.mode == 'addarea':
+            self.origin = event.pos()
+            self.rubberBand.setGeometry(QRect(self.origin, QSize()))
+            self.rubberBand.show()
+            self.changeRubberBand = True
+            QGraphicsView.mousePressEvent(self, event)
+        else:
+            super(_QGraphicsView, self).mousePressEvent(event)
 
+    # Rysowanie obszaru
     def mouseMoveEvent(self, event):
-        if self.changeRubberBand:
-            self.rubberBand.setGeometry(QRect(self.origin, event.pos()).normalized())
-            self.rectChanged.emit(self.rubberBand.geometry())
-        QGraphicsView.mouseMoveEvent(self, event)
+        if self.mode == 'addarea':
+            if self.changeRubberBand:
+                self.rubberBand.setGeometry(QRect(self.origin, event.pos()).normalized())
+            QGraphicsView.mouseMoveEvent(self, event)
+        else:
+            super(_QGraphicsView, self).mouseMoveEvent(event)
 
+    # Zakończenie rysowania obszaru
     def mouseReleaseEvent(self, event):
-        self.changeRubberBand = False
-        self.rubberBand.hide()
-        QGraphicsView.mouseReleaseEvent(self, event)
+        if self.mode == 'addarea':
+            self.changeRubberBand = False
+            self.rectChanged.emit(self.rubberBand.geometry()) #Nadanie sygnału wyzwalającego koniec rysowania
+            # self.rubberBand.hide()
+            QGraphicsView.mouseReleaseEvent(self, event)
+        else:
+            super(_QGraphicsView, self).mouseReleaseEvent(event)
 
 
 class MainWindow(QMainWindow):

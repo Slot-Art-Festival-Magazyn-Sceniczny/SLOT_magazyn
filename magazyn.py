@@ -126,8 +126,13 @@ def barcodevalcheck(code, typ):
         if len(code) == 9:
             if code[0:4] == year:
                 if code[4:6] == typcode:
-                    status = 0
-                    statustxt = 'Wprowadzono właściwy kod'
+                    try:
+                        int(code[6:9])
+                        status = 0
+                        statustxt = 'Wprowadzono właściwy kod'
+                    except:
+                        status = 2
+                        statustxt = 'Wprowadzono niewłaściwy kod!'
                 else:
                     status = 4
                     statustxt = 'Wprowadzono kod niewłaściwego typu!'
@@ -158,7 +163,7 @@ class Magazyn(MainWindow):
 
         # Domyślnie po włączeniu programu nikt nie jest zalogowany
         self.loginstatus = False
-        self.username = ''
+        self.username = 'TEST'
         self.usertype = 'user'
         self.logstatus.setText("<FONT COLOR=\'#FF4444\'> Niezalogowany")
 
@@ -169,7 +174,7 @@ class Magazyn(MainWindow):
     def connectbuttons(self):
         self.btn_login.clicked.connect(self.logowanie)
         self.btn_logout.clicked.connect(self.logowanie)
-        self.btn_addarea.clicked.connect(self.rysujobszary)
+        self.btn_addarea.clicked.connect(self.addarea)
         self.btn_listofareas.clicked.connect(self.listofareas)
         self.btn_editarea.clicked.connect(self.editarea)
         self.btn_finditem.clicked.connect(self.finditem)
@@ -177,6 +182,7 @@ class Magazyn(MainWindow):
         self.btn_comein.clicked.connect(self.comein)
         self.btn_comeout.clicked.connect(self.comeout)
         self.btn_exit.clicked.connect(self.close)
+        self.viewer.rectChanged.connect(self.areadrawend)
 
     # Moduł logowania do programu
     def logowanie(self):
@@ -214,6 +220,112 @@ class Magazyn(MainWindow):
                 self.blurwindow()
                 Dialog.komunikat('warn', 'Nie można się wylogować nie będąc wcześniej zalogowanym', self)
                 self.unblurwindow()
+
+    # Wyświetlenie listy wszystkich obszarów
+    def listofareas(self):
+        self.blurwindow()
+        model = slotbaza.getqareamodel()
+        AreaList.showtable(model)
+        self.unblurwindow()
+
+    # Dodanie nowego obszaru
+    def addarea(self):
+        self.blurwindow()
+        areaid, areaok = InputDialog.komunikat('txt', 'Podaj numer obszaru:', self)
+        if areaok:
+            areabarcode = idtobarcode(areaid, 'area')
+            areastatus, areastatustxt = barcodevalcheck(areabarcode, 'area')
+            if areastatus == 0:
+                if slotbaza.isareaexist(areaid):
+                    Dialog.komunikat('warn', 'Obszar o wprowadzonym numerze już istnieje!', self)
+                    self.unblurwindow()
+                else:
+                    areaname, nameok = InputDialog.komunikat('txt', 'Podaj nazwę nowego obszaru:', self)
+                    if nameok:
+                        Dialog.komunikat('info', 'Narysuj obszar na mapie magazynu')
+
+                        # Zapisanie danych podanych przez użytkownika - rozwiązane brzydko, ale lepiej nie umiem
+                        self.newareaname = areaname
+                        self.newareaid = areaid
+                        self.newareabarcode = areabarcode
+
+                        self.unblurwindow()
+
+                        # przełączenie viewera w tryb rysowania. Po narysuwoaniu wywołana jest funkcja areadrawend
+                        self.viewer.addareamode()
+                    else:
+                        self.unblurwindow()
+            else:
+                Dialog.komunikat('warn', areastatustxt, self)
+                self.unblurwindow()
+        else:
+            self.unblurwindow()
+
+    def areadrawend(self, pos):
+        self.viewer.normalmode()  # przełączenie viewera w normalny tryb pracy
+        coords = self.viewer.mapToScene(pos)  # viewer zwraca coordy globalne, trzeba je zmapować na scene
+
+        # sprawdzenie czy użytkownik narysował prostokąt
+        if len(coords) == 0:
+            self.viewer.rubberBand.hide()
+            self.blurwindow()
+            Dialog.komunikat('warn', 'Narysowano niepoprawny prostokąt! Obszar nie został utworzony', self)
+            self.unblurwindow()
+        else:
+            # Przeliczenie współrzędnych punktów na format posx,posy,sizex,sizey. Mozlwa kontrola zaookrąglania
+            rect = coords.boundingRect()
+            roundfactor = 5
+            posx = roundfactor * round(rect.x() / roundfactor)
+            posy = roundfactor * round(rect.y() / roundfactor)
+            sizex = roundfactor * round(rect.width() / roundfactor)
+            sizey = roundfactor * round(rect.height() / roundfactor)
+
+            # Stowrzenie obszaru w bazie danych
+            slotbaza.createarea(self.newareaid, self.newareabarcode, self.newareaname, posx, posy, sizex, sizey,
+                                self.username)
+
+            # Narysowanie obszaru na mapie
+            self.viewer.rubberBand.hide()
+            self.rysujobszary()
+            self.blurwindow()
+
+            # Wczytanie obszaru do edycji - w celu uzupełnienia szczegółowych danych
+            obszar = slotbaza.loadarea(self.newareaid)
+            nowyobszar, ok = AreaEditDialog.editarea(obszar, self)
+            if ok:
+                slotbaza.savearea(nowyobszar)
+                Dialog.komunikat('ok', 'Poprawnie stworzono obszar.', self)
+                self.unblurwindow()
+            else:
+                Dialog.komunikat('warn', 'Przerwano proces edycji obszaru! '
+                                         'Obszar został utworzony, ale zmiany nie zostały zapisane.', self)
+                self.unblurwindow()
+
+    # Edycja wybranego na liście obszaru
+    def editarea(self):
+        obszary = slotbaza.loadallareas()
+        self.blurwindow()
+        areaid, ok = AreaListSmall.showlist(obszary, self)
+        if ok:
+            if areaid == 0:
+                self.unblurwindow()
+            else:
+                if slotbaza.isareaexist(areaid):
+                    obszar = slotbaza.loadarea(areaid)
+                    nowyobszar, ok = AreaEditDialog.editarea(obszar, self)
+                    if ok:
+                        slotbaza.savearea(nowyobszar)
+                        Dialog.komunikat('ok', 'Poprawnie zmodyfikowano obszar.', self)
+                        self.unblurwindow()
+                    else:
+                        Dialog.komunikat('warn', 'Przerwano proces edycji obszaru! Zmiany nie zostały zapisane.', self)
+                        self.unblurwindow()
+                else:
+                    Dialog.komunikat('warn', 'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
+                                             'do niego przedmioty.', self)
+                    self.unblurwindow()
+        else:
+            self.unblurwindow()
 
     # Wyszukiwanie przedmiotów
     def finditem(self):
@@ -439,39 +551,6 @@ class Magazyn(MainWindow):
             else:
                 Dialog.komunikat('warn', areastatustxt, self)
                 self.unblurwindow()
-        else:
-            self.unblurwindow()
-
-    # Wyświetlenie listy wszystkich obszarów
-    def listofareas(self):
-        self.blurwindow()
-        model = slotbaza.getqareamodel()
-        AreaList.showtable(model)
-        self.unblurwindow()
-
-    # Edycja wybranego na liście obszaru
-    def editarea(self):
-        obszary = slotbaza.loadallareas()
-        self.blurwindow()
-        areaid, ok = AreaListSmall.showlist(obszary, self)
-        if ok:
-            if areaid == 0:
-                self.unblurwindow()
-            else:
-                if slotbaza.isareaexist(areaid):
-                    obszar = slotbaza.loadarea(areaid)
-                    nowyobszar, ok = AreaEditDialog.editarea(obszar, self)
-                    if ok:
-                        slotbaza.savearea(nowyobszar)
-                        Dialog.komunikat('ok', 'Poprawnie zmodyfikowano obszar.', self)
-                        self.unblurwindow()
-                    else:
-                        Dialog.komunikat('warn', 'Przerwano proces edycji obszaru! Zmiany nie zostały zapisane.', self)
-                        self.unblurwindow()
-                else:
-                    Dialog.komunikat('warn', 'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
-                                             'do niego przedmioty.', self)
-                    self.unblurwindow()
         else:
             self.unblurwindow()
 
