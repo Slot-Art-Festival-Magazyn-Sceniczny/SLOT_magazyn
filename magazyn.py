@@ -10,7 +10,7 @@ import sys
 
 from PyQt5.QtCore import Qt, QPoint, QRectF
 from PyQt5.QtGui import QFont, QLinearGradient, QColor, QPolygonF, QBrush, QPen
-from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem
+from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem, QGraphicsItemGroup, QGraphicsTextItem
 
 import slotbaza
 from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall, \
@@ -137,7 +137,7 @@ def barcodevalcheck(code, typ):
         else:
             status = 2
             statustxt = 'Wprowadzono niewłaściwy kod!'
-    return (status, statustxt)
+    return status, statustxt
 
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -333,7 +333,7 @@ class Magazyn(MainWindow):
                                             slotbaza.createitem(itemid, idtobarcode(itemid, 'item'), nazwaprzedmiotu,
                                                                 areaid)
                                             przedmiot = slotbaza.loaditem(itemid)
-                                            przedmiot['itemstate'] = True;
+                                            przedmiot['itemstate'] = True
                                             przedmiot['dateoffirstincome'] = datetime.datetime.now()
                                             przedmiot['useroffirstincome'] = self.username
                                             przedmiot['useroflastincome'] = self.username
@@ -478,25 +478,38 @@ class Magazyn(MainWindow):
     # Funkcja rysująca obszary, po wcześniejszym wyczyszczeniu sceny
     def rysujobszary(self):
         self.wyczyscscene()
-        obszary = slotbaza.getareageometries()
+        obszary = slotbaza.getareageometries()  # Wczytanie geometrii obszarów
+
+        # Wybór czcionki
         font = QFont()
         font.setPixelSize(18)
         font.setBold(True)
+
         for obszar in obszary:
+            grupa = QGraphicsItemGroup()  # Tworzy grupę
+
+            # Stworzenie prostokąta
             prosto = QGraphicsRectItem(QRectF(obszar['posx'], obszar['posy'], obszar['sizex'], obszar['sizey']))
-            prosto.setFlag(QGraphicsItem.ItemIsMovable, True)
-            prostokat = self.scena.addItem(prosto)
-            etykieta = self.scena.addText(str(obszar['areaid']))
-            etykieta.setDefaultTextColor(Qt.white)
-            etykieta.setFont(font)
-            br = etykieta.boundingRect()
-            etykieta.setPos(obszar['posx'] + obszar['sizex'] / 2 - br.width() / 2,
-                            obszar['posy'] + obszar['sizey'] / 2 - br.height() / 2)
             gradient = QLinearGradient(QPoint(obszar['posx'], obszar['posy']),
                                        QPoint(obszar['posx'], obszar['posy'] + obszar['sizey']))
             gradient.setColorAt(0, QColor('#220087FF'))
             gradient.setColorAt(1, QColor('#440048FF'))
             prosto.setBrush(gradient)
+
+            # Stworzenie etykiety
+            etykieta = QGraphicsTextItem(str(obszar['areaid']))
+            etykieta.setDefaultTextColor(Qt.white)
+            etykieta.setFont(font)
+            etykieta_br = etykieta.boundingRect()
+            etykieta.setPos(obszar['posx'] + obszar['sizex'] / 2 - etykieta_br.width() / 2,
+                            obszar['posy'] + obszar['sizey'] / 2 - etykieta_br.height() / 2)
+
+            # Dodanie prostokąta i etykiety do grupy
+            grupa.addToGroup(prosto)
+            grupa.addToGroup(etykieta)
+
+            grupa.setFlag(QGraphicsItem.ItemIsMovable, True)  # Ustawienie grupy jako możliwej do przesunięcia
+            self.scena.addItem(grupa)  # dodanie grupy do sceny
 
     # Funkcja czyszcząca scenę i rysująca pomieszczenie
     def wyczyscscene(self):
