@@ -162,8 +162,9 @@ class Magazyn(MainWindow):
         self.rysujobszary()
 
         # Domyślnie po włączeniu programu nikt nie jest zalogowany
+        self.loginbypass = True  # Jeśli True to do obsługi programu niewymagane jest logowanie
         self.loginstatus = False
-        self.username = 'TEST'
+        self.username = 'NONE'
         self.usertype = 'user'
         self.logstatus.setText("<FONT COLOR=\'#FF4444\'> Niezalogowany")
 
@@ -189,24 +190,27 @@ class Magazyn(MainWindow):
         sender = self.sender()
         # jeśli wysyłającym jest przycisk ZALOGUJ
         if sender.objectName() == 'btn_login':
-            self.blurwindow()
-            login, haslo, ok = LoginDialog.getloginhaslo(self)
-            if ok:
-                if slotbaza.isuserexist(login):
-                    if slotbaza.loginvalidate(login, hashpassword(haslo))['login']:
-                        self.loginstatus = True
-                        self.usertype = slotbaza.loginvalidate(login, hashpassword(haslo))['usertype']
-                        self.logstatus.setText("<FONT COLOR=\'#44FF44\'> Zalogowany jako " + login)
-                        Dialog.komunikat('ok', 'Pomyślnie zalogowano do systemu', self)
-                        self.unblurwindow()
+            if self.loginstatus:
+                Dialog.komunikat('warn', 'Nie można się zalogować będąc zalogowanym', self)
+            else:
+                self.blurwindow()
+                login, haslo, ok = LoginDialog.getloginhaslo(self)
+                if ok:
+                    if slotbaza.isuserexist(login):
+                        if slotbaza.loginvalidate(login, hashpassword(haslo))['login']:
+                            self.loginstatus = True
+                            self.usertype = slotbaza.loginvalidate(login, hashpassword(haslo))['usertype']
+                            self.logstatus.setText("<FONT COLOR=\'#44FF44\'> Zalogowany jako " + login)
+                            Dialog.komunikat('ok', 'Pomyślnie zalogowano do systemu', self)
+                            self.unblurwindow()
+                        else:
+                            Dialog.komunikat('warn', 'Logowanie nieudane! Niepoprawne hasło.', self)
+                            self.unblurwindow()
                     else:
-                        Dialog.komunikat('warn', 'Logowanie nieudane! Niepoprawne hasło.', self)
+                        Dialog.komunikat('warn', 'Użytkownik o podanym loginie nie istnieje.', self)
                         self.unblurwindow()
                 else:
-                    Dialog.komunikat('warn', 'Użytkownik o podanym loginie nie istnieje.', self)
                     self.unblurwindow()
-            else:
-                self.unblurwindow()
         # jeśli wysyłającym jest przycisk WYLOGUJ
         elif sender.objectName() == 'btn_logout':
             if self.loginstatus:
@@ -223,43 +227,53 @@ class Magazyn(MainWindow):
 
     # Wyświetlenie listy wszystkich obszarów
     def listofareas(self):
-        self.blurwindow()
-        model = slotbaza.getqareamodel()
-        AreaList.showtable(model)
-        self.unblurwindow()
+        if not (self.loginstatus or self.loginbypass):
+            self.blurwindow()
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!')
+            self.unblurwindow()
+        else:
+            self.blurwindow()
+            model = slotbaza.getqareamodel()
+            AreaList.showtable(model)
+            self.unblurwindow()
 
     # Dodanie nowego obszaru
     def addarea(self):
-        self.blurwindow()
-        areaid, areaok = InputDialog.komunikat('txt', 'Podaj numer obszaru:', self)
-        if areaok:
-            areabarcode = idtobarcode(areaid, 'area')
-            areastatus, areastatustxt = barcodevalcheck(areabarcode, 'area')
-            if areastatus == 0:
-                if slotbaza.isareaexist(areaid):
-                    Dialog.komunikat('warn', 'Obszar o wprowadzonym numerze już istnieje!', self)
-                    self.unblurwindow()
-                else:
-                    areaname, nameok = InputDialog.komunikat('txt', 'Podaj nazwę nowego obszaru:', self)
-                    if nameok:
-                        Dialog.komunikat('info', 'Narysuj obszar na mapie magazynu')
-
-                        # Zapisanie danych podanych przez użytkownika - rozwiązane brzydko, ale lepiej nie umiem
-                        self.newareaname = areaname
-                        self.newareaid = areaid
-                        self.newareabarcode = areabarcode
-
-                        self.unblurwindow()
-
-                        # przełączenie viewera w tryb rysowania. Po narysuwoaniu wywołana jest funkcja areadrawend
-                        self.viewer.addareamode()
-                    else:
-                        self.unblurwindow()
-            else:
-                Dialog.komunikat('warn', areastatustxt, self)
-                self.unblurwindow()
-        else:
+        if not (self.loginstatus or self.loginbypass):
+            self.blurwindow()
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!')
             self.unblurwindow()
+        else:
+            self.blurwindow()
+            areaid, areaok = InputDialog.komunikat('txt', 'Podaj numer obszaru:', self)
+            if areaok:
+                areabarcode = idtobarcode(areaid, 'area')
+                areastatus, areastatustxt = barcodevalcheck(areabarcode, 'area')
+                if areastatus == 0:
+                    if slotbaza.isareaexist(areaid):
+                        Dialog.komunikat('warn', 'Obszar o wprowadzonym numerze już istnieje!', self)
+                        self.unblurwindow()
+                    else:
+                        areaname, nameok = InputDialog.komunikat('txt', 'Podaj nazwę nowego obszaru:', self)
+                        if nameok:
+                            Dialog.komunikat('info', 'Narysuj obszar na mapie magazynu')
+
+                            # Zapisanie danych podanych przez użytkownika - rozwiązane brzydko, ale lepiej nie umiem
+                            self.newareaname = areaname
+                            self.newareaid = areaid
+                            self.newareabarcode = areabarcode
+
+                            self.unblurwindow()
+
+                            # przełączenie viewera w tryb rysowania. Po narysuwoaniu wywołana jest funkcja areadrawend
+                            self.viewer.addareamode()
+                        else:
+                            self.unblurwindow()
+                else:
+                    Dialog.komunikat('warn', areastatustxt, self)
+                    self.unblurwindow()
+            else:
+                self.unblurwindow()
 
     def areadrawend(self, pos):
         self.viewer.normalmode()  # przełączenie viewera w normalny tryb pracy
@@ -303,83 +317,101 @@ class Magazyn(MainWindow):
 
     # Edycja wybranego na liście obszaru
     def editarea(self):
-        obszary = slotbaza.loadallareas()
-        self.blurwindow()
-        areaid, ok = AreaListSmall.showlist(obszary, self)
-        if ok:
-            if areaid == 0:
-                self.unblurwindow()
-            else:
-                if slotbaza.isareaexist(areaid):
-                    obszar = slotbaza.loadarea(areaid)
-                    nowyobszar, ok = AreaEditDialog.editarea(obszar, self)
-                    if ok:
-                        slotbaza.savearea(nowyobszar)
-                        Dialog.komunikat('ok', 'Poprawnie zmodyfikowano obszar.', self)
-                        self.unblurwindow()
-                    else:
-                        Dialog.komunikat('warn', 'Przerwano proces edycji obszaru! Zmiany nie zostały zapisane.', self)
-                        self.unblurwindow()
-                else:
-                    Dialog.komunikat('warn', 'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
-                                             'do niego przedmioty.', self)
-                    self.unblurwindow()
-        else:
+        if not (self.loginstatus or self.loginbypass):
+            self.blurwindow()
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!')
             self.unblurwindow()
+        else:
+            obszary = slotbaza.loadallareas()
+            self.blurwindow()
+            areaid, ok = AreaListSmall.showlist(obszary, self)
+            if ok:
+                if areaid == 0:
+                    self.unblurwindow()
+                else:
+                    if slotbaza.isareaexist(areaid):
+                        obszar = slotbaza.loadarea(areaid)
+                        nowyobszar, ok = AreaEditDialog.editarea(obszar, self)
+                        if ok:
+                            slotbaza.savearea(nowyobszar)
+                            Dialog.komunikat('ok', 'Poprawnie zmodyfikowano obszar.', self)
+                            self.unblurwindow()
+                        else:
+                            Dialog.komunikat('warn', 'Przerwano proces edycji obszaru! Zmiany nie zostały zapisane.',
+                                             self)
+                            self.unblurwindow()
+                    else:
+                        Dialog.komunikat('warn',
+                                         'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
+                                         'do niego przedmioty.', self)
+                        self.unblurwindow()
+            else:
+                self.unblurwindow()
 
     # Wyszukiwanie przedmiotów
     def finditem(self):
-        self.blurwindow()
-        itembarcode, itemok = InputDialog.komunikat('barcode', 'Wczytaj kod przedmiotu:', self)
-        if itemok:
-            itemstatus, itemstatustxt = barcodevalcheck(itembarcode, 'item')
-            if itemstatus == 0:
-                itemid = barcodetoid(itembarcode, 'int')
-                if slotbaza.isitemexist(itemid):
-                    przedmiot = slotbaza.loaditem(itemid)
-                    if przedmiot['itemstate']:
-                        stan = 'przyjęty'
+        if not (self.loginstatus or self.loginbypass):
+            self.blurwindow()
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!')
+            self.unblurwindow()
+        else:
+            self.blurwindow()
+            itembarcode, itemok = InputDialog.komunikat('barcode', 'Wczytaj kod przedmiotu:', self)
+            if itemok:
+                itemstatus, itemstatustxt = barcodevalcheck(itembarcode, 'item')
+                if itemstatus == 0:
+                    itemid = barcodetoid(itembarcode, 'int')
+                    if slotbaza.isitemexist(itemid):
+                        przedmiot = slotbaza.loaditem(itemid)
+                        if przedmiot['itemstate']:
+                            stan = 'przyjęty'
+                        else:
+                            stan = 'wydany'
+                        areaid = przedmiot['areaass']
+                        area = slotbaza.loadarea(areaid)
+                        Dialog.komunikat('ok', 'Znaleziono przedmiot!\n' +
+                                         '\nID przedmiotu: ' + str(przedmiot['itemid']) +
+                                         '\nNazwa przedmiotu: ' + przedmiot['itemname'] +
+                                         '\n' +
+                                         '\nID obszaru: ' + str(areaid) +
+                                         '\nNazwa obszaru: ' + area['areaname'] +
+                                         '\n' +
+                                         '\nStan: ' + stan)
+                        self.unblurwindow()
                     else:
-                        stan = 'wydany'
-                    areaid = przedmiot['areaass']
-                    area = slotbaza.loadarea(areaid)
-                    Dialog.komunikat('ok', 'Znaleziono przedmiot!\n' +
-                                     '\nID przedmiotu: ' + str(przedmiot['itemid']) +
-                                     '\nNazwa przedmiotu: ' + przedmiot['itemname'] +
-                                     '\n' +
-                                     '\nID obszaru: ' + str(areaid) +
-                                     '\nNazwa obszaru: ' + area['areaname'] +
-                                     '\n' +
-                                     '\nStan: ' + stan)
-                    self.unblurwindow()
+                        Dialog.komunikat('error', 'Wczytany przedmiot nie znajduje się w bazie. '
+                                                  'Jeśli nie wiesz dlaczego, skontaktuj się z szefem ekipy', self)
+                        self.unblurwindow()
                 else:
-                    Dialog.komunikat('error', 'Wczytany przedmiot nie znajduje się w bazie. '
-                                              'Jeśli nie wiesz dlaczego, skontaktuj się z szefem ekipy', self)
+                    Dialog.komunikat('warn', itemstatustxt, self)
                     self.unblurwindow()
             else:
-                Dialog.komunikat('warn', itemstatustxt, self)
                 self.unblurwindow()
-        else:
-            self.unblurwindow()
-        pass
+            pass
 
     # Moduł zaglądania do obszarów
     def lookinside(self):
-        obszary = slotbaza.loadallareas()
-        self.blurwindow()
-        areaid, ok = AreaListSmall.showlist(obszary, self)
-        if ok:
-            if areaid == 0:
-                self.unblurwindow()
-            else:
-                if slotbaza.isareaexist(areaid):
-                    self.itemlist(areaid)
-                else:
-                    Dialog.komunikat('warn', 'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
-                                             'do niego przedmioty.', self)
-                    self.unblurwindow()
-        else:
+        if not (self.loginstatus or self.loginbypass):
+            self.blurwindow()
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!')
             self.unblurwindow()
+        else:
+            obszary = slotbaza.loadallareas()
+            self.blurwindow()
+            areaid, ok = AreaListSmall.showlist(obszary, self)
+            if ok:
+                if areaid == 0:
+                    self.unblurwindow()
+                else:
+                    if slotbaza.isareaexist(areaid):
+                        self.itemlist(areaid)
+                    else:
+                        Dialog.komunikat('warn',
+                                         'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
+                                         'do niego przedmioty.', self)
+                        self.unblurwindow()
+            else:
+                self.unblurwindow()
 
     # Wyświetlenie listy przedmiotów w obszarze od zadanym ID
     def itemlist(self, areaid):
@@ -389,170 +421,186 @@ class Magazyn(MainWindow):
 
     # Obsługa przyjmowania przedmiotów
     def comein(self):
-        self.blurwindow()
-        areabarcode, areaok = InputDialog.komunikat('barcode', 'Wczytaj kod obszaru:', self)
-        if areaok:
-            areastatus, areastatustxt = barcodevalcheck(areabarcode, 'area')
-            if areastatus == 0:
-                areaid = barcodetoid(areabarcode, 'int')
-                if slotbaza.isareaexist(areaid):
-                    kolejnyprzedmiot = True
-                    while kolejnyprzedmiot:
-                        kolejnyprzedmiot = False
-                        itembarcode, itemok = InputDialog.komunikat('barcode', 'Wczytaj kod przedmiotu:', self)
-                        if itemok:
-                            itemstatus, itemstatustxt = barcodevalcheck(itembarcode, 'item')
-                            if itemstatus == 0:
-                                itemid = barcodetoid(itembarcode, 'int')
-                                if slotbaza.isitemexist(itemid):
-                                    przedmiot = slotbaza.loaditem(itemid)
-                                    if przedmiot['itemstate']:
-                                        Dialog.komunikat('error', 'Ten przedmiot jest już przyjęty na stan magazynu! '
-                                                                  'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!', self)
-                                        self.unblurwindow()
-                                    else:
-                                        istniejacyprzedmiotok = QuestionDialog.pytanie('Ten przedmiot znajduje się '
-                                                                                       'w bazie:\nNazwa przedmiotu: '
-                                                                                       + przedmiot['itemname']
-                                                                                       + '\nStan: Wydany\nUwagi: '
-                                                                                       + przedmiot['itemcomments']
-                                                                                       + '\n\nCzy chcesz przyjąć '
-                                                                                         'przedmiot?', self)
-                                        if istniejacyprzedmiotok:
-                                            przedmiot['itemstate'] = True
-                                            przedmiot['dateoflastincome'] = datetime.datetime.now()
-                                            przedmiot['useroflastincome'] = self.username
-                                            slotbaza.saveitem(przedmiot)
-                                            Dialog.komunikat('ok', 'Przedmiot został przyjęty na stan magazynu', self)
-                                            kolejnyprzedmiot = QuestionDialog.pytanie('Czy chcesz przyjąć '
-                                                                                      'kolejny przedmiot do obszaru'
-                                                                                      ' ' + str(areaid) + '?', self)
+        if not (self.loginstatus or self.loginbypass):
+            self.blurwindow()
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!')
+            self.unblurwindow()
+        else:
+            self.blurwindow()
+            areabarcode, areaok = InputDialog.komunikat('barcode', 'Wczytaj kod obszaru:', self)
+            if areaok:
+                areastatus, areastatustxt = barcodevalcheck(areabarcode, 'area')
+                if areastatus == 0:
+                    areaid = barcodetoid(areabarcode, 'int')
+                    if slotbaza.isareaexist(areaid):
+                        kolejnyprzedmiot = True
+                        while kolejnyprzedmiot:
+                            kolejnyprzedmiot = False
+                            itembarcode, itemok = InputDialog.komunikat('barcode', 'Wczytaj kod przedmiotu:', self)
+                            if itemok:
+                                itemstatus, itemstatustxt = barcodevalcheck(itembarcode, 'item')
+                                if itemstatus == 0:
+                                    itemid = barcodetoid(itembarcode, 'int')
+                                    if slotbaza.isitemexist(itemid):
+                                        przedmiot = slotbaza.loaditem(itemid)
+                                        if przedmiot['itemstate']:
+                                            Dialog.komunikat('error',
+                                                             'Ten przedmiot jest już przyjęty na stan magazynu! '
+                                                             'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!', self)
+                                            self.unblurwindow()
                                         else:
-                                            Dialog.komunikat('warn', 'Przerwano proces przyjmowania przedmiotu.'
-                                                                     '\nPrzedmiot nie został przyjęty', self)
+                                            istniejacyprzedmiotok = QuestionDialog.pytanie('Ten przedmiot znajduje się '
+                                                                                           'w bazie:\nNazwa przedmiotu: '
+                                                                                           + przedmiot['itemname']
+                                                                                           + '\nStan: Wydany\nUwagi: '
+                                                                                           + przedmiot['itemcomments']
+                                                                                           + '\n\nCzy chcesz przyjąć '
+                                                                                             'przedmiot?', self)
+                                            if istniejacyprzedmiotok:
+                                                przedmiot['itemstate'] = True
+                                                przedmiot['dateoflastincome'] = datetime.datetime.now()
+                                                przedmiot['useroflastincome'] = self.username
+                                                slotbaza.saveitem(przedmiot)
+                                                Dialog.komunikat('ok', 'Przedmiot został przyjęty na stan magazynu',
+                                                                 self)
+                                                kolejnyprzedmiot = QuestionDialog.pytanie('Czy chcesz przyjąć '
+                                                                                          'kolejny przedmiot do obszaru'
+                                                                                          ' ' + str(areaid) + '?', self)
+                                            else:
+                                                Dialog.komunikat('warn', 'Przerwano proces przyjmowania przedmiotu.'
+                                                                         '\nPrzedmiot nie został przyjęty', self)
+                                                self.unblurwindow()
+                                    else:
+                                        nowyprzedmiotok = QuestionDialog.pytanie(
+                                            'Wprowadzony przedmiot nie znajduje się na żadnym obszarze. '
+                                            'Czy chcesz go dodać do obszaru ' + str(
+                                                areaid) + '?', self)
+                                        if nowyprzedmiotok:
+                                            nazwaprzedmiotu, nazwaprzedmiotuok = InputDialog.komunikat('txt',
+                                                                                                       'Podaj nazwę '
+                                                                                                       'nowego przedmiotu:',
+                                                                                                       self)
+                                            if nazwaprzedmiotuok:
+                                                slotbaza.createitem(itemid, idtobarcode(itemid, 'item'),
+                                                                    nazwaprzedmiotu,
+                                                                    areaid)
+                                                przedmiot = slotbaza.loaditem(itemid)
+                                                przedmiot['itemstate'] = True
+                                                przedmiot['dateoffirstincome'] = datetime.datetime.now()
+                                                przedmiot['useroffirstincome'] = self.username
+                                                przedmiot['useroflastincome'] = self.username
+                                                przedmiot['dateoflastincome'] = datetime.datetime.now()
+                                                slotbaza.saveitem(przedmiot)
+                                                Dialog.komunikat('ok',
+                                                                 'Poprawnie dodano przedmiot.'
+                                                                 '\nPredmiot został przyjęty na stan magazynu.',
+                                                                 self)
+                                                kolejnyprzedmiot = QuestionDialog.pytanie(
+                                                    'Czy chcesz przyjąć kolejny przedmiot do obszaru ' + str(
+                                                        areaid) + '?',
+                                                    self)
+                                            else:
+                                                Dialog.komunikat('warn',
+                                                                 'Przerwano proces dodawania przedmiotu. '
+                                                                 'Przedmiot nie został dodany.',
+                                                                 self)
+                                                self.unblurwindow()
+                                            pass
+                                        else:
+                                            Dialog.komunikat('error',
+                                                             'W takim razie albo zeskanowałeś zły kod, '
+                                                             'albo coś się popsuło...\nWezwij szefa ekipy.',
+                                                             self)
                                             self.unblurwindow()
                                 else:
-                                    nowyprzedmiotok = QuestionDialog.pytanie(
-                                        'Wprowadzony przedmiot nie znajduje się na żadnym obszarze. '
-                                        'Czy chcesz go dodać do obszaru ' + str(
-                                            areaid) + '?', self)
-                                    if nowyprzedmiotok:
-                                        nazwaprzedmiotu, nazwaprzedmiotuok = InputDialog.komunikat('txt',
-                                                                                                   'Podaj nazwę '
-                                                                                                   'nowego przedmiotu:',
-                                                                                                   self)
-                                        if nazwaprzedmiotuok:
-                                            slotbaza.createitem(itemid, idtobarcode(itemid, 'item'), nazwaprzedmiotu,
-                                                                areaid)
-                                            przedmiot = slotbaza.loaditem(itemid)
-                                            przedmiot['itemstate'] = True
-                                            przedmiot['dateoffirstincome'] = datetime.datetime.now()
-                                            przedmiot['useroffirstincome'] = self.username
-                                            przedmiot['useroflastincome'] = self.username
-                                            przedmiot['dateoflastincome'] = datetime.datetime.now()
-                                            slotbaza.saveitem(przedmiot)
-                                            Dialog.komunikat('ok',
-                                                             'Poprawnie dodano przedmiot.'
-                                                             '\nPredmiot został przyjęty na stan magazynu.',
-                                                             self)
-                                            kolejnyprzedmiot = QuestionDialog.pytanie(
-                                                'Czy chcesz przyjąć kolejny przedmiot do obszaru ' + str(areaid) + '?',
-                                                self)
-                                        else:
-                                            Dialog.komunikat('warn',
-                                                             'Przerwano proces dodawania przedmiotu. '
-                                                             'Przedmiot nie został dodany.',
-                                                             self)
-                                            self.unblurwindow()
-                                        pass
-                                    else:
-                                        Dialog.komunikat('error',
-                                                         'W takim razie albo zeskanowałeś zły kod, '
-                                                         'albo coś się popsuło...\nWezwij szefa ekipy.',
-                                                         self)
-                                        self.unblurwindow()
+                                    Dialog.komunikat('warn', itemstatustxt, self)
+                                    self.unblurwindow()
                             else:
-                                Dialog.komunikat('warn', itemstatustxt, self)
-                                self.unblurwindow()
-                        else:
-                            pass
-                    self.unblurwindow()
+                                pass
+                        self.unblurwindow()
+                    else:
+                        Dialog.komunikat('warn',
+                                         'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
+                                         'do niego przedmioty.', self)
+                        self.unblurwindow()
                 else:
-                    Dialog.komunikat('warn', 'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
-                                             'do niego przedmioty.', self)
+                    Dialog.komunikat('warn', areastatustxt, self)
                     self.unblurwindow()
             else:
-                Dialog.komunikat('warn', areastatustxt, self)
                 self.unblurwindow()
-        else:
-            self.unblurwindow()
 
     # Obsługa wydawania przedmiotów
     def comeout(self):
-        self.blurwindow()
-        areabarcode, areaok = InputDialog.komunikat('barcode', 'Wczytaj kod obszaru:', self)
-        if areaok:
-            areastatus, areastatustxt = barcodevalcheck(areabarcode, 'area')
-            if areastatus == 0:
-                areaid = barcodetoid(areabarcode, 'int')
-                if slotbaza.isareaexist(areaid):
-                    kolejnyprzedmiot = True
-                    while kolejnyprzedmiot:
-                        kolejnyprzedmiot = False
-                        itembarcode, itemok = InputDialog.komunikat('barcode', 'Wczytaj kod przedmiotu:', self)
-                        if itemok:
-                            itemstatus, itemstatustxt = barcodevalcheck(itembarcode, 'item')
-                            if itemstatus == 0:
-                                itemid = barcodetoid(itembarcode, 'int')
-                                if slotbaza.isitemexist(itemid):
-                                    przedmiot = slotbaza.loaditem(itemid)
-                                    if przedmiot['itemstate']:
-                                        istniejacyprzedmiotok = QuestionDialog.pytanie(
-                                            'Ten przedmiot znajduje się w bazie:\nNazwa przedmiotu: ' + przedmiot[
-                                                'itemname'] + '\nStan: Przyjęty\nUwagi: ' + przedmiot[
-                                                'itemcomments'] + '\n\nCzy chcesz wydać przedmiot?', self)
-                                        if istniejacyprzedmiotok:
-                                            przedmiot['itemstate'] = False
-                                            przedmiot['dateoflastoutcome'] = datetime.datetime.now()
-                                            przedmiot['useroflastoutcome'] = self.username
-                                            slotbaza.saveitem(przedmiot)
-                                            Dialog.komunikat('ok', 'Przedmiot został wydany z magazynu', self)
-                                            kolejnyprzedmiot = QuestionDialog.pytanie(
-                                                'Czy chcesz wydać kolejny przedmiot z obszaru ' + str(areaid) + '?',
-                                                self)
+        if not (self.loginstatus or self.loginbypass):
+            self.blurwindow()
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!')
+            self.unblurwindow()
+        else:
+            self.blurwindow()
+            areabarcode, areaok = InputDialog.komunikat('barcode', 'Wczytaj kod obszaru:', self)
+            if areaok:
+                areastatus, areastatustxt = barcodevalcheck(areabarcode, 'area')
+                if areastatus == 0:
+                    areaid = barcodetoid(areabarcode, 'int')
+                    if slotbaza.isareaexist(areaid):
+                        kolejnyprzedmiot = True
+                        while kolejnyprzedmiot:
+                            kolejnyprzedmiot = False
+                            itembarcode, itemok = InputDialog.komunikat('barcode', 'Wczytaj kod przedmiotu:', self)
+                            if itemok:
+                                itemstatus, itemstatustxt = barcodevalcheck(itembarcode, 'item')
+                                if itemstatus == 0:
+                                    itemid = barcodetoid(itembarcode, 'int')
+                                    if slotbaza.isitemexist(itemid):
+                                        przedmiot = slotbaza.loaditem(itemid)
+                                        if przedmiot['itemstate']:
+                                            istniejacyprzedmiotok = QuestionDialog.pytanie(
+                                                'Ten przedmiot znajduje się w bazie:\nNazwa przedmiotu: ' + przedmiot[
+                                                    'itemname'] + '\nStan: Przyjęty\nUwagi: ' + przedmiot[
+                                                    'itemcomments'] + '\n\nCzy chcesz wydać przedmiot?', self)
+                                            if istniejacyprzedmiotok:
+                                                przedmiot['itemstate'] = False
+                                                przedmiot['dateoflastoutcome'] = datetime.datetime.now()
+                                                przedmiot['useroflastoutcome'] = self.username
+                                                slotbaza.saveitem(przedmiot)
+                                                Dialog.komunikat('ok', 'Przedmiot został wydany z magazynu', self)
+                                                kolejnyprzedmiot = QuestionDialog.pytanie(
+                                                    'Czy chcesz wydać kolejny przedmiot z obszaru ' + str(areaid) + '?',
+                                                    self)
+                                            else:
+                                                Dialog.komunikat('warn',
+                                                                 'Przerwano proces wydawania przedmiotu.'
+                                                                 '\nPrzedmiot nie został wydany',
+                                                                 self)
+                                                self.unblurwindow()
                                         else:
-                                            Dialog.komunikat('warn',
-                                                             'Przerwano proces wydawania przedmiotu.'
-                                                             '\nPrzedmiot nie został wydany',
+                                            Dialog.komunikat('error',
+                                                             'Ten przedmiot jest już wydany z magazynu! '
+                                                             'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
                                                              self)
                                             self.unblurwindow()
                                     else:
                                         Dialog.komunikat('error',
-                                                         'Ten przedmiot jest już wydany z magazynu! '
+                                                         'Próbujesz wydać przedmiot, który nie znajduje się w bazie! '
                                                          'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
                                                          self)
                                         self.unblurwindow()
                                 else:
-                                    Dialog.komunikat('error',
-                                                     'Próbujesz wydać przedmiot, który nie znajduje się w bazie! '
-                                                     'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
-                                                     self)
+                                    Dialog.komunikat('warn', itemstatustxt, self)
                                     self.unblurwindow()
                             else:
-                                Dialog.komunikat('warn', itemstatustxt, self)
                                 self.unblurwindow()
-                        else:
-                            self.unblurwindow()
-                    self.unblurwindow()
+                        self.unblurwindow()
+                    else:
+                        Dialog.komunikat('warn',
+                                         'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
+                                         'do niego przedmioty.', self)
+                        self.unblurwindow()
                 else:
-                    Dialog.komunikat('warn', 'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
-                                             'do niego przedmioty.', self)
+                    Dialog.komunikat('warn', areastatustxt, self)
                     self.unblurwindow()
             else:
-                Dialog.komunikat('warn', areastatustxt, self)
                 self.unblurwindow()
-        else:
-            self.unblurwindow()
 
     # Funkcja rysująca obszary, po wcześniejszym wyczyszczeniu sceny
     def rysujobszary(self):
