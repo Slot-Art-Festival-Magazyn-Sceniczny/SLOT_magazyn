@@ -771,6 +771,10 @@ class SlotDialog(QDialog):
         self.lt_bottom.setObjectName("lt_bottom")
 
 
+class OrchestraModule(SlotDialog):
+    pass
+
+
 class Dialog(SlotDialog):
     def __init__(self, typ, tekst, parent=None):
         super(Dialog, self).__init__(parent)

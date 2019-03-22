@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem, QGra
 
 import slotbaza
 from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall, \
-    AreaList, ItemList
+    AreaList, ItemList, OrchestraModule
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,6 +145,7 @@ def barcodevalcheck(code, typ):
     return status, statustxt
 
 
+
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # Główna część programu
@@ -160,7 +161,7 @@ class Magazyn(MainWindow):
         super().__init__()
         self.setupUI()
         self.rysujobszary()
-
+        self.orchestramodule = OrchestraModule(self)
         # Domyślnie po włączeniu programu nikt nie jest zalogowany
         self.loginbypass = True  # Jeśli True to do obsługi programu niewymagane jest logowanie
         self.loginstatus = False
@@ -182,6 +183,7 @@ class Magazyn(MainWindow):
         self.btn_lookinside.clicked.connect(self.lookinside)
         self.btn_comein.clicked.connect(self.comein)
         self.btn_comeout.clicked.connect(self.comeout)
+        self.btn_orchestra.clicked.connect(self.orchestra)
         self.btn_exit.clicked.connect(self.close)
         self.viewer.rectChanged.connect(self.areadrawend)
 
@@ -601,6 +603,14 @@ class Magazyn(MainWindow):
                     self.unblurwindow()
             else:
                 self.unblurwindow()
+
+    def orchestra(self):
+        if not (self.loginstatus or self.loginbypass):
+            self.blurwindow()
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!')
+            self.unblurwindow()
+        else:
+            pass
 
     # Funkcja rysująca obszary, po wcześniejszym wyczyszczeniu sceny
     def rysujobszary(self):
