@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import time
 from PyQt5.QtCore import QRect, Qt, QSize, QMetaObject, QPropertyAnimation, QEasingCurve, QPoint, pyqtSignal
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QPainter
 from PyQt5.QtWidgets import QMainWindow, QFrame, QWidget, QPushButton, \
@@ -276,6 +277,7 @@ class MainWindow(QMainWindow):
             self.anim.setEndValue(10)
             self.anim.setEasingCurve(QEasingCurve.InQuad)
             self.anim.start()
+            self.disablebuttons()
 
     def unblurwindow(self):
         self.anim = QPropertyAnimation(self.blur, b'blurRadius')
@@ -288,6 +290,36 @@ class MainWindow(QMainWindow):
 
     def deleteblur(self):
         self.setGraphicsEffect(None)
+        self.enablebuttons()
+
+    def disablebuttons(self):
+        self.btn_login.setEnabled(False)
+        self.btn_logout.setEnabled(False)
+        self.btn_listofareas.setEnabled(False)
+        self.btn_itemcounter.setEnabled(False)
+        self.btn_addarea.setEnabled(False)
+        self.btn_editarea.setEnabled(False)
+        self.btn_finditem.setEnabled(False)
+        self.btn_comein.setEnabled(False)
+        self.btn_comeout.setEnabled(False)
+        self.btn_lookinside.setEnabled(False)
+        self.btn_orchestra.setEnabled(False)
+        self.btn_exit.setEnabled(False)
+
+    def enablebuttons(self):
+        time.sleep(0.1)
+        self.btn_login.setEnabled(True)
+        self.btn_logout.setEnabled(True)
+        self.btn_listofareas.setEnabled(True)
+        self.btn_itemcounter.setEnabled(True)
+        self.btn_addarea.setEnabled(True)
+        self.btn_editarea.setEnabled(True)
+        self.btn_finditem.setEnabled(True)
+        self.btn_comein.setEnabled(True)
+        self.btn_comeout.setEnabled(True)
+        self.btn_lookinside.setEnabled(True)
+        self.btn_orchestra.setEnabled(True)
+        self.btn_exit.setEnabled(True)
 
     def setmainwindow(self):
         self.setWindowModality(Qt.NonModal)
@@ -771,8 +803,34 @@ class SlotDialog(QDialog):
         self.lt_bottom.setObjectName("lt_bottom")
 
 
-class OrchestraModule(SlotDialog):
-    pass
+class OrchestraModule(QWidget):
+    def __init__(self, parent=None):
+        super(OrchestraModule, self).__init__(parent)
+        self.setwindow()
+
+    def setwindow(self):
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(100)
+        sizePolicy.setVerticalStretch(5)
+        self.setSizePolicy(sizePolicy)
+        self.setMinimumSize(QSize(200, 400))
+        self.setMaximumSize(QSize(200, 400))
+        self.setSizeIncrement(QSize(0, 0))
+        self.setStyleSheet(
+            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #B72100, stop:1 #21D4FD)")
+        self.setWindowFlags(Qt.Tool | Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        # self.setAttribute(Qt.WA_TranslucentBackground)
+        # self.setAttribute(Qt.WA_NoSystemBackground, True)
+
+    def toggleshow(self):
+        if self.isVisible():
+            self.hide()
+        else:
+            self.show()
+
+
+
+
 
 
 class Dialog(SlotDialog):

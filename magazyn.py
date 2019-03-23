@@ -604,13 +604,14 @@ class Magazyn(MainWindow):
             else:
                 self.unblurwindow()
 
+    # Moduł SLOT Orkiestry
     def orchestra(self):
         if not (self.loginstatus or self.loginbypass):
             self.blurwindow()
             Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!')
             self.unblurwindow()
         else:
-            pass
+            self.orchestramodule.toggleshow()
 
     # Funkcja rysująca obszary, po wcześniejszym wyczyszczeniu sceny
     def rysujobszary(self):
