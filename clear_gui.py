@@ -100,6 +100,9 @@ def mainstylesheet():
                  "QPushButton:pressed#btn_orchestra\n" \
                  "{background-color: #AA8400FF}\n" \
                  "\n" \
+                 "QPushButton:checked#btn_orchestra\n" \
+                 "{background-color: #558400FF}\n" \
+                 "\n" \
                  "QPushButton#btn_exit\n" \
                  "{background-color: #55C60018}\n" \
                  "\n" \
@@ -241,7 +244,7 @@ class _QGraphicsView(QGraphicsView):
     def mouseReleaseEvent(self, event):
         if self.mode == 'addarea':
             self.changeRubberBand = False
-            self.rectChanged.emit(self.rubberBand.geometry()) #Nadanie sygnału wyzwalającego koniec rysowania
+            self.rectChanged.emit(self.rubberBand.geometry())  # Nadanie sygnału wyzwalającego koniec rysowania
             # self.rubberBand.hide()
             QGraphicsView.mouseReleaseEvent(self, event)
         else:
@@ -605,6 +608,7 @@ class MainWindow(QMainWindow):
         self.btn_orchestra.setIconSize(QSize(24, 24))
         self.btn_orchestra.setFlat(False)
         self.btn_orchestra.setObjectName("btn_orchestra")
+        self.btn_orchestra.setCheckable(True)
         self.lt_buttons.addWidget(self.btn_orchestra)
 
         self.lt_leftside.addWidget(self.frm_buttons)
@@ -807,20 +811,167 @@ class OrchestraModule(QWidget):
     def __init__(self, parent=None):
         super(OrchestraModule, self).__init__(parent)
         self.setwindow()
+        self.setcentralwidget()
+        self.setframes()
+        self.setlayouts()
+        self.setbuttons()
+        self.setlabels()
+        self.setlineedits()
+
+        self.lt_central.addWidget(self.fr_top)
+        self.lt_central.addWidget(self.line)
+        self.lt_central.addWidget(self.fr_mid)
+        self.lt_central.addWidget(self.fr_bottom)
+        self.lt_module.addWidget(self.centralwidget, 0, 0, 1, 1)
 
     def setwindow(self):
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(100)
         sizePolicy.setVerticalStretch(5)
         self.setSizePolicy(sizePolicy)
-        self.setMinimumSize(QSize(200, 400))
+        self.setMinimumSize(QSize(100, 200))
         self.setMaximumSize(QSize(200, 400))
         self.setSizeIncrement(QSize(0, 0))
         self.setStyleSheet(
-            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #B72100, stop:1 #21D4FD)")
-        self.setWindowFlags(Qt.Tool | Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #FFFFFF, stop:1 #AAAAAA)")
+        self.setWindowFlags(Qt.Tool | Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint | Qt.WindowTitleHint)
+        self.setWindowFlag(Qt.WindowCloseButtonHint, False)
+        self.setWindowTitle('SLOT Orkiestra')
         # self.setAttribute(Qt.WA_TranslucentBackground)
         # self.setAttribute(Qt.WA_NoSystemBackground, True)
+
+    def setcentralwidget(self):
+        self.centralwidget = QWidget(self)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.centralwidget.setSizePolicy(sizePolicy)
+        self.centralwidget.setStyleSheet(dialogstylesheet())
+        self.centralwidget.setObjectName("centralwidget")
+
+    def setframes(self):
+        self.fr_top = QFrame(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+
+        self.fr_top.setSizePolicy(sizePolicy)
+        self.fr_top.setFrameShape(QFrame.NoFrame)
+        self.fr_top.setFrameShadow(QFrame.Plain)
+        self.fr_top.setLineWidth(0)
+        self.fr_top.setObjectName("fr_top")
+
+        self.line = QFrame(self.centralwidget)
+        self.line.setFrameShadow(QFrame.Plain)
+        self.line.setFrameShape(QFrame.HLine)
+        self.line.setObjectName("line")
+
+        self.fr_mid = QFrame(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+
+        self.fr_mid.setSizePolicy(sizePolicy)
+        self.fr_mid.setFrameShape(QFrame.NoFrame)
+        self.fr_mid.setFrameShadow(QFrame.Plain)
+        self.fr_mid.setLineWidth(0)
+        self.fr_mid.setObjectName("fr_mid")
+
+        self.fr_bottom = QFrame(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+
+        self.fr_bottom.setSizePolicy(sizePolicy)
+        self.fr_bottom.setFrameShape(QFrame.NoFrame)
+        self.fr_bottom.setFrameShadow(QFrame.Plain)
+        self.fr_bottom.setLineWidth(0)
+        self.fr_bottom.setObjectName("fr_bottom")
+
+    def setlayouts(self):
+        self.lt_module = QGridLayout(self)
+        self.lt_module.setObjectName("lt_module")
+        self.lt_module.setContentsMargins(0, 0, 0, 0)
+
+        self.lt_central = QVBoxLayout(self.centralwidget)
+        self.lt_central.setContentsMargins(0, 0, 0, 0)
+        self.lt_central.setSpacing(0)
+        self.lt_central.setObjectName("lt_central")
+
+        self.lt_top = QGridLayout(self.fr_top)
+        self.lt_top.setObjectName("lt_top")
+        self.lt_top.setContentsMargins(6, 6, 6, 6)
+        self.lt_top.setSpacing(6)
+
+        self.lt_mid = QVBoxLayout(self.fr_mid)
+        self.lt_mid.setContentsMargins(0, 0, 0, 0)
+        self.lt_mid.setSpacing(0)
+        self.lt_mid.setObjectName("lt_mid")
+
+        self.lt_bottom = QGridLayout(self)
+
+    def setbuttons(self):
+        self.btn_orchtable = QPushButton(self.fr_mid)
+        self.btn_orchtable.setText('Lista przedmiotów')
+        self.btn_orchtable.setMinimumWidth(100)
+        self.btn_orchtable.setMinimumHeight(50)
+        self.lt_mid.addWidget(self.btn_orchtable)
+
+        self.btn_orchfirstcomein = QPushButton(self.fr_mid)
+        self.btn_orchfirstcomein.setText('Przyjmij po raz pierwszy')
+        self.btn_orchfirstcomein.setMinimumWidth(100)
+        self.btn_orchfirstcomein.setMinimumHeight(50)
+        self.lt_mid.addWidget(self.btn_orchfirstcomein)
+
+        self.btn_orchcomein = QPushButton(self.fr_mid)
+        self.btn_orchcomein.setText('Przyjmij przedmiot')
+        self.btn_orchcomein.setMinimumWidth(100)
+        self.btn_orchcomein.setMinimumHeight(50)
+        self.lt_mid.addWidget(self.btn_orchcomein)
+
+        self.btn_orchcomeout = QPushButton(self.fr_mid)
+        self.btn_orchcomeout.setText('Wydaj przedmiot')
+        self.btn_orchcomeout.setMinimumWidth(100)
+        self.btn_orchcomeout.setMinimumHeight(50)
+        self.lt_mid.addWidget(self.btn_orchcomeout)
+
+    def setlabels(self):
+
+        self.lbl_items = QLabel(self.fr_top)
+        self.lbl_items.setText("Przedmioty")
+        self.lbl_items.setAlignment(Qt.AlignCenter)
+        self.lt_top.addWidget(self.lbl_items, 0, 0, 1, 2)
+
+        self.lbl_overall = QLabel(self.fr_top)
+        self.lbl_overall.setText('Łącznie:')
+        self.lbl_overall.setAlignment(Qt.AlignRight)
+        self.lt_top.addWidget(self.lbl_overall, 1, 0, 1, 1)
+
+        self.lbl_onmagazine = QLabel(self.fr_top)
+        self.lbl_onmagazine.setText('Na magazynie: ')
+        self.lbl_onmagazine.setAlignment(Qt.AlignRight)
+        self.lt_top.addWidget(self.lbl_onmagazine, 2, 0, 1, 1)
+
+        self.lbl_outmagazine = QLabel(self.fr_top)
+        self.lbl_outmagazine.setText('Poza magazynem: ')
+        self.lbl_outmagazine.setAlignment(Qt.AlignRight)
+        self.lt_top.addWidget(self.lbl_outmagazine, 3, 0, 1, 1)
+
+    def setlineedits(self):
+        self.le_overall = QLineEdit(self.fr_top)
+        self.le_overall.setText('0')
+        self.le_overall.setReadOnly(True)
+        self.lt_top.addWidget(self.le_overall, 1, 1, 1, 1)
+
+        self.le_onmagazine = QLineEdit(self.fr_top)
+        self.le_onmagazine.setText('0')
+        self.le_onmagazine.setReadOnly(True)
+        self.lt_top.addWidget(self.le_onmagazine, 2, 1, 1, 1)
+
+        self.le_outmagazine = QLineEdit(self.fr_top)
+        self.le_outmagazine.setText('0')
+        self.le_outmagazine.setReadOnly(True)
+        self.lt_top.addWidget(self.le_outmagazine, 3, 1, 1, 1)
 
     def toggleshow(self):
         if self.isVisible():
@@ -828,9 +979,25 @@ class OrchestraModule(QWidget):
         else:
             self.show()
 
+    def unblurwindow(self):
+        self.anim = QPropertyAnimation(self.blur, b'blurRadius')
+        self.anim.setDuration(500)
+        self.anim.setStartValue(self.blur.blurRadius())
+        self.anim.setEndValue(0)
+        self.anim.setEasingCurve(QEasingCurve.OutQuad)
+        self.anim.start()
+        self.anim.finished.connect(self.deleteblur)
 
+    def deleteblur(self):
+        self.setGraphicsEffect(None)
+        self.enablebuttons()
 
+    def disablebuttons(self):
+        pass
 
+    def enablebuttons(self):
+        time.sleep(0.1)
+        pass
 
 
 class Dialog(SlotDialog):
