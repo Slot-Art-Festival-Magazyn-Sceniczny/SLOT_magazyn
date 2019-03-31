@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+
 from PyQt5.QtCore import QRect, Qt, QSize, QMetaObject, QPropertyAnimation, QEasingCurve, QPoint, pyqtSignal
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QPainter
 from PyQt5.QtWidgets import QMainWindow, QFrame, QWidget, QPushButton, \
@@ -20,6 +21,9 @@ def mainstylesheet():
                  "QWidget#centralwidget\n" \
                  "{background-color: " \
                  "qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #B721FF, stop:1 #21D4FD);}\n" \
+                 "\n" \
+                 "QWidget#orch_centralwidget\n" \
+                 "{background-color: #558400FF}}\n" \
                  "\n" \
                  "QGraphicsView\n" \
                  "{background-color: #22FFFFFF}\n" \
@@ -70,6 +74,18 @@ def mainstylesheet():
                  "QPushButton#btn_exit\n" \
                  "{Text-align:left; padding-left: 30px;}\n" \
                  "\n" \
+                 "QPushButton#btn_orchtable\n" \
+                 "{Text-align:left; padding-left: 20px;}\n" \
+                 "\n" \
+                 "QPushButton#btn_orchfirstcomein\n" \
+                 "{Text-align:left; padding-left: 20px;}\n" \
+                 "\n" \
+                 "QPushButton#btn_orchcomein\n" \
+                 "{Text-align:left; padding-left: 20px;}\n" \
+                 "\n" \
+                 "QPushButton#btn_orchcomeout\n" \
+                 "{Text-align:left; padding-left: 20px;}\n" \
+                 "\n" \
                  "QPushButton:hover#btn_finditem\n" \
                  "{background-color: #550065FF}\n" \
                  "\n" \
@@ -77,6 +93,12 @@ def mainstylesheet():
                  "{background-color: #5500AE37}\n" \
                  "\n" \
                  "QPushButton:hover#btn_comeout\n" \
+                 "{background-color: #55C60018}\n" \
+                 "\n" \
+                 "QPushButton:hover#btn_orchcomein\n" \
+                 "{background-color: #5500AE37}\n" \
+                 "\n" \
+                 "QPushButton:hover#btn_orchcomeout\n" \
                  "{background-color: #55C60018}\n" \
                  "\n" \
                  "QPushButton:hover#btn_lookinside\n" \
@@ -110,7 +132,21 @@ def mainstylesheet():
                  "{background-color: #AAC60018}\n" \
                  "\n" \
                  "QPushButton:pressed#btn_exit\n" \
-                 "{background-color: #FFC60018}"
+                 "{background-color: #FFC60018}" \
+                 "\n" \
+                 "QLineEdit\n" \
+                 "{background-color: #22FFFFFF; color: white; selection-background-color: darkgray; " \
+                 "border-style: none; border-color: #FFFFFF; border-width: 1px; border-radius: 5px;}" \
+                 "QPlainTextEdit\n" \
+                 "{background-color: #22FFFFFF; color: white; selection-background-color: darkgray; " \
+                 "border-style: none; border-color: #FFFFFF; border-width: 1px; border-radius: 5px;}" \
+                 "QLabel\n" \
+                 "{color: #FFFFFFFF}\n" \
+                 "\n" \
+                 "QFrame#line\n" \
+                 "{color: #88FFFFFF}\n" \
+                 "\n"
+
     return stylesheet
 
 
@@ -260,11 +296,13 @@ class MainWindow(QMainWindow):
         self.setwidgets()
         self.settext()
         self.setcentralwidget()
+        self.setOrchestraModule()
 
         QMetaObject.connectSlotsByName(self)
         self.setWindowTitle("Magazyn Sceniczny")
 
         self.showFullScreen()
+        self.moveOrchestraModule()
 
     def blurwindow(self):
         try:
@@ -689,6 +727,19 @@ class MainWindow(QMainWindow):
         # self.viewer.scale(scale, scale)
         self.lt_rightside.addWidget(self.viewer)
 
+    def setOrchestraModule(self):
+        self.orchestramodule = OrchestraModule(self)
+        self.orchestramodule.setMinimumWidth(200)
+        self.orchestramodule.setMinimumHeight(290)
+        self.orchestramodule.hide()
+
+    def moveOrchestraModule(self):
+        pozycja = self.btn_orchestra.pos()
+        pozycjax = pozycja.x() + 260
+        pozycjay = pozycja.y() - 1
+        self.orchestramodule.move(pozycjax, pozycjay)
+
+
 
 class SlotDialog(QDialog):
 
@@ -808,7 +859,7 @@ class SlotDialog(QDialog):
 
 
 class OrchestraModule(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent):
         super(OrchestraModule, self).__init__(parent)
         self.setwindow()
         self.setcentralwidget()
@@ -818,11 +869,11 @@ class OrchestraModule(QWidget):
         self.setlabels()
         self.setlineedits()
 
-        self.lt_central.addWidget(self.fr_top)
-        self.lt_central.addWidget(self.line)
-        self.lt_central.addWidget(self.fr_mid)
-        self.lt_central.addWidget(self.fr_bottom)
-        self.lt_module.addWidget(self.centralwidget, 0, 0, 1, 1)
+        self.orch_lt_central.addWidget(self.orch_fr_top)
+        self.orch_lt_central.addWidget(self.line)
+        self.orch_lt_central.addWidget(self.orch_fr_mid)
+        self.orch_lt_central.addWidget(self.orch_fr_bottom)
+        self.orch_lt_module.addWidget(self.orch_centralwidget, 0, 0, 1, 1)
 
     def setwindow(self):
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -832,165 +883,191 @@ class OrchestraModule(QWidget):
         self.setMinimumSize(QSize(100, 200))
         self.setMaximumSize(QSize(200, 400))
         self.setSizeIncrement(QSize(0, 0))
-        self.setStyleSheet(
-            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #FFFFFF, stop:1 #AAAAAA)")
-        self.setWindowFlags(Qt.Tool | Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint | Qt.WindowTitleHint)
-        self.setWindowFlag(Qt.WindowCloseButtonHint, False)
-        self.setWindowTitle('SLOT Orkiestra')
+        # self.setStyleSheet(
+        #     "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #FFFFFF, stop:1 #AAAAAA)")
+        # self.setWindowFlags(Qt.Tool | Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint | Qt.WindowTitleHint)
+        # self.setWindowFlag(Qt.WindowCloseButtonHint, False)
+        # self.setWindowTitle('SLOT Orkiestra')
         # self.setAttribute(Qt.WA_TranslucentBackground)
         # self.setAttribute(Qt.WA_NoSystemBackground, True)
 
     def setcentralwidget(self):
-        self.centralwidget = QWidget(self)
+        self.orch_centralwidget = QWidget(self)
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        self.centralwidget.setSizePolicy(sizePolicy)
-        self.centralwidget.setStyleSheet(dialogstylesheet())
-        self.centralwidget.setObjectName("centralwidget")
+        self.orch_centralwidget.setSizePolicy(sizePolicy)
+        self.orch_centralwidget.setStyleSheet(mainstylesheet())
+        self.orch_centralwidget.setObjectName("orch_centralwidget")
 
     def setframes(self):
-        self.fr_top = QFrame(self.centralwidget)
+        self.orch_fr_top = QFrame(self.orch_centralwidget)
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
 
-        self.fr_top.setSizePolicy(sizePolicy)
-        self.fr_top.setFrameShape(QFrame.NoFrame)
-        self.fr_top.setFrameShadow(QFrame.Plain)
-        self.fr_top.setLineWidth(0)
-        self.fr_top.setObjectName("fr_top")
+        self.orch_fr_top.setSizePolicy(sizePolicy)
+        self.orch_fr_top.setFrameShape(QFrame.NoFrame)
+        self.orch_fr_top.setFrameShadow(QFrame.Plain)
+        self.orch_fr_top.setLineWidth(0)
+        self.orch_fr_top.setObjectName("orch_fr_top")
 
-        self.line = QFrame(self.centralwidget)
+        self.line = QFrame(self.orch_centralwidget)
         self.line.setFrameShadow(QFrame.Plain)
         self.line.setFrameShape(QFrame.HLine)
         self.line.setObjectName("line")
 
-        self.fr_mid = QFrame(self.centralwidget)
+        self.orch_fr_mid = QFrame(self.orch_centralwidget)
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
 
-        self.fr_mid.setSizePolicy(sizePolicy)
-        self.fr_mid.setFrameShape(QFrame.NoFrame)
-        self.fr_mid.setFrameShadow(QFrame.Plain)
-        self.fr_mid.setLineWidth(0)
-        self.fr_mid.setObjectName("fr_mid")
+        self.orch_fr_mid.setSizePolicy(sizePolicy)
+        self.orch_fr_mid.setFrameShape(QFrame.NoFrame)
+        self.orch_fr_mid.setFrameShadow(QFrame.Plain)
+        self.orch_fr_mid.setLineWidth(0)
+        self.orch_fr_mid.setObjectName("orch_fr_mid")
 
-        self.fr_bottom = QFrame(self.centralwidget)
+        self.orch_fr_bottom = QFrame(self.orch_centralwidget)
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
 
-        self.fr_bottom.setSizePolicy(sizePolicy)
-        self.fr_bottom.setFrameShape(QFrame.NoFrame)
-        self.fr_bottom.setFrameShadow(QFrame.Plain)
-        self.fr_bottom.setLineWidth(0)
-        self.fr_bottom.setObjectName("fr_bottom")
+        self.orch_fr_bottom.setSizePolicy(sizePolicy)
+        self.orch_fr_bottom.setFrameShape(QFrame.NoFrame)
+        self.orch_fr_bottom.setFrameShadow(QFrame.Plain)
+        self.orch_fr_bottom.setLineWidth(0)
+        self.orch_fr_bottom.setObjectName("orch_fr_bottom")
 
     def setlayouts(self):
-        self.lt_module = QGridLayout(self)
-        self.lt_module.setObjectName("lt_module")
-        self.lt_module.setContentsMargins(0, 0, 0, 0)
+        self.orch_lt_module = QGridLayout(self)
+        self.orch_lt_module.setObjectName("orch_lt_module")
+        self.orch_lt_module.setContentsMargins(0, 0, 0, 0)
 
-        self.lt_central = QVBoxLayout(self.centralwidget)
-        self.lt_central.setContentsMargins(0, 0, 0, 0)
-        self.lt_central.setSpacing(0)
-        self.lt_central.setObjectName("lt_central")
+        self.orch_lt_central = QVBoxLayout(self.orch_centralwidget)
+        self.orch_lt_central.setContentsMargins(0, 0, 0, 0)
+        self.orch_lt_central.setSpacing(0)
+        self.orch_lt_central.setObjectName("orch_lt_central")
 
-        self.lt_top = QGridLayout(self.fr_top)
-        self.lt_top.setObjectName("lt_top")
-        self.lt_top.setContentsMargins(6, 6, 6, 6)
-        self.lt_top.setSpacing(6)
+        self.orch_lt_top = QGridLayout(self.orch_fr_top)
+        self.orch_lt_top.setObjectName("orch_lt_top")
+        self.orch_lt_top.setContentsMargins(6, 6, 6, 6)
+        self.orch_lt_top.setSpacing(6)
 
-        self.lt_mid = QVBoxLayout(self.fr_mid)
-        self.lt_mid.setContentsMargins(0, 0, 0, 0)
-        self.lt_mid.setSpacing(0)
-        self.lt_mid.setObjectName("lt_mid")
+        self.orch_lt_mid = QVBoxLayout(self.orch_fr_mid)
+        self.orch_lt_mid.setContentsMargins(0, 0, 0, 0)
+        self.orch_lt_mid.setSpacing(0)
+        self.orch_lt_mid.setObjectName("orch_lt_mid")
 
-        self.lt_bottom = QGridLayout(self)
+        self.orch_lt_bottom = QGridLayout(self)
 
     def setbuttons(self):
-        self.btn_orchtable = QPushButton(self.fr_mid)
+        font = QFont()
+        font.setFamily("Arial")
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(60)
+
+        icon1 = QIcon()
+        icon1.addPixmap(QPixmap("images/buttons/btn_listofareas_hover.png"), QIcon.Normal, QIcon.Off)
+        icon2 = QIcon()
+        icon2.addPixmap(QPixmap("images/buttons/btn_comein_first_hover.png"), QIcon.Normal, QIcon.Off)
+        icon3 = QIcon()
+        icon3.addPixmap(QPixmap("images/buttons/btn_comein_hover.png"), QIcon.Normal, QIcon.Off)
+        icon4 = QIcon()
+        icon4.addPixmap(QPixmap("images/buttons/btn_comeout_hover.png"), QIcon.Normal, QIcon.Off)
+
+        iconsize = 20
+
+        self.btn_orchtable = QPushButton(self.orch_fr_mid)
         self.btn_orchtable.setText('Lista przedmiotów')
         self.btn_orchtable.setMinimumWidth(100)
         self.btn_orchtable.setMinimumHeight(50)
-        self.lt_mid.addWidget(self.btn_orchtable)
+        self.btn_orchtable.setFont(font)
+        self.btn_orchtable.setObjectName("btn_orchtable")
+        self.btn_orchtable.setIcon(icon1)
+        self.btn_orchtable.setIconSize(QSize(iconsize, iconsize))
+        self.orch_lt_mid.addWidget(self.btn_orchtable)
 
-        self.btn_orchfirstcomein = QPushButton(self.fr_mid)
+        self.btn_orchfirstcomein = QPushButton(self.orch_fr_mid)
         self.btn_orchfirstcomein.setText('Przyjmij po raz pierwszy')
         self.btn_orchfirstcomein.setMinimumWidth(100)
         self.btn_orchfirstcomein.setMinimumHeight(50)
-        self.lt_mid.addWidget(self.btn_orchfirstcomein)
+        self.btn_orchfirstcomein.setFont(font)
+        self.btn_orchfirstcomein.setObjectName("btn_orchfirstcomein")
+        self.btn_orchfirstcomein.setIcon(icon2)
+        self.btn_orchfirstcomein.setIconSize(QSize(iconsize, iconsize))
+        self.orch_lt_mid.addWidget(self.btn_orchfirstcomein)
 
-        self.btn_orchcomein = QPushButton(self.fr_mid)
+        self.btn_orchcomein = QPushButton(self.orch_fr_mid)
         self.btn_orchcomein.setText('Przyjmij przedmiot')
         self.btn_orchcomein.setMinimumWidth(100)
         self.btn_orchcomein.setMinimumHeight(50)
-        self.lt_mid.addWidget(self.btn_orchcomein)
+        self.btn_orchcomein.setFont(font)
+        self.btn_orchcomein.setObjectName("btn_orchcomein")
+        self.btn_orchcomein.setIcon(icon3)
+        self.btn_orchcomein.setIconSize(QSize(iconsize, iconsize))
+        self.orch_lt_mid.addWidget(self.btn_orchcomein)
 
-        self.btn_orchcomeout = QPushButton(self.fr_mid)
+        self.btn_orchcomeout = QPushButton(self.orch_fr_mid)
         self.btn_orchcomeout.setText('Wydaj przedmiot')
         self.btn_orchcomeout.setMinimumWidth(100)
         self.btn_orchcomeout.setMinimumHeight(50)
-        self.lt_mid.addWidget(self.btn_orchcomeout)
+        self.btn_orchcomeout.setFont(font)
+        self.btn_orchcomeout.setObjectName("btn_orchcomeout")
+        self.btn_orchcomeout.setIcon(icon4)
+        self.btn_orchcomeout.setIconSize(QSize(iconsize, iconsize))
+        self.orch_lt_mid.addWidget(self.btn_orchcomeout)
 
     def setlabels(self):
+        font = QFont()
+        font.setFamily("Arial")
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(50)
 
-        self.lbl_items = QLabel(self.fr_top)
+        self.lbl_items = QLabel(self.orch_fr_top)
         self.lbl_items.setText("Przedmioty")
+        # self.lbl_items.setFont(font)
         self.lbl_items.setAlignment(Qt.AlignCenter)
-        self.lt_top.addWidget(self.lbl_items, 0, 0, 1, 2)
+        self.orch_lt_top.addWidget(self.lbl_items, 0, 0, 1, 2)
 
-        self.lbl_overall = QLabel(self.fr_top)
+        self.lbl_overall = QLabel(self.orch_fr_top)
         self.lbl_overall.setText('Łącznie:')
         self.lbl_overall.setAlignment(Qt.AlignRight)
-        self.lt_top.addWidget(self.lbl_overall, 1, 0, 1, 1)
+        self.orch_lt_top.addWidget(self.lbl_overall, 1, 0, 1, 1)
 
-        self.lbl_onmagazine = QLabel(self.fr_top)
+        self.lbl_onmagazine = QLabel(self.orch_fr_top)
         self.lbl_onmagazine.setText('Na magazynie: ')
         self.lbl_onmagazine.setAlignment(Qt.AlignRight)
-        self.lt_top.addWidget(self.lbl_onmagazine, 2, 0, 1, 1)
+        self.orch_lt_top.addWidget(self.lbl_onmagazine, 2, 0, 1, 1)
 
-        self.lbl_outmagazine = QLabel(self.fr_top)
+        self.lbl_outmagazine = QLabel(self.orch_fr_top)
         self.lbl_outmagazine.setText('Poza magazynem: ')
         self.lbl_outmagazine.setAlignment(Qt.AlignRight)
-        self.lt_top.addWidget(self.lbl_outmagazine, 3, 0, 1, 1)
+        self.orch_lt_top.addWidget(self.lbl_outmagazine, 3, 0, 1, 1)
 
     def setlineedits(self):
-        self.le_overall = QLineEdit(self.fr_top)
+        self.le_overall = QLineEdit(self.orch_fr_top)
         self.le_overall.setText('0')
         self.le_overall.setReadOnly(True)
-        self.lt_top.addWidget(self.le_overall, 1, 1, 1, 1)
+        self.orch_lt_top.addWidget(self.le_overall, 1, 1, 1, 1)
 
-        self.le_onmagazine = QLineEdit(self.fr_top)
+        self.le_onmagazine = QLineEdit(self.orch_fr_top)
         self.le_onmagazine.setText('0')
         self.le_onmagazine.setReadOnly(True)
-        self.lt_top.addWidget(self.le_onmagazine, 2, 1, 1, 1)
+        self.orch_lt_top.addWidget(self.le_onmagazine, 2, 1, 1, 1)
 
-        self.le_outmagazine = QLineEdit(self.fr_top)
+        self.le_outmagazine = QLineEdit(self.orch_fr_top)
         self.le_outmagazine.setText('0')
         self.le_outmagazine.setReadOnly(True)
-        self.lt_top.addWidget(self.le_outmagazine, 3, 1, 1, 1)
+        self.orch_lt_top.addWidget(self.le_outmagazine, 3, 1, 1, 1)
 
     def toggleshow(self):
         if self.isVisible():
             self.hide()
         else:
             self.show()
-
-    def unblurwindow(self):
-        self.anim = QPropertyAnimation(self.blur, b'blurRadius')
-        self.anim.setDuration(500)
-        self.anim.setStartValue(self.blur.blurRadius())
-        self.anim.setEndValue(0)
-        self.anim.setEasingCurve(QEasingCurve.OutQuad)
-        self.anim.start()
-        self.anim.finished.connect(self.deleteblur)
-
-    def deleteblur(self):
-        self.setGraphicsEffect(None)
-        self.enablebuttons()
 
     def disablebuttons(self):
         pass
