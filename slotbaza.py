@@ -68,7 +68,7 @@ class User(ModelBazy):
 
 
 class Orchestra(ModelBazy):
-    orchestraID = IntegerField(unique=True)
+    orchestraID = IntegerField(unique=True, primary_key=True)
     orchestrabarcode = CharField(unique=True)
     firstname = CharField()
     secondname = CharField()
@@ -86,11 +86,13 @@ def closeconnection():
     baza.close()
 
 
-# Zamkniecie połączenia z bazą
+# Stworzenie tablic
 def createtables():
-    openconnection()
-    baza.create_tables([Area, Item, User, Orchestra])
-    closeconnection()
+    pass
+    # openconnection()
+    # baza.create_tables([Area, Item, User, Orchestra])
+    # baza.create_tables([Orchestra])
+    # closeconnection()
 
 
 # Sprawdzenie czy obszar o podanym ID istnieje
@@ -116,7 +118,8 @@ def createarea(areaid, areabarcode, areaname, posx, posy, sizex, sizey, user):
     if isareaexist(areaid):
         pass
     else:
-        Area.create(areaid=areaid, areabarcode=areabarcode, areaname = areaname,posx=posx, posy=posy, sizex=sizex, sizey=sizey,
+        Area.create(areaid=areaid, areabarcode=areabarcode, areaname=areaname, posx=posx, posy=posy, sizex=sizex,
+                    sizey=sizey,
                     dateofcreation=datetime.datetime.now(), userofcreation=user)
 
 
@@ -309,6 +312,34 @@ def loaditemsinarea(areaid):
         itemdictlist.append(itemdict)
         itemdict = {}
     return itemdictlist
+
+
+def isorchexist(orchestraID):
+    try:
+        Orchestra.get_by_id(orchestraID)
+        return True
+    except:
+        return False
+
+
+def orchfirstcomein(orchestraID, orchestrabarcode, firstname, secondname):
+    if isorchexist(orchestraID):
+        pass
+    else:
+        Orchestra.create(orchestraID=orchestraID, orchestrabarcode=orchestrabarcode,
+                         firstname=firstname, secondname=secondname, itemstate=True)
+
+
+def orchcountall():
+    lista = Orchestra.select()
+    dlugosc = len(lista)
+    return (dlugosc)
+
+
+def orchcountpresent():
+    lista = Orchestra.select().where(Orchestra.itemstate == True)
+    dlugosc = len(lista)
+    return (dlugosc)
 
 
 # stworzenie nowego użytkownika

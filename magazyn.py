@@ -145,7 +145,6 @@ def barcodevalcheck(code, typ):
     return status, statustxt
 
 
-
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # Główna część programu
@@ -167,6 +166,7 @@ class Magazyn(MainWindow):
         self.username = 'NONE'
         self.usertype = 'user'
         self.logstatus.setText("<FONT COLOR=\'#FF4444\'> Niezalogowany")
+        self.updateorchcounters()
 
         # Połączenie przycisków z odpowiednimi funkcjami
         self.connectbuttons()
@@ -185,6 +185,7 @@ class Magazyn(MainWindow):
         self.btn_comeout.clicked.connect(self.comeout)
         self.btn_orchestra.clicked.connect(self.orchestra)
         self.btn_exit.clicked.connect(self.close)
+        self.orchestramodule.btn_orchtable.clicked.connect(self.orchtable)
         self.viewer.rectChanged.connect(self.areadrawend)
 
     # Moduł logowania do programu
@@ -615,6 +616,18 @@ class Magazyn(MainWindow):
             self.unblurwindow()
         else:
             self.orchestramodule.toggleshow()
+            self.updateorchcounters()
+
+    def updateorchcounters(self):
+        overall = slotbaza.orchcountall()
+        present = slotbaza.orchcountpresent()
+        nonpresent = overall - present
+        self.orchestramodule.le_overall.setText(str(overall))
+        self.orchestramodule.le_onmagazine.setText(str(present))
+        self.orchestramodule.le_outmagazine.setText(str(nonpresent))
+
+    def orchtable(self):
+        pass
 
     # Funkcja rysująca obszary, po wcześniejszym wyczyszczeniu sceny
     def rysujobszary(self):
