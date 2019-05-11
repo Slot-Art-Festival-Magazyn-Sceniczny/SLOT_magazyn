@@ -664,18 +664,20 @@ class Magazyn(MainWindow):
                                 if orchitemstatus == 0:
                                     orchitemid = barcodetoid(orchitembarcode, 'int')
                                     if orchid == orchitemid:
-                                        nowyorchitem['ochstate'] = True
+                                        nowyorchitem['itemstate'] = True
                                         nowyorchitem['dateoflastincome'] = datetime.datetime.now()
                                         nowyorchitem['useroflastincome'] = self.username
                                         slotbaza.saveorch(nowyorchitem)
                                         Dialog.komunikat('ok', 'Poprawnie przyjęto przedmiot do SLOT Orkiestry', self)
                                         self.unblurwindow()
+                                        self.updateorchcounters()
                                     else:
                                         Dialog.komunikat('error',
                                                          'Kod naklejony na plakietkę i na przedmiot Różnią się! Jeśli '
                                                          'nie wiesz dlaczego, wezwij szefa ekipy!',
                                                          self)
                                         self.unblurwindow()
+                                        self.updateorchcounters()
                                 else:
                                     Dialog.komunikat('warn', orchitemstatustxt, self)
                                     Dialog.komunikat('warn',
@@ -683,24 +685,29 @@ class Magazyn(MainWindow):
                                                      'ale przedmiot nie został przyjety na magazyn!',
                                                      self)
                                     self.unblurwindow()
+                                    self.updateorchcounters()
                             else:
                                 Dialog.komunikat('warn',
                                                  'Nie wczytano kodu z przedmiotu! Wpis w bazie został utworzony, '
                                                  'ale przedmiot nie został przyjety na magazyn!',
                                                  self)
                                 self.unblurwindow()
+                                self.updateorchcounters()
                         else:
                             Dialog.komunikat('warn',
                                              'Przerwano proces edycji obszaru! Wpis w bazie został utworzony, '
                                              'ale żadne zmiany nie zostały zapisane.',
                                              self)
                             self.unblurwindow()
+                            self.updateorchcounters()
                 else:
                     Dialog.komunikat('warn', orchstatustxt, self)
                     self.unblurwindow()
+                    self.updateorchcounters()
             else:
                 Dialog.komunikat('warn', 'Przerwano proces edycji obszaru! Żadne zmiany nie zostały zapisane.', self)
                 self.unblurwindow()
+                self.updateorchcounters()
 
     def orchcomein(self):
         pass
