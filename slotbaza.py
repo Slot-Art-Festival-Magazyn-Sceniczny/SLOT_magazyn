@@ -68,12 +68,21 @@ class User(ModelBazy):
 
 
 class Orchestra(ModelBazy):
-    orchestraID = IntegerField(unique=True)
+    orchestraid = IntegerField(unique=True, primary_key=True)
     orchestrabarcode = CharField(unique=True)
-    firstname = CharField()
-    secondname = CharField()
-    itemname = CharField()
-    itemstate = BooleanField()
+    firstname = CharField(default='')
+    secondname = CharField(default='')
+    itemname = CharField(default='')
+    itemcomments = TextField(default='')
+    itemstate = BooleanField(default=False)
+    dateofcreation = DateTimeField(default='')
+    userofcreation = CharField(default='')
+    dateoffirstincome = DateTimeField(default='')
+    useroffirstincome = CharField(default='')
+    dateoflastincome = DateTimeField(default='')
+    useroflastincome = CharField(default='')
+    dateoflastoutcome = DateTimeField(default='')
+    useroflastoutcome = CharField(default='')
 
 
 # Stworzenie tabel - wykonywac tylko raz!!!
@@ -111,12 +120,21 @@ def isitemexist(itemid):
         return False
 
 
+def isorchexist(orchid):
+    try:
+        Orchestra.get_by_id(orchid)
+        return True
+    except:
+        return False
+
+
 # Stworenie obszaru
 def createarea(areaid, areabarcode, areaname, posx, posy, sizex, sizey, user):
     if isareaexist(areaid):
         pass
     else:
-        Area.create(areaid=areaid, areabarcode=areabarcode, areaname = areaname,posx=posx, posy=posy, sizex=sizex, sizey=sizey,
+        Area.create(areaid=areaid, areabarcode=areabarcode, areaname=areaname, posx=posx, posy=posy, sizex=sizex,
+                    sizey=sizey,
                     dateofcreation=datetime.datetime.now(), userofcreation=user)
 
 
@@ -202,20 +220,20 @@ def createitem(itemid, itembarcode, itemname, areaass):
 def loaditem(itemid):
     if isitemexist(itemid):
         item = Item.get_by_id(itemid)
-        iremdict = {}
-        iremdict['itemid'] = item.itemid
-        iremdict['itembarcode'] = item.itembarcode
-        iremdict['itemname'] = item.itemname
-        iremdict['itemstate'] = item.itemstate
-        iremdict['dateoffirstincome'] = item.dateoffirstincome
-        iremdict['useroffirstincome'] = item.useroffirstincome
-        iremdict['dateoflastincome'] = item.dateoflastincome
-        iremdict['useroflastincome'] = item.useroflastincome
-        iremdict['dateoflastoutcome'] = item.dateoflastoutcome
-        iremdict['useroflastoutcome'] = item.useroflastoutcome
-        iremdict['itemcomments'] = item.itemcomments
-        iremdict['areaass'] = item.areaass
-        return iremdict
+        itemdict = {}
+        itemdict['itemid'] = item.itemid
+        itemdict['itembarcode'] = item.itembarcode
+        itemdict['itemname'] = item.itemname
+        itemdict['itemstate'] = item.itemstate
+        itemdict['dateoffirstincome'] = item.dateoffirstincome
+        itemdict['useroffirstincome'] = item.useroffirstincome
+        itemdict['dateoflastincome'] = item.dateoflastincome
+        itemdict['useroflastincome'] = item.useroflastincome
+        itemdict['dateoflastoutcome'] = item.dateoflastoutcome
+        itemdict['useroflastoutcome'] = item.useroflastoutcome
+        itemdict['itemcomments'] = item.itemcomments
+        itemdict['areaass'] = item.areaass
+        return itemdict
     else:
         pass
 
@@ -309,6 +327,61 @@ def loaditemsinarea(areaid):
         itemdictlist.append(itemdict)
         itemdict = {}
     return itemdictlist
+
+
+def createorch(orchid, orchbarcode, user):
+    if isorchexist(orchid):
+        pass
+    else:
+        Orchestra.create(orchestraid=orchid, orchestrabarcode=orchbarcode, userofcreation=user,
+                         dateofcreation=datetime.datetime.now())
+
+
+def loadorch(orchid):
+    if isorchexist(orchid):
+        orch = Orchestra.get_by_id(orchid)
+        orchdict = {}
+        orchdict['orchid'] = orch.orchestraid
+        orchdict['orchbarcode'] = orch.orchestrabarcode
+        orchdict['firstname'] = orch.firstname
+        orchdict['lastname'] = orch.secondname
+        orchdict['itemname'] = orch.itemname
+        orchdict['itemcomments'] = orch.itemcomments
+        orchdict['itemstate'] = orch.itemstate
+        orchdict['dateofcreation'] = orch.dateofcreation
+        orchdict['userofcreation'] = orch.userofcreation
+        orchdict['dateoffirstincome'] = orch.dateoffirstincome
+        orchdict['useroffirstincome'] = orch.useroffirstincome
+        orchdict['dateoflastincome'] = orch.dateoflastincome
+        orchdict['useroflastincome'] = orch.useroflastincome
+        orchdict['dateoflastoutcome'] = orch.dateoflastoutcome
+        orchdict['useroflastoutcome'] = orch.useroflastoutcome
+        return orchdict
+    else:
+        pass
+
+
+def saveorch(orchdict):
+    if isorchexist(orchdict['orchid']):
+        orch = Orchestra.get_by_id(orchdict['orchid'])
+        orch.orchestraid = orchdict['orchid']
+        orch.orchestrabarcode = orchdict['orchbarcode']
+        orch.firstname = orchdict['firstname']
+        orch.secondname = orchdict['lastname']
+        orch.itemname = orchdict['itemname']
+        orch.itemcomments = orchdict['itemcomments']
+        orch.itemstate = orchdict['itemstate']
+        orch.dateofcreation = orchdict['dateofcreation']
+        orch.userofcreation = orchdict['userofcreation']
+        orch.dateoffirstincome = orchdict['dateoffirstincome']
+        orch.useroffirstincome = orchdict['useroffirstincome']
+        orch.dateoflastincome = orchdict['dateoflastincome']
+        orch.useroflastincome = orchdict['useroflastincome']
+        orch.dateoflastoutcome = orchdict['dateoflastoutcome']
+        orch.useroflastoutcome = orchdict['useroflastoutcome']
+        orch.save()
+    else:
+        pass
 
 
 # stworzenie nowego użytkownika

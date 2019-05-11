@@ -740,7 +740,6 @@ class MainWindow(QMainWindow):
         self.orchestramodule.move(pozycjax, pozycjay)
 
 
-
 class SlotDialog(QDialog):
 
     def setall(self):
@@ -2001,3 +2000,255 @@ class ItemList(QDialog):
         dialog = AreaList(model, parent)
         ok = dialog.exec_()
         return ok == QDialog.Accepted
+
+
+class OrchEditDialog(QDialog):
+    def __init__(self, orchdict, locked, buttontext, parent=None):
+        super(OrchEditDialog, self).__init__(parent)
+
+        self.orchdict = orchdict
+        self.locked = locked
+        self.buttontext = buttontext
+        self.setwindow()
+        self.setcentralwidget()
+        self.setframes()
+        self.setlayouts()
+        self.setbuttons()
+        self.setlabels()
+        self.setedits()
+        print('before filling edits')
+        self.filledits()
+        print('after filling edits')
+
+        self.line = QFrame(self.centralwidget)
+        self.line.setFrameShadow(QFrame.Plain)
+        self.line.setFrameShape(QFrame.HLine)
+        self.line.setObjectName("line")
+        print('after setting line')
+
+        self.setmainlabel()
+        print('after setting main label')
+        self.addwidgets()
+        print('widgets added')
+        self.buttonok.clicked.connect(self.accept)
+        self.buttoncancel.clicked.connect(self.reject)
+        print('init done')
+
+    def setwindow(self):
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(100)
+        sizePolicy.setVerticalStretch(5)
+        self.setSizePolicy(sizePolicy)
+        self.setMinimumSize(QSize(300, 300))
+        self.setMaximumSize(QSize(300, 300))
+        self.setSizeIncrement(QSize(0, 0))
+        self.setStyleSheet(
+            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #B721FF, stop:1 #21D4FD)")
+        self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_NoSystemBackground, True)
+
+    def setcentralwidget(self):
+        self.centralwidget = QWidget(self)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.centralwidget.setSizePolicy(sizePolicy)
+        self.centralwidget.setStyleSheet(dialogstylesheet())
+        self.centralwidget.setObjectName("centralwidget")
+
+    def setframes(self):
+        self.fr_top = QFrame(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.fr_top.setSizePolicy(sizePolicy)
+        self.fr_top.setFrameShape(QFrame.NoFrame)
+        self.fr_top.setFrameShadow(QFrame.Plain)
+        self.fr_top.setLineWidth(0)
+        self.fr_top.setObjectName("fr_top")
+
+        self.fr_label = QFrame(self.fr_top)
+        self.fr_label.setMaximumSize(QSize(16777215, 50))
+        self.fr_label.setFrameShape(QFrame.NoFrame)
+        self.fr_label.setFrameShadow(QFrame.Plain)
+        self.fr_label.setLineWidth(0)
+        self.fr_label.setObjectName("fr_label")
+
+        self.fr_content = QFrame(self.fr_top)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.fr_content.setSizePolicy(sizePolicy)
+        self.fr_content.setFrameShape(QFrame.NoFrame)
+        self.fr_content.setFrameShadow(QFrame.Plain)
+        self.fr_content.setLineWidth(0)
+        self.fr_content.setObjectName("fr_content")
+
+        self.fr_bottom = QFrame(self.centralwidget)
+        self.fr_bottom.setMaximumSize(QSize(16777215, 50))
+        self.fr_bottom.setFrameShape(QFrame.NoFrame)
+        self.fr_bottom.setFrameShadow(QFrame.Plain)
+        self.fr_bottom.setLineWidth(0)
+        self.fr_bottom.setObjectName("fr_bottom")
+
+    def setlayouts(self):
+        self.lt_dialog = QGridLayout(self)
+        self.lt_dialog.setObjectName("lt_dialog")
+        self.lt_dialog.setContentsMargins(0, 0, 0, 0)
+        self.lt_central = QVBoxLayout(self.centralwidget)
+        self.lt_central.setContentsMargins(0, 0, 0, 0)
+        self.lt_central.setSpacing(0)
+        self.lt_central.setObjectName("lt_central")
+
+        self.lt_bottom = QHBoxLayout(self.fr_bottom)
+        self.lt_bottom.setContentsMargins(0, 0, 0, 0)
+        self.lt_bottom.setSpacing(0)
+        self.lt_bottom.setObjectName("lt_bottom")
+
+        self.lt_top = QVBoxLayout(self.fr_top)
+        self.lt_top.setContentsMargins(0, 20, 0, 10)
+        self.lt_top.setSpacing(20)
+        self.lt_top.setObjectName("lt_top")
+
+        self.lt_label = QGridLayout(self.fr_label)
+        self.lt_label.setObjectName("lt_label")
+        self.lt_label.setContentsMargins(0, 0, 0, 0)
+
+        self.lt_content = QGridLayout(self.fr_content)
+        self.lt_content.setObjectName("lt_content")
+        self.lt_content.setContentsMargins(20, 0, 20, 0)
+        self.lt_content.setSpacing(9)
+
+    def setbuttons(self):
+        self.buttonok = QPushButton(self.fr_bottom)
+        self.buttonok.setText(self.buttontext)
+        self.buttonok.setFocus()
+        self.buttonok.setMinimumWidth(100)
+        self.buttonok.setMinimumHeight(50)
+        self.buttonok.setObjectName('buttonok')
+        self.buttoncancel = QPushButton(self.fr_bottom)
+        self.buttoncancel.setText('Anuluj')
+        self.buttoncancel.setMinimumWidth(100)
+        self.buttoncancel.setMinimumHeight(50)
+        self.buttoncancel.setObjectName('buttoncancel')
+
+    def setlabels(self):
+        self.label_firstname = QLabel(self.fr_content)
+        self.label_lastname = QLabel(self.fr_content)
+        self.label_itemname = QLabel(self.fr_content)
+        self.label_itemcomments = QLabel(self.fr_content)
+        self.label_itemstate = QLabel(self.fr_content)
+
+        self.label_firstname.setText('Imię')
+        self.label_lastname.setText('Nazwisko')
+        self.label_itemname.setText('Przedmiot')
+        self.label_itemcomments.setText('Komentarz')
+        self.label_itemstate.setText('Stan')
+
+        self.label_firstname.setAlignment(Qt.AlignRight)
+        self.label_lastname.setAlignment(Qt.AlignRight)
+        self.label_itemname.setAlignment(Qt.AlignRight)
+        self.label_itemcomments.setAlignment(Qt.AlignRight)
+        self.label_itemstate.setAlignment(Qt.AlignRight)
+
+    def setedits(self):
+        self.edit_firstname = QLineEdit(self.fr_content)
+        self.edit_lastname = QLineEdit(self.fr_content)
+        self.edit_itemname = QLineEdit(self.fr_content)
+        self.edit_itemcomments = QPlainTextEdit(self.fr_content)
+        self.edit_itemcomments.setMaximumHeight(50)
+        self.edit_itemcomments.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.edit_itemstate = QLineEdit(self.fr_content)
+
+    def setmainlabel(self):
+        font = QFont()
+        font.setFamily("Arial")
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+
+        self.mainlabel = QLabel(self.fr_label)
+        mainlabel = str(self.orchdict['orchid']) + ' - ' + self.orchdict['firstname'] + ' ' + self.orchdict['lastname']
+        self.mainlabel.setText(mainlabel)
+        self.mainlabel.setFont(font)
+        self.mainlabel.setAlignment(Qt.AlignCenter)
+
+    def addwidgets(self):
+        self.lt_bottom.addWidget(self.buttonok)
+        self.lt_bottom.addWidget(self.buttoncancel)
+
+        self.lt_label.addWidget(self.mainlabel, 0, 0, 1, 1)
+
+        self.lt_content.addWidget(self.label_firstname, 0, 0, 1, 1)
+        self.lt_content.addWidget(self.label_lastname, 1, 0, 1, 1)
+        self.lt_content.addWidget(self.label_itemname, 2, 0, 1, 1)
+        self.lt_content.addWidget(self.label_itemcomments, 3, 0, 1, 1)
+        self.lt_content.addWidget(self.label_itemstate, 4, 0, 1, 1)
+
+        self.lt_content.addWidget(self.edit_firstname, 0, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_lastname, 1, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_itemname, 2, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_itemcomments, 3, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_itemstate, 4, 1, 1, 1)
+
+        self.lt_top.addWidget(self.fr_label)
+        self.lt_top.addWidget(self.fr_content)
+        self.lt_central.addWidget(self.fr_top)
+        self.lt_central.addWidget(self.line)
+        self.lt_central.addWidget(self.fr_bottom)
+        self.lt_dialog.addWidget(self.centralwidget, 0, 0, 1, 1)
+
+    def filledits(self):
+        self.edit_firstname.setText(self.orchdict['firstname'])
+        self.edit_lastname.setText(self.orchdict['lastname'])
+        self.edit_itemname.setText(self.orchdict['itemname'])
+        self.edit_itemcomments.setPlainText(self.orchdict['itemcomments'])
+        if self.orchdict['itemstate']:
+            self.edit_itemstate.setText('Przyjęty')
+        else:
+            self.edit_itemstate.setText('Wydany')
+
+        self.edit_firstname.setReadOnly(self.locked)
+        self.edit_lastname.setReadOnly(self.locked)
+        self.edit_itemname.setReadOnly(self.locked)
+        self.edit_itemcomments.setReadOnly(self.locked)
+        self.edit_itemstate.setReadOnly(True)
+
+    def nowyobszar(self, orchdict):
+        orchdict['firstname'] = self.edit_firstname.text().strip()
+        orchdict['lastname'] = self.edit_lastname.text().strip()
+        orchdict['itemname'] = self.edit_itemname.text().strip()
+        orchdict['itemcomments'] = self.edit_itemcomments.toPlainText().strip()
+        return orchdict
+
+    # metoda statyczna, tworzy dialog i zwraca słownik z nowymi danymi obszaru
+    @staticmethod
+    def firstcomein(orchdict, parent=None):
+        print('static method called')
+        dialog = OrchEditDialog(orchdict, False, 'Przyjmij', parent)
+        print('dialog created')
+        ok = dialog.exec_()
+        nowyorchdict = dialog.nowyobszar(orchdict)
+        return nowyorchdict, ok == QDialog.Accepted
+
+    @staticmethod
+    def comein(orchdict, parent=None):
+        dialog = OrchEditDialog(orchdict, True, 'Przyjmij', parent)
+        ok = dialog.exec_()
+        nowyorchdict = dialog.nowyobszar(orchdict)
+        return nowyorchdict, ok == QDialog.Accepted
+
+    @staticmethod
+    def comeout(orchdict, parent=None):
+        dialog = OrchEditDialog(orchdict, True, 'Wydaj', parent)
+        ok = dialog.exec_()
+        nowyorchdict = dialog.nowyobszar(orchdict)
+        return nowyorchdict, ok == QDialog.Accepted
+
+    @staticmethod
+    def edit(orchdict, parent=None):
+        dialog = OrchEditDialog(orchdict, False, 'Zapisz', parent)
+        ok = dialog.exec_()
+        nowyorchdict = dialog.nowyobszar(orchdict)
+        return nowyorchdict, ok == QDialog.Accepted

@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem, QGra
 
 import slotbaza
 from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall, \
-    AreaList, ItemList, OrchestraModule
+    AreaList, ItemList, OrchestraModule, OrchEditDialog
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,7 +145,6 @@ def barcodevalcheck(code, typ):
     return status, statustxt
 
 
-
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # Główna część programu
@@ -184,6 +183,7 @@ class Magazyn(MainWindow):
         self.btn_comein.clicked.connect(self.comein)
         self.btn_comeout.clicked.connect(self.comeout)
         self.btn_orchestra.clicked.connect(self.orchestra)
+        self.orchestramodule.btn_orchfirstcomein.clicked.connect(self.orchfirstcomein)
         self.btn_exit.clicked.connect(self.close)
         self.viewer.rectChanged.connect(self.areadrawend)
 
@@ -615,6 +615,84 @@ class Magazyn(MainWindow):
             self.unblurwindow()
         else:
             self.orchestramodule.toggleshow()
+
+    def orchfirstcomein(self):
+        if not (self.loginstatus or self.loginbypass):
+            self.blurwindow()
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!')
+            self.unblurwindow()
+        else:
+            self.blurwindow()
+            orchbarcode, orchok = InputDialog.komunikat('barcode', 'Naklej kod kreskowy na plakietkę uczestnika, '
+                                                                   'a następnie go zeskanuj:', self)
+            if orchok:
+                orchstatus, orchstatustxt = barcodevalcheck(orchbarcode, 'orch')
+                if orchstatus == 0:
+                    orchid = barcodetoid(orchbarcode, 'int')
+                    if slotbaza.isorchexist(orchid):
+                        Dialog.komunikat('error',
+                                         'Ten przedmiot jest już przyjęty na stan magazynu! '
+                                         'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
+                                         self)
+                        self.unblurwindow()
+                    else:
+                        slotbaza.createorch(orchid, idtobarcode(orchid, 'orch'), self.username)
+                        orchitem = slotbaza.loadorch(orchid)
+                        nowyorchitem, ok = OrchEditDialog.firstcomein(orchitem, self)
+                        if ok:
+                            slotbaza.saveorch(nowyorchitem)
+                            orchitembarcode, orchitemok = InputDialog.komunikat('barcode',
+                                                                                'Naklej kod kreskowy na przedmiot, '
+                                                                                'a następnie go zeskanuj:',
+                                                                                self)
+                            if orchitemok:
+                                orchitemstatus, orchitemstatustxt = barcodevalcheck(orchitembarcode, 'orch')
+                                if orchitemstatus == 0:
+                                    orchitemid = barcodetoid(orchitembarcode, 'int')
+                                    if orchid == orchitemid:
+                                        nowyorchitem['ochstate'] = True
+                                        nowyorchitem['dateoflastincome'] = datetime.datetime.now()
+                                        nowyorchitem['useroflastincome'] = self.username
+                                        slotbaza.saveorch(nowyorchitem)
+                                        Dialog.komunikat('ok', 'Poprawnie przyjęto przedmiot do SLOT Orkiestry', self)
+                                        self.unblurwindow()
+                                    else:
+                                        Dialog.komunikat('error',
+                                                         'Kod naklejony na plakietkę i na przedmiot Różnią się! Jeśli '
+                                                         'nie wiesz dlaczego, wezwij szefa ekipy!',
+                                                         self)
+                                        self.unblurwindow()
+                                else:
+                                    Dialog.komunikat('warn', orchitemstatustxt, self)
+                                    Dialog.komunikat('warn',
+                                                     'Nie wczytano kodu z przedmiotu! Wpis w bazie został utworzony, '
+                                                     'ale przedmiot nie został przyjety na magazyn!',
+                                                     self)
+                                    self.unblurwindow()
+                            else:
+                                Dialog.komunikat('warn',
+                                                 'Nie wczytano kodu z przedmiotu! Wpis w bazie został utworzony, '
+                                                 'ale przedmiot nie został przyjety na magazyn!',
+                                                 self)
+                                self.unblurwindow()
+                        else:
+                            Dialog.komunikat('warn',
+                                             'Przerwano proces edycji obszaru! Wpis w bazie został utworzony, '
+                                             'ale żadne zmiany nie zostały zapisane.',
+                                             self)
+                            self.unblurwindow()
+                else:
+                    Dialog.komunikat('warn', orchstatustxt, self)
+                    self.unblurwindow()
+            else:
+                Dialog.komunikat('warn', 'Przerwano proces edycji obszaru! Żadne zmiany nie zostały zapisane.', self)
+                self.unblurwindow()
+
+    def orchcomein(self):
+        pass
+
+    def orchcomeout(self):
+        pass
 
     # Funkcja rysująca obszary, po wcześniejszym wyczyszczeniu sceny
     def rysujobszary(self):
