@@ -95,7 +95,7 @@ def closeconnection():
     baza.close()
 
 
-# Zamkniecie połączenia z bazą
+# Stworzenie tablic
 def createtables():
     openconnection()
     baza.create_tables([Area, Item, User, Orchestra])
@@ -382,6 +382,18 @@ def saveorch(orchdict):
         orch.save()
     else:
         pass
+
+
+def orchcountall():
+    lista = Orchestra.select()
+    dlugosc = len(lista)
+    return (dlugosc)
+
+
+def orchcountpresent():
+    lista = Orchestra.select().where(Orchestra.itemstate == True)
+    dlugosc = len(lista)
+    return (dlugosc)
 
 
 # stworzenie nowego użytkownika
