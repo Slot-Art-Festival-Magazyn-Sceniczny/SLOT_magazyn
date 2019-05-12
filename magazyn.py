@@ -184,9 +184,11 @@ class Magazyn(MainWindow):
         self.btn_comein.clicked.connect(self.comein)
         self.btn_comeout.clicked.connect(self.comeout)
         self.btn_orchestra.clicked.connect(self.orchestra)
-        self.orchestramodule.btn_orchfirstcomein.clicked.connect(self.orchfirstcomein)
         self.btn_exit.clicked.connect(self.close)
         self.orchestramodule.btn_orchtable.clicked.connect(self.orchtable)
+        self.orchestramodule.btn_orchfirstcomein.clicked.connect(self.orchfirstcomein)
+        self.orchestramodule.btn_orchcomein.clicked.connect(self.orchcomein)
+        self.orchestramodule.btn_orchcomeout.clicked.connect(self.orchcomeout)
         self.viewer.rectChanged.connect(self.areadrawend)
 
     # Moduł logowania do programu
@@ -714,11 +716,179 @@ class Magazyn(MainWindow):
 
     # SLOT Orkiestra - przyjęcie przedmiotu
     def orchcomein(self):
-        pass
+        if not (self.loginstatus or self.loginbypass):
+            self.blurwindow()
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!')
+            self.unblurwindow()
+        else:
+            self.blurwindow()
+            orchbarcode, orchok = InputDialog.komunikat('barcode', 'Wczytaj kod kreskowy z plakietki uczestnika:', self)
+            if orchok:
+                orchstatus, orchstatustxt = barcodevalcheck(orchbarcode, 'orch')
+                if orchstatus == 0:
+                    orchid = barcodetoid(orchbarcode, 'int')
+                    if slotbaza.isorchexist(orchid):
+                        orchitem = slotbaza.loadorch(orchid)
+                        nowyorchitem, ok = OrchEditDialog.comein(orchitem, self)
+                        if ok:
+                            if nowyorchitem['itemstate']:
+                                Dialog.komunikat('error',
+                                                 'Próbujesz przyjąć przedmiot, '
+                                                 'który już jest przyjęty na stan magazynu!'
+                                                 'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
+                                                 self)
+                                self.unblurwindow()
+                            else:
+                                orchitembarcode, orchitemok = InputDialog.komunikat('barcode',
+                                                                                    'Wczytaj kod kreskowy z naklejki na '
+                                                                                    'przedmiocie',
+                                                                                    self)
+                                if orchitemok:
+                                    orchitemstatus, orchitemstatustxt = barcodevalcheck(orchitembarcode, 'orch')
+                                    if orchitemstatus == 0:
+                                        orchitemid = barcodetoid(orchitembarcode, 'int')
+                                        if orchid == orchitemid:
+                                            nowyorchitem['itemstate'] = True
+                                            nowyorchitem['dateoflastincome'] = datetime.datetime.now()
+                                            nowyorchitem['useroflastincome'] = self.username
+                                            slotbaza.saveorch(nowyorchitem)
+                                            Dialog.komunikat('ok', 'Poprawnie przyjęto przedmiot do SLOT Orkiestry',
+                                                             self)
+                                            self.unblurwindow()
+                                            self.updateorchcounters()
+                                        else:
+                                            Dialog.komunikat('error',
+                                                             'Kod naklejony na plakietkę i na przedmiot Różnią się! Jeśli '
+                                                             'nie wiesz dlaczego, wezwij szefa ekipy!',
+                                                             self)
+                                            self.unblurwindow()
+                                            self.updateorchcounters()
+                                    else:
+                                        Dialog.komunikat('warn', orchitemstatustxt, self)
+                                        Dialog.komunikat('warn',
+                                                         'Nie wczytano kodu z przedmiotu! '
+                                                         'Przedmiot nie został przyjety na magazyn!',
+                                                         self)
+                                        self.unblurwindow()
+                                        self.updateorchcounters()
+                                else:
+                                    Dialog.komunikat('warn',
+                                                     'Nie wczytano kodu z przedmiotu! '
+                                                     'Przedmiot nie został przyjety na magazyn!',
+                                                     self)
+                                    self.unblurwindow()
+                                    self.updateorchcounters()
+                        else:
+                            Dialog.komunikat('warn',
+                                             'Przerwano proces przyjmowania przedmiotu! '
+                                             'Przedmiot nie został przyjety na magazyn!',
+                                             self)
+                            self.unblurwindow()
+                            self.updateorchcounters()
+                    else:
+                        Dialog.komunikat('error',
+                                         'Ten przedmiot nie znajduje się w bazie! '
+                                         'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
+                                         self)
+                        self.unblurwindow()
+                else:
+                    Dialog.komunikat('warn', orchstatustxt, self)
+                    self.unblurwindow()
+                    self.updateorchcounters()
+            else:
+                Dialog.komunikat('warn',
+                                 'Przerwano proces przyjmowania przedmiotu! Przedmiot nie został przyjęty na maagazyn.',
+                                 self)
+                self.unblurwindow()
+                self.updateorchcounters()
+
 
     # SLOT Orkiestra - wydanie przedmiotu
     def orchcomeout(self):
-        pass
+        if not (self.loginstatus or self.loginbypass):
+            self.blurwindow()
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!')
+            self.unblurwindow()
+        else:
+            self.blurwindow()
+            orchbarcode, orchok = InputDialog.komunikat('barcode', 'Wczytaj kod kreskowy z plakietki uczestnika:', self)
+            if orchok:
+                orchstatus, orchstatustxt = barcodevalcheck(orchbarcode, 'orch')
+                if orchstatus == 0:
+                    orchid = barcodetoid(orchbarcode, 'int')
+                    if slotbaza.isorchexist(orchid):
+                        orchitem = slotbaza.loadorch(orchid)
+                        nowyorchitem, ok = OrchEditDialog.comeout(orchitem, self)
+                        if ok:
+                            if not (nowyorchitem['itemstate']):
+                                Dialog.komunikat('error',
+                                                 'Próbujesz wydać przedmiot, '
+                                                 'który już jest wydany z magazynu!'
+                                                 'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
+                                                 self)
+                                self.unblurwindow()
+                            else:
+                                orchitembarcode, orchitemok = InputDialog.komunikat('barcode',
+                                                                                    'Wczytaj kod kreskowy z naklejki na '
+                                                                                    'przedmiocie',
+                                                                                    self)
+                                if orchitemok:
+                                    orchitemstatus, orchitemstatustxt = barcodevalcheck(orchitembarcode, 'orch')
+                                    if orchitemstatus == 0:
+                                        orchitemid = barcodetoid(orchitembarcode, 'int')
+                                        if orchid == orchitemid:
+                                            nowyorchitem['itemstate'] = False
+                                            nowyorchitem['dateoflastoutcome'] = datetime.datetime.now()
+                                            nowyorchitem['useroflastoutcome'] = self.username
+                                            slotbaza.saveorch(nowyorchitem)
+                                            Dialog.komunikat('ok', 'Poprawnie wydano przedmiot ze SLOT Orkiestry', self)
+                                            self.unblurwindow()
+                                            self.updateorchcounters()
+                                        else:
+                                            Dialog.komunikat('error',
+                                                             'Kod naklejony na plakietkę i na przedmiot Różnią się! Jeśli '
+                                                             'nie wiesz dlaczego, wezwij szefa ekipy!',
+                                                             self)
+                                            self.unblurwindow()
+                                            self.updateorchcounters()
+                                    else:
+                                        Dialog.komunikat('warn', orchitemstatustxt, self)
+                                        Dialog.komunikat('warn',
+                                                         'Nie wczytano kodu z przedmiotu! '
+                                                         'Przedmiot nie został wydany z magazynu!',
+                                                         self)
+                                        self.unblurwindow()
+                                        self.updateorchcounters()
+                                else:
+                                    Dialog.komunikat('warn',
+                                                     'Nie wczytano kodu z przedmiotu! '
+                                                     'Przedmiot nie został wydany z magazynu!',
+                                                     self)
+                                    self.unblurwindow()
+                                    self.updateorchcounters()
+                        else:
+                            Dialog.komunikat('warn',
+                                             'Przerwano proces wydawania przedmiotu! '
+                                             'Przedmiot nie został wydany z magazynu!',
+                                             self)
+                            self.unblurwindow()
+                            self.updateorchcounters()
+                    else:
+                        Dialog.komunikat('error',
+                                         'Ten przedmiot nie znajduje się w bazie! '
+                                         'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
+                                         self)
+                        self.unblurwindow()
+                else:
+                    Dialog.komunikat('warn', orchstatustxt, self)
+                    self.unblurwindow()
+                    self.updateorchcounters()
+            else:
+                Dialog.komunikat('warn',
+                                 'Przerwano proces wydawania przedmiotu! Przedmiot nie został wydany z magazynu!',
+                                 self)
+                self.unblurwindow()
+                self.updateorchcounters()
 
     # Funkcja rysująca obszary, po wcześniejszym wyczyszczeniu sceny
     def rysujobszary(self):

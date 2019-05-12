@@ -319,6 +319,7 @@ class MainWindow(QMainWindow):
             self.anim.setEasingCurve(QEasingCurve.InQuad)
             self.anim.start()
             self.disablebuttons()
+            self.orchestramodule.disablebuttons()
 
     def unblurwindow(self):
         self.anim = QPropertyAnimation(self.blur, b'blurRadius')
@@ -332,6 +333,7 @@ class MainWindow(QMainWindow):
     def deleteblur(self):
         self.setGraphicsEffect(None)
         self.enablebuttons()
+        self.orchestramodule.enablebuttons()
 
     def disablebuttons(self):
         self.btn_login.setEnabled(False)
@@ -1069,11 +1071,17 @@ class OrchestraModule(QWidget):
             self.show()
 
     def disablebuttons(self):
-        pass
+        self.btn_orchtable.setEnabled(False)
+        self.btn_orchfirstcomein.setEnabled(False)
+        self.btn_orchcomein.setEnabled(False)
+        self.btn_orchcomeout.setEnabled(False)
 
     def enablebuttons(self):
         time.sleep(0.1)
-        pass
+        self.btn_orchtable.setEnabled(True)
+        self.btn_orchfirstcomein.setEnabled(True)
+        self.btn_orchcomein.setEnabled(True)
+        self.btn_orchcomeout.setEnabled(True)
 
 
 class Dialog(SlotDialog):
