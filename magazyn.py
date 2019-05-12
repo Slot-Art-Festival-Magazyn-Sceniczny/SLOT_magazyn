@@ -13,6 +13,7 @@ from PyQt5.QtGui import QFont, QLinearGradient, QColor, QPolygonF, QBrush, QPen
 from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem, QGraphicsItemGroup, QGraphicsTextItem
 
 import slotbaza
+import logbaza
 from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall, \
     AreaList, ItemList, OrchestraModule, OrchEditDialog
 
@@ -163,7 +164,7 @@ class Magazyn(MainWindow):
         # Domyślnie po włączeniu programu nikt nie jest zalogowany
         self.loginbypass = True  # Jeśli True to do obsługi programu niewymagane jest logowanie
         self.loginstatus = False
-        self.username = 'NONE'
+        self.username = ''
         self.usertype = 'user'
         self.logstatus.setText("<FONT COLOR=\'#FF4444\'> Niezalogowany")
         self.updateorchcounters()
@@ -205,14 +206,18 @@ class Magazyn(MainWindow):
                     if slotbaza.isuserexist(login):
                         if slotbaza.loginvalidate(login, hashpassword(haslo))['login']:
                             self.loginstatus = True
+                            self.username = login
                             self.usertype = slotbaza.loginvalidate(login, hashpassword(haslo))['usertype']
                             self.logstatus.setText("<FONT COLOR=\'#44FF44\'> Zalogowany jako " + login)
+                            logbaza.userchange(login, 'Log In')
                             Dialog.komunikat('ok', 'Pomyślnie zalogowano do systemu', self)
                             self.unblurwindow()
                         else:
+                            logbaza.userchange(login, 'Failed Log In (wrong password)')
                             Dialog.komunikat('warn', 'Logowanie nieudane! Niepoprawne hasło.', self)
                             self.unblurwindow()
                     else:
+                        logbaza.userchange(login, 'Failed Log In (wrong username)')
                         Dialog.komunikat('warn', 'Użytkownik o podanym loginie nie istnieje.', self)
                         self.unblurwindow()
                 else:
@@ -220,10 +225,13 @@ class Magazyn(MainWindow):
         # jeśli wysyłającym jest przycisk WYLOGUJ
         elif sender.objectName() == 'btn_logout':
             if self.loginstatus:
+                login = self.username
                 self.loginstatus = False
+                self.username = ''
                 self.usertype = 'user'
                 self.logstatus.setText("<FONT COLOR=\'#FF4444\'> Niezalogowany")
                 self.blurwindow()
+                logbaza.userchange(login, 'Log Out')
                 Dialog.komunikat('ok', 'Pomyślnie wylogowano z systemu', self)
                 self.unblurwindow()
             else:
@@ -257,6 +265,7 @@ class Magazyn(MainWindow):
                 areastatus, areastatustxt = barcodevalcheck(areabarcode, 'area')
                 if areastatus == 0:
                     if slotbaza.isareaexist(areaid):
+                        logbaza.areachange(self.username, 'Override Trial', areaid)
                         Dialog.komunikat('warn', 'Obszar o wprowadzonym numerze już istnieje!', self)
                         self.unblurwindow()
                     else:
@@ -311,9 +320,11 @@ class Magazyn(MainWindow):
 
             # Wczytanie obszaru do edycji - w celu uzupełnienia szczegółowych danych
             obszar = slotbaza.loadarea(self.newareaid)
+            logbaza.areachange(self.username, 'Create', self.newareaid, '', obszar)
             nowyobszar, ok = AreaEditDialog.editarea(obszar, self)
             if ok:
                 slotbaza.savearea(nowyobszar)
+                logbaza.areachange(self.username, 'Create edit', self.newareaid, obszar, nowyobszar)
                 Dialog.komunikat('ok', 'Poprawnie stworzono obszar.', self)
                 self.unblurwindow()
             else:
@@ -339,6 +350,7 @@ class Magazyn(MainWindow):
                         obszar = slotbaza.loadarea(areaid)
                         nowyobszar, ok = AreaEditDialog.editarea(obszar, self)
                         if ok:
+                            logbaza.areachange(self.username, 'Edit', areaid, obszar, nowyobszar)
                             slotbaza.savearea(nowyobszar)
                             Dialog.komunikat('ok', 'Poprawnie zmodyfikowano obszar.', self)
                             self.unblurwindow()
@@ -453,6 +465,7 @@ class Magazyn(MainWindow):
                                     if slotbaza.isitemexist(itemid):
                                         przedmiot = slotbaza.loaditem(itemid)
                                         if przedmiot['itemstate']:
+                                            logbaza.itemchange(self.username, 'Override Come In', areaid, itemid)
                                             Dialog.komunikat('error',
                                                              'Ten przedmiot jest już przyjęty na stan magazynu! '
                                                              'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!', self)
@@ -470,12 +483,14 @@ class Magazyn(MainWindow):
                                                 przedmiot['dateoflastincome'] = datetime.datetime.now()
                                                 przedmiot['useroflastincome'] = self.username
                                                 slotbaza.saveitem(przedmiot)
+                                                logbaza.itemchange(self.username, 'Come In', areaid, itemid)
                                                 Dialog.komunikat('ok', 'Przedmiot został przyjęty na stan magazynu',
                                                                  self)
                                                 kolejnyprzedmiot = QuestionDialog.pytanie('Czy chcesz przyjąć '
                                                                                           'kolejny przedmiot do obszaru'
                                                                                           ' ' + str(areaid) + '?', self)
                                             else:
+                                                logbaza.itemchange(self.username, 'Failed Come In', areaid, itemid)
                                                 Dialog.komunikat('warn', 'Przerwano proces przyjmowania przedmiotu.'
                                                                          '\nPrzedmiot nie został przyjęty', self)
                                                 self.unblurwindow()
@@ -493,12 +508,16 @@ class Magazyn(MainWindow):
                                                 slotbaza.createitem(itemid, idtobarcode(itemid, 'item'),
                                                                     nazwaprzedmiotu,
                                                                     areaid)
+                                                logbaza.itemchange(self.username, 'Create', areaid, itemid, '',
+                                                                   przedmiot)
                                                 przedmiot = slotbaza.loaditem(itemid)
                                                 przedmiot['itemstate'] = True
                                                 przedmiot['dateoffirstincome'] = datetime.datetime.now()
                                                 przedmiot['useroffirstincome'] = self.username
                                                 przedmiot['useroflastincome'] = self.username
                                                 przedmiot['dateoflastincome'] = datetime.datetime.now()
+                                                logbaza.itemchange(self.username, 'First Come In', areaid, itemid, '',
+                                                                   przedmiot)
                                                 slotbaza.saveitem(przedmiot)
                                                 Dialog.komunikat('ok',
                                                                  'Poprawnie dodano przedmiot.'
@@ -509,6 +528,7 @@ class Magazyn(MainWindow):
                                                         areaid) + '?',
                                                     self)
                                             else:
+                                                logbaza.itemchange(self.username, 'Creation Trial', areaid, itemid)
                                                 Dialog.komunikat('warn',
                                                                  'Przerwano proces dodawania przedmiotu. '
                                                                  'Przedmiot nie został dodany.',
@@ -516,6 +536,7 @@ class Magazyn(MainWindow):
                                                 self.unblurwindow()
                                             pass
                                         else:
+                                            logbaza.itemchange(self.username, 'Creation Trial', areaid, itemid)
                                             Dialog.komunikat('error',
                                                              'W takim razie albo zeskanowałeś zły kod, '
                                                              'albo coś się popsuło...\nWezwij szefa ekipy.',
@@ -528,6 +549,7 @@ class Magazyn(MainWindow):
                                 pass
                         self.unblurwindow()
                     else:
+                        logbaza.itemchange(self.username, 'Assignment Fail during come in', areaid, 0)
                         Dialog.komunikat('warn',
                                          'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
                                          'do niego przedmioty.', self)
@@ -572,23 +594,27 @@ class Magazyn(MainWindow):
                                                 przedmiot['dateoflastoutcome'] = datetime.datetime.now()
                                                 przedmiot['useroflastoutcome'] = self.username
                                                 slotbaza.saveitem(przedmiot)
+                                                logbaza.itemchange(self.username, 'Come Out', areaid, itemid)
                                                 Dialog.komunikat('ok', 'Przedmiot został wydany z magazynu', self)
                                                 kolejnyprzedmiot = QuestionDialog.pytanie(
                                                     'Czy chcesz wydać kolejny przedmiot z obszaru ' + str(areaid) + '?',
                                                     self)
                                             else:
+                                                logbaza.itemchange(self.username, 'Failed Come Out', areaid, itemid)
                                                 Dialog.komunikat('warn',
                                                                  'Przerwano proces wydawania przedmiotu.'
                                                                  '\nPrzedmiot nie został wydany',
                                                                  self)
                                                 self.unblurwindow()
                                         else:
+                                            logbaza.itemchange(self.username, 'Override Come Out', areaid, itemid)
                                             Dialog.komunikat('error',
                                                              'Ten przedmiot jest już wydany z magazynu! '
                                                              'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
                                                              self)
                                             self.unblurwindow()
                                     else:
+                                        logbaza.itemchange(self.username, 'Failed Come Out Critical', areaid, itemid)
                                         Dialog.komunikat('error',
                                                          'Próbujesz wydać przedmiot, który nie znajduje się w bazie! '
                                                          'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
@@ -601,6 +627,7 @@ class Magazyn(MainWindow):
                                 self.unblurwindow()
                         self.unblurwindow()
                     else:
+                        logbaza.itemchange(self.username, 'Assignment Fail during come out', areaid, 0)
                         Dialog.komunikat('warn',
                                          'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
                                          'do niego przedmioty.', self)
@@ -649,6 +676,7 @@ class Magazyn(MainWindow):
                 if orchstatus == 0:
                     orchid = barcodetoid(orchbarcode, 'int')
                     if slotbaza.isorchexist(orchid):
+                        logbaza.orchchange(self.username, 'Override Trial during first come in', orchid)
                         Dialog.komunikat('error',
                                          'Ten przedmiot jest już przyjęty na stan magazynu! '
                                          'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
@@ -657,9 +685,11 @@ class Magazyn(MainWindow):
                     else:
                         slotbaza.createorch(orchid, idtobarcode(orchid, 'orch'), self.username)
                         orchitem = slotbaza.loadorch(orchid)
+                        logbaza.orchchange(self.username, 'Creation', orchid, '', orchitem)
                         nowyorchitem, ok = OrchEditDialog.firstcomein(orchitem, self)
                         if ok:
                             slotbaza.saveorch(nowyorchitem)
+                            logbaza.orchchange(self.username, 'Creation Edit', orchid, orchitem, nowyorchitem)
                             orchitembarcode, orchitemok = InputDialog.komunikat('barcode',
                                                                                 'Naklej kod kreskowy na przedmiot, '
                                                                                 'a następnie go zeskanuj:',
@@ -673,10 +703,12 @@ class Magazyn(MainWindow):
                                         nowyorchitem['dateoflastincome'] = datetime.datetime.now()
                                         nowyorchitem['useroflastincome'] = self.username
                                         slotbaza.saveorch(nowyorchitem)
+                                        logbaza.orchchange(self.username, 'First Come In', orchid)
                                         Dialog.komunikat('ok', 'Poprawnie przyjęto przedmiot do SLOT Orkiestry', self)
                                         self.unblurwindow()
                                         self.updateorchcounters()
                                     else:
+                                        logbaza.orchchange(self.username, 'Differential durgin first come in', orchid)
                                         Dialog.komunikat('error',
                                                          'Kod naklejony na plakietkę i na przedmiot Różnią się! Jeśli '
                                                          'nie wiesz dlaczego, wezwij szefa ekipy!',
@@ -732,6 +764,7 @@ class Magazyn(MainWindow):
                         nowyorchitem, ok = OrchEditDialog.comein(orchitem, self)
                         if ok:
                             if nowyorchitem['itemstate']:
+                                logbaza.orchchange(self.username, 'Override Trial during come in', orchid)
                                 Dialog.komunikat('error',
                                                  'Próbujesz przyjąć przedmiot, '
                                                  'który już jest przyjęty na stan magazynu!'
@@ -752,11 +785,13 @@ class Magazyn(MainWindow):
                                             nowyorchitem['dateoflastincome'] = datetime.datetime.now()
                                             nowyorchitem['useroflastincome'] = self.username
                                             slotbaza.saveorch(nowyorchitem)
+                                            logbaza.orchchange(self.username, 'Come In', orchid)
                                             Dialog.komunikat('ok', 'Poprawnie przyjęto przedmiot do SLOT Orkiestry',
                                                              self)
                                             self.unblurwindow()
                                             self.updateorchcounters()
                                         else:
+                                            logbaza.orchchange(self.username, 'Differential during come in', orchid)
                                             Dialog.komunikat('error',
                                                              'Kod naklejony na plakietkę i na przedmiot Różnią się! Jeśli '
                                                              'nie wiesz dlaczego, wezwij szefa ekipy!',
@@ -786,6 +821,7 @@ class Magazyn(MainWindow):
                             self.unblurwindow()
                             self.updateorchcounters()
                     else:
+                        logbaza.orchchange(self.user, 'Failed Come In Critical', orchid)
                         Dialog.komunikat('error',
                                          'Ten przedmiot nie znajduje się w bazie! '
                                          'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
@@ -801,7 +837,6 @@ class Magazyn(MainWindow):
                                  self)
                 self.unblurwindow()
                 self.updateorchcounters()
-
 
     # SLOT Orkiestra - wydanie przedmiotu
     def orchcomeout(self):
@@ -821,6 +856,7 @@ class Magazyn(MainWindow):
                         nowyorchitem, ok = OrchEditDialog.comeout(orchitem, self)
                         if ok:
                             if not (nowyorchitem['itemstate']):
+                                logbaza.orchchange(self.user, 'Override Trial during come out', orchid)
                                 Dialog.komunikat('error',
                                                  'Próbujesz wydać przedmiot, '
                                                  'który już jest wydany z magazynu!'
@@ -841,10 +877,12 @@ class Magazyn(MainWindow):
                                             nowyorchitem['dateoflastoutcome'] = datetime.datetime.now()
                                             nowyorchitem['useroflastoutcome'] = self.username
                                             slotbaza.saveorch(nowyorchitem)
+                                            logbaza.orchchange(self.user, 'Come Out', orchid)
                                             Dialog.komunikat('ok', 'Poprawnie wydano przedmiot ze SLOT Orkiestry', self)
                                             self.unblurwindow()
                                             self.updateorchcounters()
                                         else:
+                                            logbaza.orchchange(self.username, 'Differential during come out', orchid)
                                             Dialog.komunikat('error',
                                                              'Kod naklejony na plakietkę i na przedmiot Różnią się! Jeśli '
                                                              'nie wiesz dlaczego, wezwij szefa ekipy!',
@@ -874,6 +912,7 @@ class Magazyn(MainWindow):
                             self.unblurwindow()
                             self.updateorchcounters()
                     else:
+                        logbaza.orchchange(self.user, 'Failed Come Out Critical', orchid)
                         Dialog.komunikat('error',
                                          'Ten przedmiot nie znajduje się w bazie! '
                                          'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',

@@ -2177,7 +2177,11 @@ class OrchEditDialog(QDialog):
         font.setWeight(75)
 
         self.mainlabel = QLabel(self.fr_label)
-        mainlabel = str(self.orchdict['orchid']) + ' - ' + self.orchdict['firstname'] + ' ' + self.orchdict['lastname']
+        if not (self.locked) and self.buttontext == 'Przyjmij':
+            mainlabel = str(self.orchdict['orchid']) + ' - Wprowadź dane'
+        else:
+            mainlabel = str(self.orchdict['orchid']) + ' - ' + self.orchdict['firstname'] + ' ' + self.orchdict[
+                'lastname']
         self.mainlabel.setText(mainlabel)
         self.mainlabel.setFont(font)
         self.mainlabel.setAlignment(Qt.AlignCenter)

@@ -11,9 +11,9 @@ qbaza = QSqlDatabase("QSQLITE")
 qbaza.setDatabaseName(db_filename)
 
 if qbaza.open():
-    print('Udalo sie połączyć z bazą')
+    print('Udalo sie połączyć z główną bazą')
 else:
-    print('Nie udało sie połączyć z bazą')
+    print('Nie udało sie połączyć z główną bazą')
 
 
 class ModelBazy(Model):
@@ -85,12 +85,12 @@ class Orchestra(ModelBazy):
     useroflastoutcome = CharField(default='')
 
 
-# Stworzenie tabel - wykonywac tylko raz!!!
+# Otwarcie połączenia z bazą
 def openconnection():
     baza.connect()
 
 
-# Otwarcie połączenia z bazą
+# Zamknięcie połączenia z bazą
 def closeconnection():
     baza.close()
 
