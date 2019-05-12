@@ -120,6 +120,7 @@ def isitemexist(itemid):
         return False
 
 
+# Sprawdzenie, czy przedmiot SLOT Orkiestry o podanym ID istnieje
 def isorchexist(orchid):
     try:
         Orchestra.get_by_id(orchid)
@@ -128,7 +129,7 @@ def isorchexist(orchid):
         return False
 
 
-# Stworenie obszaru
+# Stworzenie obszaru
 def createarea(areaid, areabarcode, areaname, posx, posy, sizex, sizey, user):
     if isareaexist(areaid):
         pass
@@ -329,6 +330,7 @@ def loaditemsinarea(areaid):
     return itemdictlist
 
 
+# SLOT Orkiestra - stworzenie przedmiotu
 def createorch(orchid, orchbarcode, user):
     if isorchexist(orchid):
         pass
@@ -337,6 +339,7 @@ def createorch(orchid, orchbarcode, user):
                          dateofcreation=datetime.datetime.now())
 
 
+# SLOT Orkiestra - wczytanie przedmiotu
 def loadorch(orchid):
     if isorchexist(orchid):
         orch = Orchestra.get_by_id(orchid)
@@ -361,6 +364,7 @@ def loadorch(orchid):
         pass
 
 
+# SLOT Orkiestra - Zapisanie przedmiotu
 def saveorch(orchdict):
     if isorchexist(orchdict['orchid']):
         orch = Orchestra.get_by_id(orchdict['orchid'])
@@ -384,12 +388,14 @@ def saveorch(orchdict):
         pass
 
 
+# SLOT Orkiestra - zliczenie wszystkich obszarów
 def orchcountall():
     lista = Orchestra.select()
     dlugosc = len(lista)
     return (dlugosc)
 
 
+# SLOT Orkiestra - zliczenie wszystkich obszarów przyjętych
 def orchcountpresent():
     lista = Orchestra.select().where(Orchestra.itemstate == True)
     dlugosc = len(lista)
@@ -495,6 +501,7 @@ class AreaQSqlTableModel(QSqlTableModel):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
 
 
+# Klasa pomocnicza - wyłączona edycji niektórych kolumn
 class ItemQSqlTableModel(QSqlTableModel):
     def __init__(self, parent=None, db=QSqlDatabase()):
         super(ItemQSqlTableModel, self).__init__(parent, db)
@@ -546,6 +553,7 @@ def getqareamodel():
     return model
 
 
+# funkcja zwracająca model tablicy 'item' zgodny z Qt
 def getqitemmodel(areaid):
     model = ItemQSqlTableModel(None, qbaza)
     model.setTable('item')
@@ -569,6 +577,7 @@ def getqitemmodel(areaid):
     return model
 
 
+# funkcja zwracająca model tablicy 'item' zgodny z Qt
 def getqitemsmodel():
     model = ItemQSqlTableModel(None, qbaza)
     model.setTable('item')

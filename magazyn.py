@@ -619,6 +619,7 @@ class Magazyn(MainWindow):
             self.orchestramodule.toggleshow()
             self.updateorchcounters()
 
+    # Funkcja odświeżająca liczniki w module SLOT Orkiestry
     def updateorchcounters(self):
         overall = slotbaza.orchcountall()
         present = slotbaza.orchcountpresent()
@@ -627,9 +628,11 @@ class Magazyn(MainWindow):
         self.orchestramodule.le_onmagazine.setText(str(present))
         self.orchestramodule.le_outmagazine.setText(str(nonpresent))
 
+    # Wyświetlenie listy przedmiotów ze SLOT Orkiestry
     def orchtable(self):
         pass
 
+    # SLOT Orkiestra - pierwsze przyjęcie przedmiotu
     def orchfirstcomein(self):
         if not (self.loginstatus or self.loginbypass):
             self.blurwindow()
@@ -709,9 +712,11 @@ class Magazyn(MainWindow):
                 self.unblurwindow()
                 self.updateorchcounters()
 
+    # SLOT Orkiestra - przyjęcie przedmiotu
     def orchcomein(self):
         pass
 
+    # SLOT Orkiestra - wydanie przedmiotu
     def orchcomeout(self):
         pass
 
