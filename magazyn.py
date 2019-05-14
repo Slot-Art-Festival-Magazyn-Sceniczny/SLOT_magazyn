@@ -186,11 +186,39 @@ class Magazyn(MainWindow):
         self.btn_comeout.clicked.connect(self.comeout)
         self.btn_orchestra.clicked.connect(self.orchestra)
         self.btn_exit.clicked.connect(self.close)
+        self.btn_exit2.clicked.connect(self.close)
         self.orchestramodule.btn_orchtable.clicked.connect(self.orchtable)
         self.orchestramodule.btn_orchfirstcomein.clicked.connect(self.orchfirstcomein)
         self.orchestramodule.btn_orchcomein.clicked.connect(self.orchcomein)
         self.orchestramodule.btn_orchcomeout.clicked.connect(self.orchcomeout)
+        self.btn_adminpanel.clicked.connect(self.adminpanel)
         self.viewer.rectChanged.connect(self.areadrawend)
+
+    def adminpanel(self):
+        self.blurwindow()
+        login, haslo, ok = LoginDialog.getloginhaslo(self)
+        if not ok:
+            self.unblurwindow()
+            return
+        if not slotbaza.isuserexist(login):
+            logbaza.userchange(self.username, 'Admin Login Fail', login)
+            Dialog.komunikat('warn', 'Logowanie Administratora nieudane')
+            self.unblurwindow()
+            return
+        if not login == 'admin':
+            logbaza.userchange(self.username, 'Admin Login Fail', login)
+            Dialog.komunikat('warn', 'Logowanie Administratora nieudane')
+            self.unblurwindow()
+            return
+        if not slotbaza.loginvalidate(login, hashpassword(haslo))['login']:
+            logbaza.userchange(self.username, 'Admin Login Fail', login)
+            Dialog.komunikat('warn', 'Logowanie Administratora nieudane')
+            self.unblurwindow()
+            return
+        logbaza.userchange(self.username, 'Admin Login Succes')
+        Dialog.komunikat('ok', 'Pomyslnie zalogowano')
+        self.unblurwindow()
+
 
     # Moduł logowania do programu
     def logowanie(self):

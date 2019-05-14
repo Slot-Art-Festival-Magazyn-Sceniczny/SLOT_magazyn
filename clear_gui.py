@@ -31,6 +31,9 @@ def mainstylesheet():
                  "QFrame#frm_leftside\n" \
                  "{background-color: #22FFFFFF}\n" \
                  "\n" \
+                 "QFrame#frm_top\n" \
+                 "{background-color: #22FFFFFF}\n" \
+                 "\n" \
                  "QFrame#frm_login\n" \
                  "{background-color: #22FFFFFF}\n" \
                  "\n" \
@@ -297,6 +300,8 @@ class MainWindow(QMainWindow):
         self.settext()
         self.setcentralwidget()
         self.setOrchestraModule()
+        self.btn_maximize.clicked.connect(self.maximize_btn_action)
+        self.btn_minimize.clicked.connect(self.minimize_btn_action)
 
         QMetaObject.connectSlotsByName(self)
         self.setWindowTitle("Magazyn Sceniczny")
@@ -475,9 +480,14 @@ class MainWindow(QMainWindow):
         self.lt_buttons.setObjectName("lt_buttons")
 
         self.lt_rightside = QVBoxLayout(self.frm_rightside)
-        self.lt_rightside.setContentsMargins(20, 20, 20, 0)
+        self.lt_rightside.setContentsMargins(20, 0, 20, 0)
         self.lt_rightside.setSpacing(6)
         self.lt_rightside.setObjectName("lt_rightside")
+
+        self.lt_top = QHBoxLayout(self.frm_top)
+        self.lt_top.setContentsMargins(0, 0, 0, 0)
+        self.lt_top.setSpacing(0)
+        self.lt_top.setObjectName("lt_top")
 
     def setwidgets(self):
         spacerItem = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Maximum)
@@ -488,6 +498,8 @@ class MainWindow(QMainWindow):
         spacerItem5 = QSpacerItem(0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         spacerItem6 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)
         spacerItem7 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        spacerItem8 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Fixed)
+        spacerItem9 = QSpacerItem(50, 20, QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         font = QFont()
         font.setFamily("Arial")
@@ -521,6 +533,16 @@ class MainWindow(QMainWindow):
         icon7.addPixmap(QPixmap("images/buttons/btn_orchestra_hover.png"), QIcon.Normal, QIcon.Off)
         icon8 = QIcon()
         icon8.addPixmap(QPixmap("images/buttons/btn_exit_hover.png"), QIcon.Normal, QIcon.Off)
+        icon9 = QIcon()
+        icon9.addPixmap(QPixmap("images/buttons/btn_settings.png"), QIcon.Normal, QIcon.Off)
+        icon10 = QIcon()
+        icon10.addPixmap(QPixmap("images/buttons/btn_admin.png"), QIcon.Normal, QIcon.Off)
+        icon11 = QIcon()
+        icon11.addPixmap(QPixmap("images/buttons/btn_minimize.png"), QIcon.Normal, QIcon.Off)
+        icon12 = QIcon()
+        icon12.addPixmap(QPixmap("images/buttons/btn_maximize.png"), QIcon.Normal, QIcon.Off)
+        icon13 = QIcon()
+        icon13.addPixmap(QPixmap("images/buttons/btn_close.png"), QIcon.Normal, QIcon.Off)
 
         self.label_2 = QLabel(self.frm_logo)
         self.label_2.setText("")
@@ -672,6 +694,61 @@ class MainWindow(QMainWindow):
         # self.btn_exit.raise_()
 
         self.lt_central.addWidget(self.frm_leftside)
+
+        self.btn_adminpanel = QPushButton(self.frm_top)
+        self.btn_adminpanel.setMinimumSize(QSize(50, 32))
+        self.btn_adminpanel.setMaximumSize(QSize(16777215, 50))
+        self.btn_adminpanel.setFont(font)
+        self.btn_adminpanel.setIcon(icon10)
+        self.btn_adminpanel.setIconSize(QSize(24, 24))
+        self.btn_adminpanel.setObjectName("btn_adminpanel")
+        self.btn_adminpanel.setToolTip('Panel Aministratora')
+
+        self.btn_settings = QPushButton(self.frm_top)
+        self.btn_settings.setMinimumSize(QSize(50, 32))
+        self.btn_settings.setMaximumSize(QSize(16777215, 50))
+        self.btn_settings.setFont(font)
+        self.btn_settings.setIcon(icon9)
+        self.btn_settings.setIconSize(QSize(24, 24))
+        self.btn_settings.setObjectName("btn_settings")
+        self.btn_settings.setToolTip('Ustawienia')
+
+        self.btn_minimize = QPushButton(self.frm_top)
+        self.btn_minimize.setMinimumSize(QSize(50, 32))
+        self.btn_minimize.setMaximumSize(QSize(16777215, 50))
+        self.btn_minimize.setFont(font)
+        self.btn_minimize.setIcon(icon11)
+        self.btn_minimize.setIconSize(QSize(24, 24))
+        self.btn_minimize.setObjectName("btn_minimize")
+        self.btn_minimize.setToolTip('Minimalizuj')
+
+        self.btn_maximize = QPushButton(self.frm_top)
+        self.btn_maximize.setMinimumSize(QSize(50, 32))
+        self.btn_maximize.setMaximumSize(QSize(16777215, 50))
+        self.btn_maximize.setFont(font)
+        self.btn_maximize.setIcon(icon12)
+        self.btn_maximize.setIconSize(QSize(24, 24))
+        self.btn_maximize.setObjectName("btn_maximize")
+        self.btn_maximize.setToolTip('Full-screen')
+
+        self.btn_exit2 = QPushButton(self.frm_top)
+        self.btn_exit2.setMinimumSize(QSize(50, 32))
+        self.btn_exit2.setMaximumSize(QSize(16777215, 50))
+        self.btn_exit2.setFont(font)
+        self.btn_exit2.setIcon(icon13)
+        self.btn_exit2.setIconSize(QSize(24, 24))
+        self.btn_exit2.setObjectName("btn_exit2")
+        self.btn_exit2.setToolTip('Wyjście')
+
+        self.lt_top.addItem(spacerItem8)
+        self.lt_top.addWidget(self.btn_adminpanel)
+        self.lt_top.addWidget(self.btn_settings)
+        self.lt_top.addItem(spacerItem9)
+        self.lt_top.addWidget(self.btn_minimize)
+        self.lt_top.addWidget(self.btn_maximize)
+        self.lt_top.addWidget(self.btn_exit2)
+
+
         self.lt_rightside.addWidget(self.frm_top)
 
         self.setscena()
@@ -740,6 +817,15 @@ class MainWindow(QMainWindow):
         pozycjax = pozycja.x() + 260
         pozycjay = pozycja.y() - 1
         self.orchestramodule.move(pozycjax, pozycjay)
+
+    def maximize_btn_action(self):
+        if self.isFullScreen():
+            self.showNormal()
+        else:
+            self.showFullScreen()
+
+    def minimize_btn_action(self):
+        self.showMinimized()
 
 
 class SlotDialog(QDialog):
@@ -1082,6 +1168,11 @@ class OrchestraModule(QWidget):
         self.btn_orchfirstcomein.setEnabled(True)
         self.btn_orchcomein.setEnabled(True)
         self.btn_orchcomeout.setEnabled(True)
+
+
+class AdminPanel(QWidget):
+    def __init__(self, parent):
+        super(AdminPanel, self).__init__(parent)
 
 
 class Dialog(SlotDialog):
