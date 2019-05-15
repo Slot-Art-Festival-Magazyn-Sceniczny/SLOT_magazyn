@@ -748,7 +748,6 @@ class MainWindow(QMainWindow):
         self.lt_top.addWidget(self.btn_maximize)
         self.lt_top.addWidget(self.btn_exit2)
 
-
         self.lt_rightside.addWidget(self.frm_top)
 
         self.setscena()
@@ -1170,9 +1169,166 @@ class OrchestraModule(QWidget):
         self.btn_orchcomeout.setEnabled(True)
 
 
-class AdminPanel(QWidget):
+class AdminPanel(QDialog):
     def __init__(self, parent):
         super(AdminPanel, self).__init__(parent)
+
+        self.setwindow()
+        self.setcentralwidget()
+        self.setframes()
+        self.setlayouts()
+        self.setbuttons()
+        self.setmainlabel()
+
+        self.line = QFrame(self.centralwidget)
+        self.line.setFrameShadow(QFrame.Plain)
+        self.line.setFrameShape(QFrame.HLine)
+        self.line.setObjectName("line")
+
+        self.addwidgets()
+
+        self.buttoncancel.clicked.connect(self.reject)
+
+    def setwindow(self):
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(100)
+        sizePolicy.setVerticalStretch(5)
+        self.setSizePolicy(sizePolicy)
+        self.setMinimumSize(QSize(300, 300))
+        self.setMaximumSize(QSize(300, 300))
+        self.setSizeIncrement(QSize(0, 0))
+        self.setStyleSheet(
+            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #B721FF, stop:1 #21D4FD)")
+        self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_NoSystemBackground, True)
+
+    def setcentralwidget(self):
+        self.centralwidget = QWidget(self)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.centralwidget.setSizePolicy(sizePolicy)
+        self.centralwidget.setStyleSheet(dialogstylesheet())
+        self.centralwidget.setObjectName("centralwidget")
+
+    def setframes(self):
+        self.fr_top = QFrame(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.fr_top.setSizePolicy(sizePolicy)
+        self.fr_top.setFrameShape(QFrame.NoFrame)
+        self.fr_top.setFrameShadow(QFrame.Plain)
+        self.fr_top.setLineWidth(0)
+        self.fr_top.setObjectName("fr_top")
+
+        self.fr_label = QFrame(self.fr_top)
+        self.fr_label.setMaximumSize(QSize(16777215, 50))
+        self.fr_label.setFrameShape(QFrame.NoFrame)
+        self.fr_label.setFrameShadow(QFrame.Plain)
+        self.fr_label.setLineWidth(0)
+        self.fr_label.setObjectName("fr_label")
+
+        self.fr_content = QFrame(self.fr_top)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.fr_content.setSizePolicy(sizePolicy)
+        self.fr_content.setFrameShape(QFrame.NoFrame)
+        self.fr_content.setFrameShadow(QFrame.Plain)
+        self.fr_content.setLineWidth(0)
+        self.fr_content.setObjectName("fr_content")
+
+        self.fr_bottom = QFrame(self.centralwidget)
+        self.fr_bottom.setMaximumSize(QSize(16777215, 50))
+        self.fr_bottom.setFrameShape(QFrame.NoFrame)
+        self.fr_bottom.setFrameShadow(QFrame.Plain)
+        self.fr_bottom.setLineWidth(0)
+        self.fr_bottom.setObjectName("fr_bottom")
+
+    def setlayouts(self):
+        self.lt_dialog = QGridLayout(self)
+        self.lt_dialog.setObjectName("lt_dialog")
+        self.lt_dialog.setContentsMargins(0, 0, 0, 0)
+        self.lt_central = QVBoxLayout(self.centralwidget)
+        self.lt_central.setContentsMargins(0, 0, 0, 0)
+        self.lt_central.setSpacing(0)
+        self.lt_central.setObjectName("lt_central")
+
+        self.lt_bottom = QHBoxLayout(self.fr_bottom)
+        self.lt_bottom.setContentsMargins(0, 0, 0, 0)
+        self.lt_bottom.setSpacing(0)
+        self.lt_bottom.setObjectName("lt_bottom")
+
+        self.lt_top = QVBoxLayout(self.fr_top)
+        self.lt_top.setContentsMargins(0, 20, 0, 10)
+        self.lt_top.setSpacing(20)
+        self.lt_top.setObjectName("lt_top")
+
+        self.lt_label = QGridLayout(self.fr_label)
+        self.lt_label.setObjectName("lt_label")
+        self.lt_label.setContentsMargins(0, 0, 0, 0)
+
+        self.lt_content = QVBoxLayout(self.fr_content)
+        self.lt_content.setObjectName("lt_content")
+        self.lt_content.setContentsMargins(20, 0, 20, 0)
+        self.lt_content.setSpacing(9)
+
+    def setmainlabel(self):
+        font = QFont()
+        font.setFamily("Arial")
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+
+        self.mainlabel = QLabel(self.fr_label)
+        mainlabel = 'Panel Administratora'
+        self.mainlabel.setText(mainlabel)
+        self.mainlabel.setFont(font)
+        self.mainlabel.setAlignment(Qt.AlignCenter)
+
+    def setbuttons(self):
+        self.buttoncancel = QPushButton(self.fr_bottom)
+        self.buttoncancel.setText('Anuluj')
+        self.buttoncancel.setMinimumWidth(100)
+        self.buttoncancel.setMinimumHeight(50)
+        self.buttoncancel.setObjectName('buttoncancel')
+
+        self.btn_adduser = QPushButton(self.fr_content)
+        self.btn_adduser.setText('Dodaj użytkownika')
+        self.btn_adduser.setFocus()
+        self.btn_adduser.setMinimumWidth(100)
+        self.btn_adduser.setMinimumHeight(50)
+        self.btn_adduser.setObjectName('btn_adduser')
+
+        self.btn_userlist = QPushButton(self.fr_content)
+        self.btn_userlist.setText('Lista użytkowników')
+        self.btn_userlist.setFocus()
+        self.btn_userlist.setMinimumWidth(100)
+        self.btn_userlist.setMinimumHeight(50)
+        self.btn_userlist.setObjectName('btn_userlist')
+
+    def addwidgets(self):
+        self.lt_label.addWidget(self.mainlabel)
+
+        self.lt_content.addWidget(self.btn_adduser)
+        self.lt_content.addWidget(self.btn_userlist)
+
+        self.lt_bottom.addWidget(self.buttoncancel)
+
+        self.lt_top.addWidget(self.fr_label)
+        self.lt_top.addWidget(self.fr_content)
+        self.lt_central.addWidget(self.fr_top)
+        self.lt_central.addWidget(self.line)
+        self.lt_central.addWidget(self.fr_bottom)
+        self.lt_dialog.addWidget(self.centralwidget, 0, 0, 1, 1)
+
+    @staticmethod
+    def panel(parent=None):
+        dialog = AdminPanel(parent)
+        ok = dialog.exec_()
+        print('test')
 
 
 class Dialog(SlotDialog):
@@ -2115,23 +2271,18 @@ class OrchEditDialog(QDialog):
         self.setbuttons()
         self.setlabels()
         self.setedits()
-        print('before filling edits')
         self.filledits()
-        print('after filling edits')
 
         self.line = QFrame(self.centralwidget)
         self.line.setFrameShadow(QFrame.Plain)
         self.line.setFrameShape(QFrame.HLine)
         self.line.setObjectName("line")
-        print('after setting line')
 
         self.setmainlabel()
-        print('after setting main label')
         self.addwidgets()
-        print('widgets added')
+
         self.buttonok.clicked.connect(self.accept)
         self.buttoncancel.clicked.connect(self.reject)
-        print('init done')
 
     def setwindow(self):
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)

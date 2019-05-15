@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem, QGra
 import slotbaza
 import logbaza
 from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall, \
-    AreaList, ItemList, OrchestraModule, OrchEditDialog
+    AreaList, ItemList, OrchestraModule, OrchEditDialog, AdminPanel
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,6 +217,8 @@ class Magazyn(MainWindow):
             return
         logbaza.userchange(self.username, 'Admin Login Succes')
         Dialog.komunikat('ok', 'Pomyslnie zalogowano')
+        AdminPanel.panel(self)
+
         self.unblurwindow()
 
 
