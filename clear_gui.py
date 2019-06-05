@@ -2054,6 +2054,7 @@ class AreaList(QDialog):
         self.table.hideColumn(4)
         self.table.hideColumn(5)
         self.table.hideColumn(6)
+        self.table.setSortingEnabled(True)
 
         self.table.resizeColumnsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)
@@ -2215,6 +2216,7 @@ class ItemList(QDialog):
         self.table.setModel(self.model)
         self.table.resizeColumnsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.setSortingEnabled(True)
 
         self.table.setFrameShape(QFrame.NoFrame)
         self.table.setFrameShadow(QFrame.Plain)
@@ -2235,6 +2237,175 @@ class ItemList(QDialog):
     @staticmethod
     def showtable(model, parent=None):
         dialog = AreaList(model, parent)
+        ok = dialog.exec_()
+        return ok == QDialog.Accepted
+
+
+class OrchList(QDialog):
+    def __init__(self, model, parent=None):
+        super(OrchList, self).__init__(parent)
+        self.model = model
+
+        self.setwindow()
+        self.setcentralwidget()
+        self.setframes()
+        self.setlayouts()
+        self.setbuttons()
+        self.settable()
+
+        self.line = QFrame(self.centralwidget)
+        self.line.setFrameShadow(QFrame.Plain)
+        self.line.setFrameShape(QFrame.HLine)
+        self.line.setObjectName("line")
+
+        self.addwidgets()
+
+        self.buttonok.clicked.connect(self.submitandaccept)
+        self.buttoncancel.clicked.connect(self.revertaandreject)
+
+    def submitandaccept(self):
+        self.model.submitAll()
+        self.accept()
+
+    def revertaandreject(self):
+        self.model.revertAll()
+        self.reject()
+
+    def setwindow(self):
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(100)
+        sizePolicy.setVerticalStretch(5)
+        self.setSizePolicy(sizePolicy)
+        self.setMinimumSize(QSize(1200, 600))
+        self.setMaximumSize(QSize(1200, 600))
+        self.setSizeIncrement(QSize(0, 0))
+        self.setStyleSheet(
+            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #B721FF, stop:1 #21D4FD)")
+        self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_NoSystemBackground, True)
+
+    def setcentralwidget(self):
+        self.centralwidget = QWidget(self)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.centralwidget.setSizePolicy(sizePolicy)
+        self.centralwidget.setStyleSheet(dialogstylesheet())
+        self.centralwidget.setObjectName("centralwidget")
+
+    def setframes(self):
+        self.fr_top = QFrame(self.centralwidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.fr_top.setSizePolicy(sizePolicy)
+        self.fr_top.setFrameShape(QFrame.NoFrame)
+        self.fr_top.setFrameShadow(QFrame.Plain)
+        self.fr_top.setLineWidth(0)
+        self.fr_top.setObjectName("fr_top")
+
+        self.fr_label = QFrame(self.fr_top)
+        self.fr_label.setMaximumSize(QSize(16777215, 50))
+        self.fr_label.setFrameShape(QFrame.NoFrame)
+        self.fr_label.setFrameShadow(QFrame.Plain)
+        self.fr_label.setLineWidth(0)
+        self.fr_label.setObjectName("fr_label")
+
+        self.fr_content = QFrame(self.fr_top)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.fr_content.setSizePolicy(sizePolicy)
+        self.fr_content.setFrameShape(QFrame.NoFrame)
+        self.fr_content.setFrameShadow(QFrame.Plain)
+        self.fr_content.setLineWidth(0)
+        self.fr_content.setObjectName("fr_content")
+
+        self.fr_bottom = QFrame(self.centralwidget)
+        self.fr_bottom.setMaximumSize(QSize(16777215, 50))
+        self.fr_bottom.setFrameShape(QFrame.NoFrame)
+        self.fr_bottom.setFrameShadow(QFrame.Plain)
+        self.fr_bottom.setLineWidth(0)
+        self.fr_bottom.setObjectName("fr_bottom")
+
+    def setlayouts(self):
+        self.lt_dialog = QGridLayout(self)
+        self.lt_dialog.setObjectName("lt_dialog")
+        self.lt_dialog.setContentsMargins(0, 0, 0, 0)
+        self.lt_central = QVBoxLayout(self.centralwidget)
+        self.lt_central.setContentsMargins(0, 0, 0, 0)
+        self.lt_central.setSpacing(0)
+        self.lt_central.setObjectName("lt_central")
+
+        self.lt_bottom = QHBoxLayout(self.fr_bottom)
+        self.lt_bottom.setContentsMargins(0, 0, 0, 0)
+        self.lt_bottom.setSpacing(0)
+        self.lt_bottom.setObjectName("lt_bottom")
+
+        self.lt_top = QVBoxLayout(self.fr_top)
+        self.lt_top.setContentsMargins(0, 0, 0, 10)
+        self.lt_top.setSpacing(20)
+        self.lt_top.setObjectName("lt_top")
+
+        self.lt_label = QGridLayout(self.fr_label)
+        self.lt_label.setObjectName("lt_label")
+        self.lt_label.setContentsMargins(0, 0, 0, 0)
+
+        self.lt_content = QGridLayout(self.fr_content)
+        self.lt_content.setObjectName("lt_content")
+        self.lt_content.setContentsMargins(0, 0, 0, 0)
+        self.lt_content.setSpacing(9)
+
+    def setbuttons(self):
+        self.buttonok = QPushButton(self.fr_bottom)
+        self.buttonok.setText('Zapisz zmiany')
+        self.buttonok.setFocus()
+        self.buttonok.setMinimumWidth(100)
+        self.buttonok.setMinimumHeight(50)
+        self.buttonok.setObjectName('buttonok')
+        self.buttoncancel = QPushButton(self.fr_bottom)
+        self.buttoncancel.setText('Anuluj')
+        self.buttoncancel.setMinimumWidth(100)
+        self.buttoncancel.setMinimumHeight(50)
+        self.buttoncancel.setObjectName('buttoncancel')
+
+    def settable(self):
+        self.table = QTableView(self.fr_content)
+        self.table.setModel(self.model)
+        self.table.hideColumn(7)
+        self.table.hideColumn(8)
+        self.table.hideColumn(9)
+        self.table.hideColumn(10)
+        self.table.hideColumn(11)
+        self.table.hideColumn(12)
+        self.table.hideColumn(13)
+        self.table.hideColumn(14)
+        self.table.horizontalHeader().moveSection(5, 6)
+        self.table.setSortingEnabled(True)
+
+        self.table.resizeColumnsToContents()
+        self.table.horizontalHeader().setStretchLastSection(True)
+
+        self.table.setFrameShape(QFrame.NoFrame)
+        self.table.setFrameShadow(QFrame.Plain)
+        self.table.setLineWidth(0)
+        self.table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+    def addwidgets(self):
+        self.lt_bottom.addWidget(self.buttonok)
+        self.lt_bottom.addWidget(self.buttoncancel)
+        self.lt_content.addWidget(self.table, 0, 0, 1, 1)
+        self.lt_top.addWidget(self.fr_content)
+        self.lt_central.addWidget(self.fr_top)
+        self.lt_central.addWidget(self.line)
+        self.lt_central.addWidget(self.fr_bottom)
+        self.lt_dialog.addWidget(self.centralwidget, 0, 0, 1, 1)
+
+    # metoda statyczna, tworzy dialog i wybrany ID, ok
+    @staticmethod
+    def showtable(model, parent=None):
+        dialog = OrchList(model, parent)
         ok = dialog.exec_()
         return ok == QDialog.Accepted
 

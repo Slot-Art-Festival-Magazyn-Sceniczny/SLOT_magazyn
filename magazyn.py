@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem, QGra
 import slotbaza
 import logbaza
 from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall, \
-    AreaList, ItemList, OrchestraModule, OrchEditDialog, AdminPanel
+    AreaList, ItemList, OrchList, OrchestraModule, OrchEditDialog, AdminPanel
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -220,7 +220,6 @@ class Magazyn(MainWindow):
         AdminPanel.panel(self)
 
         self.unblurwindow()
-
 
     # Moduł logowania do programu
     def logowanie(self):
@@ -689,7 +688,15 @@ class Magazyn(MainWindow):
 
     # Wyświetlenie listy przedmiotów ze SLOT Orkiestry
     def orchtable(self):
-        pass
+        if not (self.loginstatus or self.loginbypass):
+            self.blurwindow()
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!')
+            self.unblurwindow()
+        else:
+            self.blurwindow()
+            model = slotbaza.getqorchmodel()
+            OrchList.showtable(model)
+            self.unblurwindow()
 
     # SLOT Orkiestra - pierwsze przyjęcie przedmiotu
     def orchfirstcomein(self):

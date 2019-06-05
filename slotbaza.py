@@ -531,6 +531,24 @@ class ItemQSqlTableModel(QSqlTableModel):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
 
 
+# Klasa pomocnicza - wyłączona edycji niektórych kolumn
+class OrchQSqlTableModel(QSqlTableModel):
+    def __init__(self, parent=None, db=QSqlDatabase()):
+        super(OrchQSqlTableModel, self).__init__(parent, db)
+
+    # def flags(self, index):
+    #     if (index.column() == 0):
+    #         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+    #     elif (index.column() == 1):
+    #         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+    #     elif (index.column() == 7):
+    #         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+    #     elif (index.column() == 8):
+    #         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+    #     else:
+    #         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+
+
 # funkcja zwracająca model tablicy 'area' zgodny z Qt
 def getqareamodel():
     model = AreaQSqlTableModel(None, qbaza)
@@ -593,6 +611,23 @@ def getqitemsmodel():
     model.setHeaderData(13, Qt.Horizontal, 'Ostatnio wydał')
     model.setHeaderData(14, Qt.Horizontal, 'Uwagi')
     model.setHeaderData(15, Qt.Horizontal, 'Obszar')
+    model.select()
+    model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+
+    return model
+
+
+# funkcja zwracająca model tablicy 'orch' zgodny z Qt
+def getqorchmodel():
+    model = OrchQSqlTableModel(None, qbaza)
+    model.setTable('orchestra')
+    model.setHeaderData(0, Qt.Horizontal, 'No')
+    model.setHeaderData(1, Qt.Horizontal, 'Kod kreskowy')
+    model.setHeaderData(2, Qt.Horizontal, 'Imię')
+    model.setHeaderData(3, Qt.Horizontal, 'Nazwisko')
+    model.setHeaderData(4, Qt.Horizontal, 'Przedmiot')
+    model.setHeaderData(5, Qt.Horizontal, 'Uwagi')
+    model.setHeaderData(6, Qt.Horizontal, 'Na magazynie?')
     model.select()
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
 
