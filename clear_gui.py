@@ -301,7 +301,6 @@ class MainWindow(QMainWindow):
         self.setcentralwidget()
         self.setOrchestraModule()
         self.btn_maximize.clicked.connect(self.maximize_btn_action)
-        self.btn_minimize.clicked.connect(self.minimize_btn_action)
 
         QMetaObject.connectSlotsByName(self)
         self.setWindowTitle("Magazyn Sceniczny")
@@ -713,15 +712,6 @@ class MainWindow(QMainWindow):
         self.btn_settings.setObjectName("btn_settings")
         self.btn_settings.setToolTip('Ustawienia')
 
-        self.btn_minimize = QPushButton(self.frm_top)
-        self.btn_minimize.setMinimumSize(QSize(50, 32))
-        self.btn_minimize.setMaximumSize(QSize(16777215, 50))
-        self.btn_minimize.setFont(font)
-        self.btn_minimize.setIcon(icon11)
-        self.btn_minimize.setIconSize(QSize(24, 24))
-        self.btn_minimize.setObjectName("btn_minimize")
-        self.btn_minimize.setToolTip('Minimalizuj')
-
         self.btn_maximize = QPushButton(self.frm_top)
         self.btn_maximize.setMinimumSize(QSize(50, 32))
         self.btn_maximize.setMaximumSize(QSize(16777215, 50))
@@ -731,22 +721,11 @@ class MainWindow(QMainWindow):
         self.btn_maximize.setObjectName("btn_maximize")
         self.btn_maximize.setToolTip('Full-screen')
 
-        self.btn_exit2 = QPushButton(self.frm_top)
-        self.btn_exit2.setMinimumSize(QSize(50, 32))
-        self.btn_exit2.setMaximumSize(QSize(16777215, 50))
-        self.btn_exit2.setFont(font)
-        self.btn_exit2.setIcon(icon13)
-        self.btn_exit2.setIconSize(QSize(24, 24))
-        self.btn_exit2.setObjectName("btn_exit2")
-        self.btn_exit2.setToolTip('Wyjście')
-
         self.lt_top.addItem(spacerItem8)
         self.lt_top.addWidget(self.btn_adminpanel)
         self.lt_top.addWidget(self.btn_settings)
-        self.lt_top.addItem(spacerItem9)
-        self.lt_top.addWidget(self.btn_minimize)
+        # self.lt_top.addItem(spacerItem9)
         self.lt_top.addWidget(self.btn_maximize)
-        self.lt_top.addWidget(self.btn_exit2)
 
         self.lt_rightside.addWidget(self.frm_top)
 
@@ -819,7 +798,10 @@ class MainWindow(QMainWindow):
 
     def maximize_btn_action(self):
         if self.isFullScreen():
+
             self.showNormal()
+
+
         else:
             self.showFullScreen()
 

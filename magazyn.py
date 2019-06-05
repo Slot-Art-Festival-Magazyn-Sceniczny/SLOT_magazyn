@@ -186,7 +186,7 @@ class Magazyn(MainWindow):
         self.btn_comeout.clicked.connect(self.comeout)
         self.btn_orchestra.clicked.connect(self.orchestra)
         self.btn_exit.clicked.connect(self.close)
-        self.btn_exit2.clicked.connect(self.close)
+        # self.btn_exit2.clicked.connect(self.close)
         self.orchestramodule.btn_orchtable.clicked.connect(self.orchtable)
         self.orchestramodule.btn_orchfirstcomein.clicked.connect(self.orchfirstcomein)
         self.orchestramodule.btn_orchcomein.clicked.connect(self.orchcomein)
