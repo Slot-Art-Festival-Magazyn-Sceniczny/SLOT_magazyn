@@ -319,6 +319,7 @@ class Magazyn(MainWindow):
             else:
                 self.unblurwindow()
 
+    # Zakończenie rysowania obszaru, okno dodawania obszaru
     def areadrawend(self, pos):
         self.viewer.normalmode()  # przełączenie viewera w normalny tryb pracy
         coords = self.viewer.mapToScene(pos)  # viewer zwraca coordy globalne, trzeba je zmapować na scene
@@ -466,6 +467,7 @@ class Magazyn(MainWindow):
         ItemList.showtable(model)
         self.unblurwindow()
 
+    # Przełączenie viewera w tryb itemcounter
     def itemcounter(self):
         pass
 
@@ -493,36 +495,48 @@ class Magazyn(MainWindow):
                                     itemid = barcodetoid(itembarcode, 'int')
                                     if slotbaza.isitemexist(itemid):
                                         przedmiot = slotbaza.loaditem(itemid)
-                                        if przedmiot['itemstate']:
-                                            logbaza.itemchange(self.username, 'Override Come In', areaid, itemid)
-                                            Dialog.komunikat('error',
-                                                             'Ten przedmiot jest już przyjęty na stan magazynu! '
-                                                             'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!', self)
-                                            self.unblurwindow()
-                                        else:
-                                            istniejacyprzedmiotok = QuestionDialog.pytanie('Ten przedmiot znajduje się '
-                                                                                           'w bazie:\nNazwa przedmiotu: '
-                                                                                           + przedmiot['itemname']
-                                                                                           + '\nStan: Wydany\nUwagi: '
-                                                                                           + przedmiot['itemcomments']
-                                                                                           + '\n\nCzy chcesz przyjąć '
-                                                                                             'przedmiot?', self)
-                                            if istniejacyprzedmiotok:
-                                                przedmiot['itemstate'] = True
-                                                przedmiot['dateoflastincome'] = datetime.datetime.now()
-                                                przedmiot['useroflastincome'] = self.username
-                                                slotbaza.saveitem(przedmiot)
-                                                logbaza.itemchange(self.username, 'Come In', areaid, itemid)
-                                                Dialog.komunikat('ok', 'Przedmiot został przyjęty na stan magazynu',
-                                                                 self)
-                                                kolejnyprzedmiot = QuestionDialog.pytanie('Czy chcesz przyjąć '
-                                                                                          'kolejny przedmiot do obszaru'
-                                                                                          ' ' + str(areaid) + '?', self)
-                                            else:
-                                                logbaza.itemchange(self.username, 'Failed Come In', areaid, itemid)
-                                                Dialog.komunikat('warn', 'Przerwano proces przyjmowania przedmiotu.'
-                                                                         '\nPrzedmiot nie został przyjęty', self)
+                                        if przedmiot['areaass'].areaid == areaid:
+                                            if przedmiot['itemstate']:
+                                                logbaza.itemchange(self.username, 'Override Come In', areaid, itemid)
+                                                Dialog.komunikat('error',
+                                                                 'Ten przedmiot jest już przyjęty na stan magazynu! '
+                                                                 'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!', self)
                                                 self.unblurwindow()
+                                            else:
+                                                istniejacyprzedmiotok = QuestionDialog.pytanie('Ten przedmiot znajduje '
+                                                                                               'się w bazie:\n'
+                                                                                               'Nazwa przedmiotu: '
+                                                                                               + przedmiot['itemname']
+                                                                                               + '\nStan: Wydany'
+                                                                                                 '\nUwagi: '
+                                                                                               + przedmiot['item'
+                                                                                                           'comments']
+                                                                                               + '\n\nCzy chcesz '
+                                                                                                 'przyjąć '
+                                                                                                 'przedmiot?', self)
+                                                if istniejacyprzedmiotok:
+                                                    przedmiot['itemstate'] = True
+                                                    przedmiot['dateoflastincome'] = datetime.datetime.now()
+                                                    przedmiot['useroflastincome'] = self.username
+                                                    slotbaza.saveitem(przedmiot)
+                                                    logbaza.itemchange(self.username, 'Come In', areaid, itemid)
+                                                    Dialog.komunikat('ok', 'Przedmiot został przyjęty na stan magazynu',
+                                                                     self)
+                                                    kolejnyprzedmiot = QuestionDialog.pytanie('Czy chcesz przyjąć '
+                                                                                              'kolejny przedmiot '
+                                                                                              'do obszaru'
+                                                                                              ' ' + str(areaid) + '?',
+                                                                                              self)
+                                                else:
+                                                    logbaza.itemchange(self.username, 'Failed Come In', areaid, itemid)
+                                                    Dialog.komunikat('warn', 'Przerwano proces przyjmowania przedmiotu.'
+                                                                             '\nPrzedmiot nie został przyjęty', self)
+                                                    self.unblurwindow()
+                                        else:
+                                            Dialog.komunikat('error', 'Próbujesz przyjąć przedmiot, '
+                                                                      'który jest przypisany do innego obszaru! '
+                                                                      'Jeśli nie wiesz dlaczego, wezwij szefa ekipy.',
+                                                             self)
                                     else:
                                         nowyprzedmiotok = QuestionDialog.pytanie(
                                             'Wprowadzony przedmiot nie znajduje się na żadnym obszarze. '
@@ -613,35 +627,43 @@ class Magazyn(MainWindow):
                                     itemid = barcodetoid(itembarcode, 'int')
                                     if slotbaza.isitemexist(itemid):
                                         przedmiot = slotbaza.loaditem(itemid)
-                                        if przedmiot['itemstate']:
-                                            istniejacyprzedmiotok = QuestionDialog.pytanie(
-                                                'Ten przedmiot znajduje się w bazie:\nNazwa przedmiotu: ' + przedmiot[
-                                                    'itemname'] + '\nStan: Przyjęty\nUwagi: ' + przedmiot[
-                                                    'itemcomments'] + '\n\nCzy chcesz wydać przedmiot?', self)
-                                            if istniejacyprzedmiotok:
-                                                przedmiot['itemstate'] = False
-                                                przedmiot['dateoflastoutcome'] = datetime.datetime.now()
-                                                przedmiot['useroflastoutcome'] = self.username
-                                                slotbaza.saveitem(przedmiot)
-                                                logbaza.itemchange(self.username, 'Come Out', areaid, itemid)
-                                                Dialog.komunikat('ok', 'Przedmiot został wydany z magazynu', self)
-                                                kolejnyprzedmiot = QuestionDialog.pytanie(
-                                                    'Czy chcesz wydać kolejny przedmiot z obszaru ' + str(areaid) + '?',
-                                                    self)
+                                        if przedmiot['areaass'].areaid == areaid:
+                                            if przedmiot['itemstate']:
+                                                istniejacyprzedmiotok = QuestionDialog.pytanie(
+                                                    'Ten przedmiot znajduje się w bazie:\nNazwa przedmiotu: ' +
+                                                    przedmiot[
+                                                        'itemname'] + '\nStan: Przyjęty\nUwagi: ' + przedmiot[
+                                                        'itemcomments'] + '\n\nCzy chcesz wydać przedmiot?', self)
+                                                if istniejacyprzedmiotok:
+                                                    przedmiot['itemstate'] = False
+                                                    przedmiot['dateoflastoutcome'] = datetime.datetime.now()
+                                                    przedmiot['useroflastoutcome'] = self.username
+                                                    slotbaza.saveitem(przedmiot)
+                                                    logbaza.itemchange(self.username, 'Come Out', areaid, itemid)
+                                                    Dialog.komunikat('ok', 'Przedmiot został wydany z magazynu', self)
+                                                    kolejnyprzedmiot = QuestionDialog.pytanie(
+                                                        'Czy chcesz wydać kolejny przedmiot z obszaru ' + str(
+                                                            areaid) + '?',
+                                                        self)
+                                                else:
+                                                    logbaza.itemchange(self.username, 'Failed Come Out', areaid, itemid)
+                                                    Dialog.komunikat('warn',
+                                                                     'Przerwano proces wydawania przedmiotu.'
+                                                                     '\nPrzedmiot nie został wydany',
+                                                                     self)
+                                                    self.unblurwindow()
                                             else:
-                                                logbaza.itemchange(self.username, 'Failed Come Out', areaid, itemid)
-                                                Dialog.komunikat('warn',
-                                                                 'Przerwano proces wydawania przedmiotu.'
-                                                                 '\nPrzedmiot nie został wydany',
+                                                logbaza.itemchange(self.username, 'Override Come Out', areaid, itemid)
+                                                Dialog.komunikat('error',
+                                                                 'Ten przedmiot jest już wydany z magazynu! '
+                                                                 'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
                                                                  self)
                                                 self.unblurwindow()
                                         else:
-                                            logbaza.itemchange(self.username, 'Override Come Out', areaid, itemid)
-                                            Dialog.komunikat('error',
-                                                             'Ten przedmiot jest już wydany z magazynu! '
-                                                             'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
+                                            Dialog.komunikat('error', 'Próbujesz wydać przedmiot, '
+                                                                      'który jest przypisany do innego obszaru! '
+                                                                      'Jeśli nie wiesz dlaczego, wezwij szefa ekipy.',
                                                              self)
-                                            self.unblurwindow()
                                     else:
                                         logbaza.itemchange(self.username, 'Failed Come Out Critical', areaid, itemid)
                                         Dialog.komunikat('error',
