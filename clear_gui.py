@@ -2,12 +2,12 @@
 
 import time
 
-from PyQt5.QtCore import QRect, Qt, QSize, QMetaObject, QPropertyAnimation, QEasingCurve, QPoint, pyqtSignal
+from PyQt5.QtCore import QRect, Qt, QSize, QMetaObject, QPropertyAnimation, QEasingCurve, QPoint, pyqtSignal, QEvent
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QPainter
 from PyQt5.QtWidgets import QMainWindow, QFrame, QWidget, QPushButton, \
     QVBoxLayout, QHBoxLayout, QLabel, QGraphicsView, QGraphicsScene, QDialog, QLineEdit, \
     QGridLayout, QSizePolicy, QSpacerItem, QLayout, QGraphicsBlurEffect, QRubberBand, QPlainTextEdit, QListWidget, \
-    QTableView
+    QTableView, QItemDelegate
 
 
 def mainstylesheet():
@@ -2215,6 +2215,7 @@ class ItemList(QDialog):
         self.buttoncancel.setObjectName('buttoncancel')
 
     def settable(self):
+        delegate = CheckBoxDelegate(None)
         self.table = QTableView(self.fr_content)
         self.table.setModel(self.model)
         self.table.resizeColumnsToContents()
@@ -2222,6 +2223,7 @@ class ItemList(QDialog):
         self.table.setSortingEnabled(True)
 
         self.table.hideColumn(11)
+        self.table.setItemDelegateForColumn(3, delegate)
 
         self.table.setFrameShape(QFrame.NoFrame)
         self.table.setFrameShadow(QFrame.Plain)
@@ -2286,6 +2288,7 @@ class OrchList(QDialog):
         self.setSizeIncrement(QSize(0, 0))
         self.setStyleSheet(
             "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #B721FF, stop:1 #21D4FD)")
+
         self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_NoSystemBackground, True)
@@ -2376,8 +2379,10 @@ class OrchList(QDialog):
         self.buttoncancel.setObjectName('buttoncancel')
 
     def settable(self):
+        delegate = CheckBoxDelegate(None)
         self.table = QTableView(self.fr_content)
         self.table.setModel(self.model)
+        self.table.setItemDelegateForColumn(6, delegate)
         self.table.hideColumn(7)
         self.table.hideColumn(8)
         self.table.hideColumn(9)
@@ -2664,3 +2669,45 @@ class OrchEditDialog(QDialog):
         ok = dialog.exec_()
         nowyorchdict = dialog.nowyobszar(orchdict)
         return nowyorchdict, ok == QDialog.Accepted
+
+
+class CheckBoxDelegate(QItemDelegate):
+    """
+    A delegate that places a fully functioning QCheckBox cell of the column to which it's applied.
+    """
+
+    def __init__(self, parent):
+        QItemDelegate.__init__(self, parent)
+
+    def createEditor(self, parent, option, index):
+        """
+        Important, otherwise an editor is created if the user clicks in this cell.
+        """
+        return None
+
+    def paint(self, painter, option, index):
+        """
+        Paint a checkbox without the label.
+        """
+        self.drawCheck(painter, option, option.rect, Qt.Unchecked if int(index.data()) == 0 else Qt.Checked)
+
+    def editorEvent(self, event, model, option, index):
+        '''
+        Change the data in the model and the state of the checkbox
+        if the user presses the left mousebutton and this cell is editable. Otherwise do nothing.
+        '''
+        if not int(index.flags() & Qt.ItemIsEditable) > 0:
+            return False
+
+        if event.type() == QEvent.MouseButtonRelease and event.button() == Qt.LeftButton:
+            # Change the checkbox-state
+            self.setModelData(None, model, index)
+            return True
+
+        return False
+
+    def setModelData(self, editor, model, index):
+        '''
+        The user wanted to change the old state in the opposite.
+        '''
+        model.setData(index, 1 if int(index.data()) == 0 else 0, Qt.EditRole)
