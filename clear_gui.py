@@ -301,6 +301,9 @@ class MainWindow(QMainWindow):
         self.setcentralwidget()
         self.setOrchestraModule()
         self.btn_maximize.clicked.connect(self.maximize_btn_action)
+        icon_main = QIcon()
+        icon_main.addPixmap(QPixmap("images/slot.png"), QIcon.Normal, QIcon.Off)
+        self.setWindowIcon(icon_main)
 
         QMetaObject.connectSlotsByName(self)
         self.setWindowTitle("Magazyn Sceniczny")
