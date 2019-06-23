@@ -511,21 +511,21 @@ class ItemQSqlTableModel(QSqlTableModel):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         elif (index.column() == 1):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 3):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 4):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 5):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 6):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         elif (index.column() == 7):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         elif (index.column() == 8):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         elif (index.column() == 9):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
-        elif (index.column() == 10):
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         elif (index.column() == 11):
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
-        elif (index.column() == 12):
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
-        elif (index.column() == 13):
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
-        elif (index.column() == 15):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         else:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
@@ -602,15 +602,15 @@ def getqitemsmodel():
     model.setHeaderData(0, Qt.Horizontal, 'No')
     model.setHeaderData(1, Qt.Horizontal, 'Kod kreskowy')
     model.setHeaderData(2, Qt.Horizontal, 'Nazwa')
-    model.setHeaderData(7, Qt.Horizontal, 'Na magazynie?')
-    model.setHeaderData(8, Qt.Horizontal, 'Kiedy stworzony')
-    model.setHeaderData(9, Qt.Horizontal, 'Kto stworzył')
-    model.setHeaderData(10, Qt.Horizontal, 'Ostatnio przyjęty')
-    model.setHeaderData(11, Qt.Horizontal, 'Ostatnio przyjął')
-    model.setHeaderData(12, Qt.Horizontal, 'Ostatnio wydany')
-    model.setHeaderData(13, Qt.Horizontal, 'Ostatnio wydał')
-    model.setHeaderData(14, Qt.Horizontal, 'Uwagi')
-    model.setHeaderData(15, Qt.Horizontal, 'Obszar')
+    model.setHeaderData(3, Qt.Horizontal, 'Na magazynie?')
+    model.setHeaderData(4, Qt.Horizontal, 'Kiedy stworzony')
+    model.setHeaderData(5, Qt.Horizontal, 'Kto stworzył')
+    model.setHeaderData(6, Qt.Horizontal, 'Ostatnio przyjęty')
+    model.setHeaderData(7, Qt.Horizontal, 'Ostatnio przyjął')
+    model.setHeaderData(8, Qt.Horizontal, 'Ostatnio wydany')
+    model.setHeaderData(9, Qt.Horizontal, 'Ostatnio wydał')
+    model.setHeaderData(10, Qt.Horizontal, 'Uwagi')
+    model.setHeaderData(11, Qt.Horizontal, 'Obszar')
     model.select()
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
 

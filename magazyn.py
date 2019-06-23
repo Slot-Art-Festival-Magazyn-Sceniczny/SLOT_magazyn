@@ -454,8 +454,8 @@ class Magazyn(MainWindow):
                         self.itemlist(areaid)
                     else:
                         Dialog.komunikat('warn',
-                                         'Wskazany obszar nie istnieje!\nDodaj najpierw obszar, aby móc przyjmować '
-                                         'do niego przedmioty.', self)
+                                         'Wskazany obszar nie istnieje!\n'
+                                         'Jeśli nie wiesz dlaczego, wezwij szefa ekipy', self)
                         self.unblurwindow()
             else:
                 self.unblurwindow()

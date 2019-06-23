@@ -2087,7 +2087,7 @@ class AreaList(QDialog):
 
 class ItemList(QDialog):
     def __init__(self, model, parent=None):
-        super(AreaList, self).__init__(parent)
+        super(ItemList, self).__init__(parent)
         self.model = model
 
         self.setwindow()
@@ -2221,6 +2221,8 @@ class ItemList(QDialog):
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setSortingEnabled(True)
 
+        self.table.hideColumn(11)
+
         self.table.setFrameShape(QFrame.NoFrame)
         self.table.setFrameShadow(QFrame.Plain)
         self.table.setLineWidth(0)
@@ -2239,7 +2241,7 @@ class ItemList(QDialog):
     # metoda statyczna, tworzy dialog i wybrany ID, ok
     @staticmethod
     def showtable(model, parent=None):
-        dialog = AreaList(model, parent)
+        dialog = ItemList(model, parent)
         ok = dialog.exec_()
         return ok == QDialog.Accepted
 
