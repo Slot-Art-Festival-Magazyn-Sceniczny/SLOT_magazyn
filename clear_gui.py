@@ -575,7 +575,7 @@ class MainWindow(QMainWindow):
 
         self.lt_login.addWidget(self.frm_loginbuttons)
         self.logstatus = QLabel(self.frm_login)
-        self.logstatus.setMinimumSize(QSize(0, 13))
+        self.logstatus.setMinimumSize(QSize(0, 20))
         self.logstatus.setFont(font2)
         self.logstatus.setAlignment(Qt.AlignCenter)
         self.logstatus.setObjectName("logstatus")
@@ -786,7 +786,7 @@ class MainWindow(QMainWindow):
     def moveOrchestraModule(self):
         pozycja = self.btn_orchestra.pos()
         pozycjax = pozycja.x() + 260
-        pozycjay = pozycja.y() - 1
+        pozycjay = pozycja.y() - 3
         self.orchestramodule.move(pozycjax, pozycjay)
 
     def maximize_btn_action(self):
