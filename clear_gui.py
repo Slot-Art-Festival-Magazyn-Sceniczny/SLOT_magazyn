@@ -2646,9 +2646,7 @@ class OrchEditDialog(QDialog):
     # metoda statyczna, tworzy dialog i zwraca słownik z nowymi danymi obszaru
     @staticmethod
     def firstcomein(orchdict, parent=None):
-        print('static method called')
         dialog = OrchEditDialog(orchdict, False, 'Przyjmij', parent)
-        print('dialog created')
         ok = dialog.exec_()
         nowyorchdict = dialog.nowyobszar(orchdict)
         return nowyorchdict, ok == QDialog.Accepted
