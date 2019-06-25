@@ -190,7 +190,6 @@ class Magazyn(MainWindow):
         self.btn_logout.clicked.connect(self.logowanie)
         self.btn_addarea.clicked.connect(self.addarea)
         self.btn_listofareas.clicked.connect(self.listofareas)
-        self.btn_itemcounter.clicked.connect(self.itemcounter)
         self.btn_editarea.clicked.connect(self.editarea)
         self.btn_finditem.clicked.connect(self.finditem)
         self.btn_lookinside.clicked.connect(self.lookinside)
@@ -478,10 +477,6 @@ class Magazyn(MainWindow):
         model = slotbaza.getqitemmodel(areaid)
         ItemList.showtable(model)
         self.unblurwindow()
-
-    # Przełączenie viewera w tryb itemcounter
-    def itemcounter(self):
-        pass
 
     # Obsługa przyjmowania przedmiotów
     def comein(self):
