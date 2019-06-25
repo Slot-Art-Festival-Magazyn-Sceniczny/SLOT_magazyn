@@ -238,7 +238,9 @@ class Magazyn(MainWindow):
         # jeśli wysyłającym jest przycisk ZALOGUJ
         if sender.objectName() == 'btn_login':
             if self.loginstatus:
+                self.blurwindow()
                 Dialog.komunikat('warn', 'Nie można się zalogować będąc zalogowanym', self)
+                self.unblurwindow()
             else:
                 self.blurwindow()
                 login, haslo, ok = LoginDialog.getloginhaslo(self)
