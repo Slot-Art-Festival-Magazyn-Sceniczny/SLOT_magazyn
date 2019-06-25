@@ -174,7 +174,7 @@ class Magazyn(MainWindow):
         self.setupUI()
         self.rysujobszary()
         # Domyślnie po włączeniu programu nikt nie jest zalogowany
-        self.loginbypass = True  # Jeśli True to do obsługi programu niewymagane jest logowanie
+        self.loginbypass = False  # Jeśli True to do obsługi programu niewymagane jest logowanie
         self.loginstatus = False
         self.username = ''
         self.usertype = 'user'
@@ -468,7 +468,7 @@ class Magazyn(MainWindow):
                         self.itemlist(areaid)
                     else:
                         Dialog.komunikat('warn',
-                                         'Wskazany obszar nie istnieje!\n'
+                                         'Wskazany obszar nie istnieje! \n'
                                          'Jeśli nie wiesz dlaczego, wezwij szefa ekipy', self)
                         self.unblurwindow()
             else:
@@ -591,7 +591,7 @@ class Magazyn(MainWindow):
                                             logbaza.itemchange(self.username, 'Creation Trial', areaid, itemid)
                                             Dialog.komunikat('error',
                                                              'W takim razie albo zeskanowałeś zły kod, '
-                                                             'albo coś się popsuło...\nWezwij szefa ekipy.',
+                                                             'albo coś się popsuło... \nWezwij szefa ekipy.',
                                                              self)
                                             self.unblurwindow()
                                 else:
@@ -835,7 +835,7 @@ class Magazyn(MainWindow):
                                 logbaza.orchchange(self.username, 'Override Trial during come in', orchid)
                                 Dialog.komunikat('error',
                                                  'Próbujesz przyjąć przedmiot, '
-                                                 'który już jest przyjęty na stan magazynu!'
+                                                 'który już jest przyjęty na stan magazynu! '
                                                  'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
                                                  self)
                                 self.unblurwindow()
@@ -927,7 +927,7 @@ class Magazyn(MainWindow):
                                 logbaza.orchchange(self.username, 'Override Trial during come out', orchid)
                                 Dialog.komunikat('error',
                                                  'Próbujesz wydać przedmiot, '
-                                                 'który już jest wydany z magazynu!'
+                                                 'który już jest wydany z magazynu! '
                                                  'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
                                                  self)
                                 self.unblurwindow()
