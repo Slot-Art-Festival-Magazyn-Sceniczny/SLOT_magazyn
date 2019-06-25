@@ -880,7 +880,7 @@ class Magazyn(MainWindow):
                             self.unblurwindow()
                             self.updateorchcounters()
                     else:
-                        logbaza.orchchange(self.user, 'Failed Come In Critical', orchid)
+                        logbaza.orchchange(self.username, 'Failed Come In Critical', orchid)
                         Dialog.komunikat('error',
                                          'Ten przedmiot nie znajduje się w bazie! '
                                          'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
@@ -915,7 +915,7 @@ class Magazyn(MainWindow):
                         nowyorchitem, ok = OrchEditDialog.comeout(orchitem, self)
                         if ok:
                             if not (nowyorchitem['itemstate']):
-                                logbaza.orchchange(self.user, 'Override Trial during come out', orchid)
+                                logbaza.orchchange(self.username, 'Override Trial during come out', orchid)
                                 Dialog.komunikat('error',
                                                  'Próbujesz wydać przedmiot, '
                                                  'który już jest wydany z magazynu!'
@@ -936,7 +936,7 @@ class Magazyn(MainWindow):
                                             nowyorchitem['dateoflastoutcome'] = datetime.datetime.now()
                                             nowyorchitem['useroflastoutcome'] = self.username
                                             slotbaza.saveorch(nowyorchitem)
-                                            logbaza.orchchange(self.user, 'Come Out', orchid)
+                                            logbaza.orchchange(self.username, 'Come Out', orchid)
                                             Dialog.komunikat('ok', 'Poprawnie wydano przedmiot ze SLOT Orkiestry', self)
                                             self.unblurwindow()
                                             self.updateorchcounters()
@@ -971,7 +971,7 @@ class Magazyn(MainWindow):
                             self.unblurwindow()
                             self.updateorchcounters()
                     else:
-                        logbaza.orchchange(self.user, 'Failed Come Out Critical', orchid)
+                        logbaza.orchchange(self.username, 'Failed Come Out Critical', orchid)
                         Dialog.komunikat('error',
                                          'Ten przedmiot nie znajduje się w bazie! '
                                          'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',

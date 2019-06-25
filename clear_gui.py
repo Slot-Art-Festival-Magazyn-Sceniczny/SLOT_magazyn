@@ -205,7 +205,11 @@ def dialogstylesheet():
                  "QHeaderView::section:checked" \
                  "{background-color: #AA000000; color: white; border: 1px solid #55000000}\n" \
                  "QHeaderView::section" \
-                 "{background-color: #55000000; color: white; border: 1px solid #55000000}\n"
+                 "{background-color: #55000000; color: white; border: 1px solid #55000000}\n" \
+                 "QTableView::indicator:checked {" \
+                 "color: #b1b1b1; background-color: #5500FF00;}" \
+                 "QTableView::indicator:unchecked {" \
+                 "color: #b1b1b1; background-color: #55FF0000;}"
     return stylesheet
 
 

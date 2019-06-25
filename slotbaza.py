@@ -536,17 +536,15 @@ class OrchQSqlTableModel(QSqlTableModel):
     def __init__(self, parent=None, db=QSqlDatabase()):
         super(OrchQSqlTableModel, self).__init__(parent, db)
 
-    # def flags(self, index):
-    #     if (index.column() == 0):
-    #         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
-    #     elif (index.column() == 1):
-    #         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
-    #     elif (index.column() == 7):
-    #         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
-    #     elif (index.column() == 8):
-    #         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
-    #     else:
-    #         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+    def flags(self, index):
+        if (index.column() == 0):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 1):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        elif (index.column() == 6):
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        else:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
 
 
 # funkcja zwracająca model tablicy 'area' zgodny z Qt
