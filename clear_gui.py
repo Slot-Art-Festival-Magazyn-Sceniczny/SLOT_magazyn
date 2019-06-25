@@ -2047,6 +2047,7 @@ class AreaList(QDialog):
         self.table.hideColumn(4)
         self.table.hideColumn(5)
         self.table.hideColumn(6)
+        self.table.hideColumn(8)
         self.table.setSortingEnabled(True)
 
         self.table.resizeColumnsToContents()
