@@ -112,15 +112,23 @@ def barcodevalcheck(code, typ):
     year = settings['year']
     if typ == 'area':
         typcode = '10'
+        codemin = int(settings['areamin'])
+        codemax = int(settings['areamax'])
     elif typ == 'item':
         typcode = '20'
+        codemin = int(settings['itemmin'])
+        codemax = int(settings['itemmax'])
     elif typ == 'orch':
         typcode = '30'
+        codemin = int(settings['orchmin'])
+        codemax = int(settings['orchmax'])
     elif typ == 'user':
         typcode = '40'
+        codemin = 1
+        codemax = 100
     else:
         pass
-    if code == '':
+    if code is None or code == '':
         status = 1
         statustxt = 'Nie wprowadzono żadnego kodu!'
     else:
@@ -129,8 +137,12 @@ def barcodevalcheck(code, typ):
                 if code[4:6] == typcode:
                     try:
                         int(code[6:9])
-                        status = 0
-                        statustxt = 'Wprowadzono właściwy kod'
+                        if int(code[6:9]) < codemin or int(code[6:9]) > codemax:
+                            status = 5
+                            statustxt = 'Wprowadzono kod spoza zakresu'
+                        else:
+                            status = 0
+                            statustxt = 'Wprowadzono właściwy kod'
                     except:
                         status = 2
                         statustxt = 'Wprowadzono niewłaściwy kod!'
