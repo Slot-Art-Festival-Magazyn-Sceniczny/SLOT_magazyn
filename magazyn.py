@@ -563,9 +563,9 @@ class Magazyn(MainWindow):
                                                 slotbaza.createitem(itemid, idtobarcode(itemid, 'item'),
                                                                     nazwaprzedmiotu,
                                                                     areaid)
+                                                przedmiot = slotbaza.loaditem(itemid)
                                                 logbaza.itemchange(self.username, 'Create', areaid, itemid, '',
                                                                    przedmiot)
-                                                przedmiot = slotbaza.loaditem(itemid)
                                                 przedmiot['itemstate'] = True
                                                 przedmiot['dateoffirstincome'] = datetime.datetime.now()
                                                 przedmiot['useroffirstincome'] = self.username
