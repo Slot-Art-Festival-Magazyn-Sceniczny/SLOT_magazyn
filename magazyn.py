@@ -904,7 +904,7 @@ class Magazyn(MainWindow):
                     self.updateorchcounters()
             else:
                 Dialog.komunikat('warn',
-                                 'Przerwano proces przyjmowania przedmiotu! Przedmiot nie został przyjęty na maagazyn.',
+                                 'Przerwano proces przyjmowania przedmiotu! Przedmiot nie został przyjęty na magazyn.',
                                  self)
                 self.unblurwindow()
                 self.updateorchcounters()
