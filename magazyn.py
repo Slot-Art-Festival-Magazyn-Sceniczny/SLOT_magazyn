@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem, QGra
 import slotbaza
 import logbaza
 from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall, \
-    AreaList, ItemList, OrchList, OrchestraModule, OrchEditDialog, AdminPanel
+    AreaList, ItemList, OrchList, OrchestraModule, OrchEditDialog, AdminPanel, _QGraphicsItemGroup
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

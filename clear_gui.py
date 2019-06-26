@@ -7,7 +7,7 @@ from PyQt5.QtGui import QFont, QPixmap, QIcon, QPainter
 from PyQt5.QtWidgets import QMainWindow, QFrame, QWidget, QPushButton, \
     QVBoxLayout, QHBoxLayout, QLabel, QGraphicsView, QGraphicsScene, QDialog, QLineEdit, \
     QGridLayout, QSizePolicy, QSpacerItem, QLayout, QGraphicsBlurEffect, QRubberBand, QPlainTextEdit, QListWidget, \
-    QTableView, QItemDelegate
+    QTableView, QItemDelegate, QGraphicsItemGroup
 
 
 def mainstylesheet():
@@ -292,6 +292,14 @@ class _QGraphicsView(QGraphicsView):
             QGraphicsView.mouseReleaseEvent(self, event)
         else:
             super(_QGraphicsView, self).mouseReleaseEvent(event)
+
+
+class _QGraphicsItemGroup(QGraphicsItemGroup):
+    def __init__(self, parent):
+        super(_QGraphicsItemGroup, self).__init__(parent)
+
+    def mousePressEvent(self, event):
+        super(_QGraphicsView, self).mousePressEvent(event)
 
 
 class MainWindow(QMainWindow):
