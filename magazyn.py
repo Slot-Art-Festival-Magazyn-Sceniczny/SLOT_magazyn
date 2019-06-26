@@ -779,7 +779,7 @@ class Magazyn(MainWindow):
                                         self.unblurwindow()
                                         self.updateorchcounters()
                                     else:
-                                        logbaza.orchchange(self.username, 'Differential durgin first come in', orchid)
+                                        logbaza.orchchange(self.username, 'Differential during first come in', orchid)
                                         Dialog.komunikat('error',
                                                          'Kod naklejony na plakietkę i na przedmiot Różnią się! Jeśli '
                                                          'nie wiesz dlaczego, wezwij szefa ekipy!',

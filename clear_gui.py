@@ -2386,8 +2386,8 @@ class OrchList(QDialog):
         delegate = CheckBoxDelegate(None)
         self.table = QTableView(self.fr_content)
         self.table.setModel(self.model)
-        self.table.setItemDelegateForColumn(6, delegate)
-        self.table.hideColumn(7)
+        self.table.setItemDelegateForColumn(7, delegate)
+
         self.table.hideColumn(8)
         self.table.hideColumn(9)
         self.table.hideColumn(10)
@@ -2395,7 +2395,8 @@ class OrchList(QDialog):
         self.table.hideColumn(12)
         self.table.hideColumn(13)
         self.table.hideColumn(14)
-        self.table.horizontalHeader().moveSection(5, 6)
+        self.table.hideColumn(15)
+        self.table.horizontalHeader().moveSection(6, 7)
         self.table.setSortingEnabled(True)
 
         self.table.resizeColumnsToContents()
@@ -2553,18 +2554,21 @@ class OrchEditDialog(QDialog):
     def setlabels(self):
         self.label_firstname = QLabel(self.fr_content)
         self.label_lastname = QLabel(self.fr_content)
+        self.label_phone = QLabel(self.fr_content)
         self.label_itemname = QLabel(self.fr_content)
         self.label_itemcomments = QLabel(self.fr_content)
         self.label_itemstate = QLabel(self.fr_content)
 
         self.label_firstname.setText('Imię')
         self.label_lastname.setText('Nazwisko')
+        self.label_phone.setText('Telefon')
         self.label_itemname.setText('Przedmiot')
         self.label_itemcomments.setText('Komentarz')
         self.label_itemstate.setText('Stan')
 
         self.label_firstname.setAlignment(Qt.AlignRight)
         self.label_lastname.setAlignment(Qt.AlignRight)
+        self.label_phone.setAlignment(Qt.AlignRight)
         self.label_itemname.setAlignment(Qt.AlignRight)
         self.label_itemcomments.setAlignment(Qt.AlignRight)
         self.label_itemstate.setAlignment(Qt.AlignRight)
@@ -2572,6 +2576,7 @@ class OrchEditDialog(QDialog):
     def setedits(self):
         self.edit_firstname = QLineEdit(self.fr_content)
         self.edit_lastname = QLineEdit(self.fr_content)
+        self.edit_phone = QLineEdit(self.fr_content)
         self.edit_itemname = QLineEdit(self.fr_content)
         self.edit_itemcomments = QPlainTextEdit(self.fr_content)
         self.edit_itemcomments.setMaximumHeight(50)
@@ -2603,15 +2608,17 @@ class OrchEditDialog(QDialog):
 
         self.lt_content.addWidget(self.label_firstname, 0, 0, 1, 1)
         self.lt_content.addWidget(self.label_lastname, 1, 0, 1, 1)
-        self.lt_content.addWidget(self.label_itemname, 2, 0, 1, 1)
-        self.lt_content.addWidget(self.label_itemcomments, 3, 0, 1, 1)
-        self.lt_content.addWidget(self.label_itemstate, 4, 0, 1, 1)
+        self.lt_content.addWidget(self.label_phone, 2, 0, 1, 1)
+        self.lt_content.addWidget(self.label_itemname, 3, 0, 1, 1)
+        self.lt_content.addWidget(self.label_itemcomments, 4, 0, 1, 1)
+        self.lt_content.addWidget(self.label_itemstate, 5, 0, 1, 1)
 
         self.lt_content.addWidget(self.edit_firstname, 0, 1, 1, 1)
         self.lt_content.addWidget(self.edit_lastname, 1, 1, 1, 1)
-        self.lt_content.addWidget(self.edit_itemname, 2, 1, 1, 1)
-        self.lt_content.addWidget(self.edit_itemcomments, 3, 1, 1, 1)
-        self.lt_content.addWidget(self.edit_itemstate, 4, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_phone, 2, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_itemname, 3, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_itemcomments, 4, 1, 1, 1)
+        self.lt_content.addWidget(self.edit_itemstate, 5, 1, 1, 1)
 
         self.lt_top.addWidget(self.fr_label)
         self.lt_top.addWidget(self.fr_content)
@@ -2623,6 +2630,7 @@ class OrchEditDialog(QDialog):
     def filledits(self):
         self.edit_firstname.setText(self.orchdict['firstname'])
         self.edit_lastname.setText(self.orchdict['lastname'])
+        self.edit_phone.setText(self.orchdict['phone'])
         self.edit_itemname.setText(self.orchdict['itemname'])
         self.edit_itemcomments.setPlainText(self.orchdict['itemcomments'])
         if self.orchdict['itemstate']:
@@ -2632,6 +2640,7 @@ class OrchEditDialog(QDialog):
 
         self.edit_firstname.setReadOnly(self.locked)
         self.edit_lastname.setReadOnly(self.locked)
+        self.edit_phone.setReadOnly(self.locked)
         self.edit_itemname.setReadOnly(self.locked)
         self.edit_itemcomments.setReadOnly(self.locked)
         self.edit_itemstate.setReadOnly(True)
@@ -2639,6 +2648,7 @@ class OrchEditDialog(QDialog):
     def nowyobszar(self, orchdict):
         orchdict['firstname'] = self.edit_firstname.text().strip()
         orchdict['lastname'] = self.edit_lastname.text().strip()
+        orchdict['phone'] = self.edit_phone.text().strip()
         orchdict['itemname'] = self.edit_itemname.text().strip()
         orchdict['itemcomments'] = self.edit_itemcomments.toPlainText().strip()
         return orchdict

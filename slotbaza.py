@@ -72,6 +72,7 @@ class Orchestra(ModelBazy):
     orchestrabarcode = CharField(unique=True)
     firstname = CharField(default='')
     secondname = CharField(default='')
+    phone = CharField(default='')
     itemname = CharField(default='')
     itemcomments = TextField(default='')
     itemstate = BooleanField(default=False)
@@ -98,7 +99,7 @@ def closeconnection():
 # Stworzenie tablic
 def createtables():
     openconnection()
-    baza.create_tables([Area, Item, User, Orchestra])
+    baza.create_tables([Orchestra])
     closeconnection()
 
 
@@ -348,6 +349,7 @@ def loadorch(orchid):
         orchdict['orchbarcode'] = orch.orchestrabarcode
         orchdict['firstname'] = orch.firstname
         orchdict['lastname'] = orch.secondname
+        orchdict['phone'] = orch.phone
         orchdict['itemname'] = orch.itemname
         orchdict['itemcomments'] = orch.itemcomments
         orchdict['itemstate'] = orch.itemstate
@@ -372,6 +374,7 @@ def saveorch(orchdict):
         orch.orchestrabarcode = orchdict['orchbarcode']
         orch.firstname = orchdict['firstname']
         orch.secondname = orchdict['lastname']
+        orch.phone = orchdict['phone']
         orch.itemname = orchdict['itemname']
         orch.itemcomments = orchdict['itemcomments']
         orch.itemstate = orchdict['itemstate']
@@ -541,7 +544,7 @@ class OrchQSqlTableModel(QSqlTableModel):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         elif (index.column() == 1):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
-        elif (index.column() == 6):
+        elif (index.column() == 7):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         else:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
@@ -578,7 +581,7 @@ def getqitemmodel(areaid):
     model.setHeaderData(0, Qt.Horizontal, 'No')
     model.setHeaderData(1, Qt.Horizontal, 'Kod kreskowy')
     model.setHeaderData(2, Qt.Horizontal, 'Nazwa')
-    model.setHeaderData(3, Qt.Horizontal, 'Na magazynie?')
+    model.setHeaderData(3, Qt.Horizontal, 'Stan')
     model.setHeaderData(4, Qt.Horizontal, 'Kiedy stworzony')
     model.setHeaderData(5, Qt.Horizontal, 'Kto stworzył')
     model.setHeaderData(6, Qt.Horizontal, 'Ostatnio przyjęty')
@@ -623,9 +626,10 @@ def getqorchmodel():
     model.setHeaderData(1, Qt.Horizontal, 'Kod kreskowy')
     model.setHeaderData(2, Qt.Horizontal, 'Imię')
     model.setHeaderData(3, Qt.Horizontal, 'Nazwisko')
-    model.setHeaderData(4, Qt.Horizontal, 'Przedmiot')
-    model.setHeaderData(5, Qt.Horizontal, 'Uwagi')
-    model.setHeaderData(6, Qt.Horizontal, 'Na magazynie?')
+    model.setHeaderData(4, Qt.Horizontal, 'Telefon')
+    model.setHeaderData(5, Qt.Horizontal, 'Przedmiot')
+    model.setHeaderData(6, Qt.Horizontal, 'Uwagi')
+    model.setHeaderData(7, Qt.Horizontal, 'Na magazynie?')
     model.select()
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
 
