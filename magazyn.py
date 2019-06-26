@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem, QGra
 import slotbaza
 import logbaza
 from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall, \
-    AreaList, ItemList, OrchList, OrchestraModule, OrchEditDialog, AdminPanel, _QGraphicsItemGroup
+    AreaList, ItemList, OrchList, OrchestraModule, OrchEditDialog, AdminModule, _QGraphicsItemGroup
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -205,32 +205,38 @@ class Magazyn(MainWindow):
         self.btn_adminpanel.clicked.connect(self.adminpanel)
         self.viewer.rectChanged.connect(self.areadrawend)
 
-    def adminpanel(self):
-        self.blurwindow()
-        login, haslo, ok = LoginDialog.getloginhaslo(self)
-        if not ok:
-            self.unblurwindow()
-            return
-        if not slotbaza.isuserexist(login):
-            logbaza.userchange(self.username, 'Admin Login Fail', login)
-            Dialog.komunikat('warn', 'Logowanie Administratora nieudane')
-            self.unblurwindow()
-            return
-        if not login == 'admin':
-            logbaza.userchange(self.username, 'Admin Login Fail', login)
-            Dialog.komunikat('warn', 'Logowanie Administratora nieudane')
-            self.unblurwindow()
-            return
-        if not slotbaza.loginvalidate(login, hashpassword(haslo))['login']:
-            logbaza.userchange(self.username, 'Admin Login Fail', login)
-            Dialog.komunikat('warn', 'Logowanie Administratora nieudane')
-            self.unblurwindow()
-            return
-        logbaza.userchange(self.username, 'Admin Login Succes')
-        Dialog.komunikat('ok', 'Pomyslnie zalogowano')
-        AdminPanel.panel(self)
+    def userlist(self):
+        print('user list')
 
-        self.unblurwindow()
+    def adminpanel(self):
+        if self.adminmodule.isVisible():
+            self.adminmodule.toggleshow()
+        else:
+            self.blurwindow()
+            login, haslo, ok = LoginDialog.getloginhaslo(self)
+            if not ok:
+                self.unblurwindow()
+                return
+            if not slotbaza.isuserexist(login):
+                logbaza.userchange(self.username, 'Admin Login Fail', login)
+                Dialog.komunikat('warn', 'Logowanie Administratora nieudane')
+                self.unblurwindow()
+                return
+            if not login == 'admin':
+                logbaza.userchange(self.username, 'Admin Login Fail', login)
+                Dialog.komunikat('warn', 'Logowanie Administratora nieudane')
+                self.unblurwindow()
+                return
+            if not slotbaza.loginvalidate(login, hashpassword(haslo))['login']:
+                logbaza.userchange(self.username, 'Admin Login Fail', login)
+                Dialog.komunikat('warn', 'Logowanie Administratora nieudane')
+                self.unblurwindow()
+                return
+            logbaza.userchange(self.username, 'Admin Login Succes')
+            Dialog.komunikat('ok', 'Pomyslnie zalogowano')
+            self.unblurwindow()
+            self.adminmodule.toggleshow()
+
 
     # Moduł logowania do programu
     def logowanie(self):

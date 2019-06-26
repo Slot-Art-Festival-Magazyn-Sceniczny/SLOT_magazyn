@@ -7,7 +7,7 @@ from PyQt5.QtGui import QFont, QPixmap, QIcon, QPainter
 from PyQt5.QtWidgets import QMainWindow, QFrame, QWidget, QPushButton, \
     QVBoxLayout, QHBoxLayout, QLabel, QGraphicsView, QGraphicsScene, QDialog, QLineEdit, \
     QGridLayout, QSizePolicy, QSpacerItem, QLayout, QGraphicsBlurEffect, QRubberBand, QPlainTextEdit, QListWidget, \
-    QTableView, QItemDelegate, QGraphicsItemGroup
+    QTableView, QItemDelegate, QGraphicsItemGroup, QDesktopWidget
 
 
 def mainstylesheet():
@@ -24,6 +24,9 @@ def mainstylesheet():
                  "\n" \
                  "QWidget#orch_centralwidget\n" \
                  "{background-color: #558400FF}}\n" \
+                 "\n" \
+                 "QWidget#admin_centralwidget\n" \
+                 "{background-color: #88000000}\n" \
                  "\n" \
                  "QGraphicsView\n" \
                  "{background-color: #22FFFFFF}\n" \
@@ -312,6 +315,7 @@ class MainWindow(QMainWindow):
         self.settext()
         self.setcentralwidget()
         self.setOrchestraModule()
+        self.setAdminModule()
         self.btn_maximize.clicked.connect(self.maximize_btn_action)
         icon_main = QIcon()
         icon_main.addPixmap(QPixmap("images/slot.png"), QIcon.Normal, QIcon.Off)
@@ -322,6 +326,7 @@ class MainWindow(QMainWindow):
 
         self.showFullScreen()
         self.moveOrchestraModule()
+        self.moveAdminModule()
 
     def blurwindow(self):
         try:
@@ -366,6 +371,9 @@ class MainWindow(QMainWindow):
         self.btn_lookinside.setEnabled(False)
         self.btn_orchestra.setEnabled(False)
         self.btn_exit.setEnabled(False)
+        self.btn_adminpanel.setEnabled(False)
+        self.btn_maximize.setEnabled(False)
+        self.btn_settings.setEnabled(False)
 
     def enablebuttons(self):
         time.sleep(0.1)
@@ -380,6 +388,9 @@ class MainWindow(QMainWindow):
         self.btn_lookinside.setEnabled(True)
         self.btn_orchestra.setEnabled(True)
         self.btn_exit.setEnabled(True)
+        self.btn_adminpanel.setEnabled(True)
+        self.btn_maximize.setEnabled(True)
+        self.btn_settings.setEnabled(True)
 
     def setmainwindow(self):
         self.setWindowModality(Qt.NonModal)
@@ -797,11 +808,21 @@ class MainWindow(QMainWindow):
         pozycjay = pozycja.y() - 3
         self.orchestramodule.move(pozycjax, pozycjay)
 
+    def setAdminModule(self):
+        self.adminmodule = AdminModule(self)
+        self.adminmodule.setMinimumWidth(200)
+        self.adminmodule.setMinimumHeight(290)
+        self.adminmodule.hide()
+
+    def moveAdminModule(self):
+        pozycjax = self.frameGeometry().center().x() - (self.adminmodule.rect().width() / 2)
+        pozycjay = self.frameGeometry().center().y() - (self.adminmodule.rect().height() / 2)
+        self.adminmodule.move(pozycjax, pozycjay)
+
     def maximize_btn_action(self):
         if self.isFullScreen():
 
             self.showNormal()
-
 
         else:
             self.showFullScreen()
@@ -1152,166 +1173,146 @@ class OrchestraModule(QWidget):
         self.btn_orchcomeout.setEnabled(True)
 
 
-class AdminPanel(QDialog):
+class AdminModule(QWidget):
     def __init__(self, parent):
-        super(AdminPanel, self).__init__(parent)
-
+        super(AdminModule, self).__init__(parent)
         self.setwindow()
         self.setcentralwidget()
         self.setframes()
         self.setlayouts()
         self.setbuttons()
-        self.setmainlabel()
+        self.setlabels()
 
-        self.line = QFrame(self.centralwidget)
-        self.line.setFrameShadow(QFrame.Plain)
-        self.line.setFrameShape(QFrame.HLine)
-        self.line.setObjectName("line")
-
-        self.addwidgets()
-
-        self.buttoncancel.clicked.connect(self.reject)
+        self.admin_lt_central.addWidget(self.admin_fr_top)
+        self.admin_lt_central.addWidget(self.line)
+        self.admin_lt_central.addWidget(self.admin_fr_mid)
+        self.admin_lt_module.addWidget(self.admin_centralwidget, 0, 0, 1, 1)
 
     def setwindow(self):
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(100)
         sizePolicy.setVerticalStretch(5)
         self.setSizePolicy(sizePolicy)
-        self.setMinimumSize(QSize(300, 300))
-        self.setMaximumSize(QSize(300, 300))
-        self.setSizeIncrement(QSize(0, 0))
-        self.setStyleSheet(
-            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #B721FF, stop:1 #21D4FD)")
-        self.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setAttribute(Qt.WA_NoSystemBackground, True)
+        self.setMinimumSize(QSize(500, 150))
+
 
     def setcentralwidget(self):
-        self.centralwidget = QWidget(self)
+        self.admin_centralwidget = QWidget(self)
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        self.centralwidget.setSizePolicy(sizePolicy)
-        self.centralwidget.setStyleSheet(dialogstylesheet())
-        self.centralwidget.setObjectName("centralwidget")
+        self.admin_centralwidget.setSizePolicy(sizePolicy)
+        self.admin_centralwidget.setStyleSheet(mainstylesheet())
+        self.admin_centralwidget.setObjectName("admin_centralwidget")
 
     def setframes(self):
-        self.fr_top = QFrame(self.centralwidget)
+        self.admin_fr_top = QFrame(self.admin_centralwidget)
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        self.fr_top.setSizePolicy(sizePolicy)
-        self.fr_top.setFrameShape(QFrame.NoFrame)
-        self.fr_top.setFrameShadow(QFrame.Plain)
-        self.fr_top.setLineWidth(0)
-        self.fr_top.setObjectName("fr_top")
 
-        self.fr_label = QFrame(self.fr_top)
-        self.fr_label.setMaximumSize(QSize(16777215, 50))
-        self.fr_label.setFrameShape(QFrame.NoFrame)
-        self.fr_label.setFrameShadow(QFrame.Plain)
-        self.fr_label.setLineWidth(0)
-        self.fr_label.setObjectName("fr_label")
+        # self.admin_fr_top.setSizePolicy(sizePolicy)
+        self.admin_fr_top.setFrameShape(QFrame.NoFrame)
+        self.admin_fr_top.setFrameShadow(QFrame.Plain)
+        self.admin_fr_top.setLineWidth(0)
+        self.admin_fr_top.setObjectName("admin_fr_top")
 
-        self.fr_content = QFrame(self.fr_top)
+        self.line = QFrame(self.admin_centralwidget)
+        self.line.setFrameShadow(QFrame.Plain)
+        self.line.setFrameShape(QFrame.HLine)
+        self.line.setObjectName("line")
+
+        self.admin_fr_mid = QFrame(self.admin_centralwidget)
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        self.fr_content.setSizePolicy(sizePolicy)
-        self.fr_content.setFrameShape(QFrame.NoFrame)
-        self.fr_content.setFrameShadow(QFrame.Plain)
-        self.fr_content.setLineWidth(0)
-        self.fr_content.setObjectName("fr_content")
 
-        self.fr_bottom = QFrame(self.centralwidget)
-        self.fr_bottom.setMaximumSize(QSize(16777215, 50))
-        self.fr_bottom.setFrameShape(QFrame.NoFrame)
-        self.fr_bottom.setFrameShadow(QFrame.Plain)
-        self.fr_bottom.setLineWidth(0)
-        self.fr_bottom.setObjectName("fr_bottom")
+        # self.admin_fr_mid.setSizePolicy(sizePolicy)
+        self.admin_fr_mid.setFrameShape(QFrame.NoFrame)
+        self.admin_fr_mid.setFrameShadow(QFrame.Plain)
+        self.admin_fr_mid.setLineWidth(0)
+        self.admin_fr_mid.setObjectName("admin_fr_mid")
 
     def setlayouts(self):
-        self.lt_dialog = QGridLayout(self)
-        self.lt_dialog.setObjectName("lt_dialog")
-        self.lt_dialog.setContentsMargins(0, 0, 0, 0)
-        self.lt_central = QVBoxLayout(self.centralwidget)
-        self.lt_central.setContentsMargins(0, 0, 0, 0)
-        self.lt_central.setSpacing(0)
-        self.lt_central.setObjectName("lt_central")
+        self.admin_lt_module = QGridLayout(self)
+        self.admin_lt_module.setObjectName("admin_lt_module")
+        self.admin_lt_module.setContentsMargins(0, 0, 0, 0)
 
-        self.lt_bottom = QHBoxLayout(self.fr_bottom)
-        self.lt_bottom.setContentsMargins(0, 0, 0, 0)
-        self.lt_bottom.setSpacing(0)
-        self.lt_bottom.setObjectName("lt_bottom")
+        self.admin_lt_central = QVBoxLayout(self.admin_centralwidget)
+        self.admin_lt_central.setContentsMargins(0, 0, 0, 0)
+        self.admin_lt_central.setSpacing(0)
+        self.admin_lt_central.setObjectName("admin_lt_central")
 
-        self.lt_top = QVBoxLayout(self.fr_top)
-        self.lt_top.setContentsMargins(0, 20, 0, 10)
-        self.lt_top.setSpacing(20)
-        self.lt_top.setObjectName("lt_top")
+        self.admin_lt_top = QGridLayout(self.admin_fr_top)
+        self.admin_lt_top.setObjectName("admin_lt_top")
+        self.admin_lt_top.setContentsMargins(6, 6, 6, 6)
+        self.admin_lt_top.setSpacing(6)
 
-        self.lt_label = QGridLayout(self.fr_label)
-        self.lt_label.setObjectName("lt_label")
-        self.lt_label.setContentsMargins(0, 0, 0, 0)
-
-        self.lt_content = QVBoxLayout(self.fr_content)
-        self.lt_content.setObjectName("lt_content")
-        self.lt_content.setContentsMargins(20, 0, 20, 0)
-        self.lt_content.setSpacing(9)
-
-    def setmainlabel(self):
-        font = QFont()
-        font.setFamily("Arial")
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
-
-        self.mainlabel = QLabel(self.fr_label)
-        mainlabel = 'Panel Administratora'
-        self.mainlabel.setText(mainlabel)
-        self.mainlabel.setFont(font)
-        self.mainlabel.setAlignment(Qt.AlignCenter)
+        self.admin_lt_mid = QVBoxLayout(self.admin_fr_mid)
+        self.admin_lt_mid.setContentsMargins(0, 0, 0, 0)
+        self.admin_lt_mid.setSpacing(0)
+        self.admin_lt_mid.setObjectName("admin_lt_mid")
 
     def setbuttons(self):
-        self.buttoncancel = QPushButton(self.fr_bottom)
-        self.buttoncancel.setText('Anuluj')
-        self.buttoncancel.setMinimumWidth(100)
-        self.buttoncancel.setMinimumHeight(50)
-        self.buttoncancel.setObjectName('buttoncancel')
+        font = QFont()
+        font.setFamily("Arial")
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(60)
 
-        self.btn_adduser = QPushButton(self.fr_content)
-        self.btn_adduser.setText('Dodaj użytkownika')
-        self.btn_adduser.setFocus()
-        self.btn_adduser.setMinimumWidth(100)
-        self.btn_adduser.setMinimumHeight(50)
-        self.btn_adduser.setObjectName('btn_adduser')
-
-        self.btn_userlist = QPushButton(self.fr_content)
+        self.btn_userlist = QPushButton(self.admin_fr_mid)
         self.btn_userlist.setText('Lista użytkowników')
-        self.btn_userlist.setFocus()
         self.btn_userlist.setMinimumWidth(100)
         self.btn_userlist.setMinimumHeight(50)
-        self.btn_userlist.setObjectName('btn_userlist')
+        self.btn_userlist.setFont(font)
+        self.btn_userlist.setObjectName("btn_userlist")
+        self.admin_lt_mid.addWidget(self.btn_userlist)
 
-    def addwidgets(self):
-        self.lt_label.addWidget(self.mainlabel)
+        self.btn_adduser = QPushButton(self.admin_fr_mid)
+        self.btn_adduser.setText('Dodaj użytkownika')
+        self.btn_adduser.setMinimumWidth(100)
+        self.btn_adduser.setMinimumHeight(50)
+        self.btn_adduser.setFont(font)
+        self.btn_adduser.setObjectName("btn_adduser")
+        self.admin_lt_mid.addWidget(self.btn_adduser)
 
-        self.lt_content.addWidget(self.btn_adduser)
-        self.lt_content.addWidget(self.btn_userlist)
+        self.btn_changeuserpassword = QPushButton(self.admin_fr_mid)
+        self.btn_changeuserpassword.setText('Zmień hasło')
+        self.btn_changeuserpassword.setMinimumWidth(100)
+        self.btn_changeuserpassword.setMinimumHeight(50)
+        self.btn_changeuserpassword.setFont(font)
+        self.btn_changeuserpassword.setObjectName("btn_changeuserpassword")
+        self.admin_lt_mid.addWidget(self.btn_changeuserpassword)
 
-        self.lt_bottom.addWidget(self.buttoncancel)
+    def setlabels(self):
+        font = QFont()
+        font.setFamily("Arial")
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setWeight(50)
 
-        self.lt_top.addWidget(self.fr_label)
-        self.lt_top.addWidget(self.fr_content)
-        self.lt_central.addWidget(self.fr_top)
-        self.lt_central.addWidget(self.line)
-        self.lt_central.addWidget(self.fr_bottom)
-        self.lt_dialog.addWidget(self.centralwidget, 0, 0, 1, 1)
+        self.lbl_title = QLabel(self.admin_fr_top)
+        self.lbl_title.setText("Panel Administratora")
+        self.lbl_title.setFont(font)
+        self.lbl_title.setAlignment(Qt.AlignCenter)
+        self.admin_lt_top.addWidget(self.lbl_title, 0, 0, 1, 2)
 
-    @staticmethod
-    def panel(parent=None):
-        dialog = AdminPanel(parent)
-        ok = dialog.exec_()
-        print('test')
+    def toggleshow(self):
+        if self.isVisible():
+            self.hide()
+        else:
+            self.show()
+
+    def disablebuttons(self):
+        self.btn_userlist.setEnabled(False)
+        self.btn_adduser.setEnabled(False)
+        self.btn_changeuserpassword.setEnabled(False)
+
+    def enablebuttons(self):
+        time.sleep(0.1)
+        self.btn_userlist.setEnabled(True)
+        self.btn_adduser.setEnabled(True)
+        self.btn_changeuserpassword.setEnabled(True)
 
 
 class Dialog(SlotDialog):
