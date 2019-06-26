@@ -603,7 +603,7 @@ def getqitemsmodel():
     model.setHeaderData(0, Qt.Horizontal, 'No')
     model.setHeaderData(1, Qt.Horizontal, 'Kod kreskowy')
     model.setHeaderData(2, Qt.Horizontal, 'Nazwa')
-    model.setHeaderData(3, Qt.Horizontal, 'Na magazynie?')
+    model.setHeaderData(3, Qt.Horizontal, 'Stan')
     model.setHeaderData(4, Qt.Horizontal, 'Kiedy stworzony')
     model.setHeaderData(5, Qt.Horizontal, 'Kto stworzył')
     model.setHeaderData(6, Qt.Horizontal, 'Ostatnio przyjęty')
@@ -629,7 +629,7 @@ def getqorchmodel():
     model.setHeaderData(4, Qt.Horizontal, 'Telefon')
     model.setHeaderData(5, Qt.Horizontal, 'Przedmiot')
     model.setHeaderData(6, Qt.Horizontal, 'Uwagi')
-    model.setHeaderData(7, Qt.Horizontal, 'Na magazynie?')
+    model.setHeaderData(7, Qt.Horizontal, 'Stan')
     model.select()
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
 
