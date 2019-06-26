@@ -350,7 +350,6 @@ class MainWindow(QMainWindow):
         self.btn_login.setEnabled(False)
         self.btn_logout.setEnabled(False)
         self.btn_listofareas.setEnabled(False)
-        self.btn_itemcounter.setEnabled(False)
         self.btn_addarea.setEnabled(False)
         self.btn_editarea.setEnabled(False)
         self.btn_finditem.setEnabled(False)
@@ -365,7 +364,6 @@ class MainWindow(QMainWindow):
         self.btn_login.setEnabled(True)
         self.btn_logout.setEnabled(True)
         self.btn_listofareas.setEnabled(True)
-        self.btn_itemcounter.setEnabled(True)
         self.btn_addarea.setEnabled(True)
         self.btn_editarea.setEnabled(True)
         self.btn_finditem.setEnabled(True)
@@ -577,7 +575,7 @@ class MainWindow(QMainWindow):
 
         self.lt_login.addWidget(self.frm_loginbuttons)
         self.logstatus = QLabel(self.frm_login)
-        self.logstatus.setMinimumSize(QSize(0, 13))
+        self.logstatus.setMinimumSize(QSize(0, 20))
         self.logstatus.setFont(font2)
         self.logstatus.setAlignment(Qt.AlignCenter)
         self.logstatus.setObjectName("logstatus")
@@ -596,17 +594,6 @@ class MainWindow(QMainWindow):
         self.btn_listofareas.setFlat(False)
         self.btn_listofareas.setObjectName("btn_listofareas")
         self.lt_buttons.addWidget(self.btn_listofareas)
-
-        self.btn_itemcounter = QPushButton(self.frm_buttons)
-        self.btn_itemcounter.setMinimumSize(QSize(0, 50))
-        self.btn_itemcounter.setFont(font)
-        self.btn_itemcounter.setAutoFillBackground(False)
-        self.btn_itemcounter.setStyleSheet("")
-        self.btn_itemcounter.setIcon(icon0)
-        self.btn_itemcounter.setIconSize(QSize(24, 24))
-        self.btn_itemcounter.setFlat(False)
-        self.btn_itemcounter.setObjectName("btn_itemcounter")
-        self.lt_buttons.addWidget(self.btn_itemcounter)
 
         self.btn_addarea = QPushButton(self.frm_buttons)
         self.btn_addarea.setMinimumSize(QSize(0, 50))
@@ -746,7 +733,6 @@ class MainWindow(QMainWindow):
         self.btn_logout.setText("WYLOGUJ")
         self.logstatus.setText("<FONT COLOR=\'#AA2222\'> Niezalogowany")
         self.btn_listofareas.setText("LISTA OBSZARÓW")
-        self.btn_itemcounter.setText("ZAPEŁNIENIE")
         self.btn_addarea.setText("DODAJ OBSZAR")
         self.btn_editarea.setText("EDYTUJ OBSZAR")
         self.btn_finditem.setText("WYSZUKAJ PRZEDMIOT")
@@ -800,7 +786,7 @@ class MainWindow(QMainWindow):
     def moveOrchestraModule(self):
         pozycja = self.btn_orchestra.pos()
         pozycjax = pozycja.x() + 260
-        pozycjay = pozycja.y() - 1
+        pozycjay = pozycja.y() - 3
         self.orchestramodule.move(pozycjax, pozycjay)
 
     def maximize_btn_action(self):
@@ -2061,6 +2047,7 @@ class AreaList(QDialog):
         self.table.hideColumn(4)
         self.table.hideColumn(5)
         self.table.hideColumn(6)
+        self.table.hideColumn(8)
         self.table.setSortingEnabled(True)
 
         self.table.resizeColumnsToContents()

@@ -174,7 +174,7 @@ class Magazyn(MainWindow):
         self.setupUI()
         self.rysujobszary()
         # Domyślnie po włączeniu programu nikt nie jest zalogowany
-        self.loginbypass = True  # Jeśli True to do obsługi programu niewymagane jest logowanie
+        self.loginbypass = False  # Jeśli True to do obsługi programu niewymagane jest logowanie
         self.loginstatus = False
         self.username = ''
         self.usertype = 'user'
@@ -190,7 +190,6 @@ class Magazyn(MainWindow):
         self.btn_logout.clicked.connect(self.logowanie)
         self.btn_addarea.clicked.connect(self.addarea)
         self.btn_listofareas.clicked.connect(self.listofareas)
-        self.btn_itemcounter.clicked.connect(self.itemcounter)
         self.btn_editarea.clicked.connect(self.editarea)
         self.btn_finditem.clicked.connect(self.finditem)
         self.btn_lookinside.clicked.connect(self.lookinside)
@@ -239,7 +238,9 @@ class Magazyn(MainWindow):
         # jeśli wysyłającym jest przycisk ZALOGUJ
         if sender.objectName() == 'btn_login':
             if self.loginstatus:
+                self.blurwindow()
                 Dialog.komunikat('warn', 'Nie można się zalogować będąc zalogowanym', self)
+                self.unblurwindow()
             else:
                 self.blurwindow()
                 login, haslo, ok = LoginDialog.getloginhaslo(self)
@@ -467,7 +468,7 @@ class Magazyn(MainWindow):
                         self.itemlist(areaid)
                     else:
                         Dialog.komunikat('warn',
-                                         'Wskazany obszar nie istnieje!\n'
+                                         'Wskazany obszar nie istnieje! \n'
                                          'Jeśli nie wiesz dlaczego, wezwij szefa ekipy', self)
                         self.unblurwindow()
             else:
@@ -478,10 +479,6 @@ class Magazyn(MainWindow):
         model = slotbaza.getqitemmodel(areaid)
         ItemList.showtable(model)
         self.unblurwindow()
-
-    # Przełączenie viewera w tryb itemcounter
-    def itemcounter(self):
-        pass
 
     # Obsługa przyjmowania przedmiotów
     def comein(self):
@@ -594,7 +591,7 @@ class Magazyn(MainWindow):
                                             logbaza.itemchange(self.username, 'Creation Trial', areaid, itemid)
                                             Dialog.komunikat('error',
                                                              'W takim razie albo zeskanowałeś zły kod, '
-                                                             'albo coś się popsuło...\nWezwij szefa ekipy.',
+                                                             'albo coś się popsuło... \nWezwij szefa ekipy.',
                                                              self)
                                             self.unblurwindow()
                                 else:
@@ -838,7 +835,7 @@ class Magazyn(MainWindow):
                                 logbaza.orchchange(self.username, 'Override Trial during come in', orchid)
                                 Dialog.komunikat('error',
                                                  'Próbujesz przyjąć przedmiot, '
-                                                 'który już jest przyjęty na stan magazynu!'
+                                                 'który już jest przyjęty na stan magazynu! '
                                                  'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
                                                  self)
                                 self.unblurwindow()
@@ -930,7 +927,7 @@ class Magazyn(MainWindow):
                                 logbaza.orchchange(self.username, 'Override Trial during come out', orchid)
                                 Dialog.komunikat('error',
                                                  'Próbujesz wydać przedmiot, '
-                                                 'który już jest wydany z magazynu!'
+                                                 'który już jest wydany z magazynu! '
                                                  'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
                                                  self)
                                 self.unblurwindow()
