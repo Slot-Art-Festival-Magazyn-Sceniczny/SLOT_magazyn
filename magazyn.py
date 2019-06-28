@@ -172,6 +172,7 @@ class Magazyn(MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUI()
+        self.selected = 0
         self.rysujobszary()
         # Domyślnie po włączeniu programu nikt nie jest zalogowany
         self.loginbypass = False  # Jeśli True to do obsługi programu niewymagane jest logowanie
@@ -398,7 +399,11 @@ class Magazyn(MainWindow):
                 else:
                     if slotbaza.isareaexist(areaid):
                         obszar = slotbaza.loadarea(areaid)
+                        self.selected = areaid
+                        self.rysujobszary()
+                        self.selected = 0
                         nowyobszar, ok = AreaEditDialog.editarea(obszar, self)
+                        self.rysujobszary()
                         if ok:
                             logbaza.areachange(self.username, 'Edit', areaid, obszar, nowyobszar)
                             slotbaza.savearea(nowyobszar)
@@ -437,6 +442,9 @@ class Magazyn(MainWindow):
                             stan = 'wydany'
                         areaid = przedmiot['areaass']
                         area = slotbaza.loadarea(areaid)
+                        self.selected = area['areaid']
+                        self.rysujobszary()
+                        self.selected = 0
                         Dialog.komunikat('ok', 'Znaleziono przedmiot!\n' +
                                          '\nID przedmiotu: ' + str(przedmiot['itemid']) +
                                          '\nNazwa przedmiotu: ' + przedmiot['itemname'] +
@@ -445,6 +453,7 @@ class Magazyn(MainWindow):
                                          '\nNazwa obszaru: ' + area['areaname'] +
                                          '\n' +
                                          '\nStan: ' + stan)
+                        self.rysujobszary()
                         self.unblurwindow()
                     else:
                         Dialog.komunikat('error', 'Wczytany przedmiot nie znajduje się w bazie. '
@@ -472,7 +481,11 @@ class Magazyn(MainWindow):
                     self.unblurwindow()
                 else:
                     if slotbaza.isareaexist(areaid):
+                        self.selected = areaid
+                        self.rysujobszary()
+                        self.selected = 0
                         self.itemlist(areaid)
+                        self.rysujobszary()
                     else:
                         Dialog.komunikat('warn',
                                          'Wskazany obszar nie istnieje! \n'
@@ -502,6 +515,9 @@ class Magazyn(MainWindow):
                     areaid = barcodetoid(areabarcode, 'int')
                     if slotbaza.isareaexist(areaid):
                         kolejnyprzedmiot = True
+                        self.selected = areaid
+                        self.rysujobszary()
+                        self.selected = 0
                         while kolejnyprzedmiot:
                             kolejnyprzedmiot = False
                             itembarcode, itemok = InputDialog.komunikat('barcode', 'Wczytaj kod przedmiotu:', self)
@@ -517,6 +533,7 @@ class Magazyn(MainWindow):
                                                 Dialog.komunikat('error',
                                                                  'Ten przedmiot jest już przyjęty na stan magazynu! '
                                                                  'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!', self)
+                                                self.rysujobszary()
                                                 self.unblurwindow()
                                             else:
                                                 istniejacyprzedmiotok = QuestionDialog.pytanie('Ten przedmiot znajduje '
@@ -547,6 +564,7 @@ class Magazyn(MainWindow):
                                                     logbaza.itemchange(self.username, 'Failed Come In', areaid, itemid)
                                                     Dialog.komunikat('warn', 'Przerwano proces przyjmowania przedmiotu.'
                                                                              '\nPrzedmiot nie został przyjęty', self)
+                                                    self.rysujobszary()
                                                     self.unblurwindow()
                                         else:
                                             Dialog.komunikat('error', 'Próbujesz przyjąć przedmiot, '
@@ -592,6 +610,7 @@ class Magazyn(MainWindow):
                                                                  'Przerwano proces dodawania przedmiotu. '
                                                                  'Przedmiot nie został dodany.',
                                                                  self)
+                                                self.rysujobszary()
                                                 self.unblurwindow()
                                             pass
                                         else:
@@ -600,12 +619,15 @@ class Magazyn(MainWindow):
                                                              'W takim razie albo zeskanowałeś zły kod, '
                                                              'albo coś się popsuło... \nWezwij szefa ekipy.',
                                                              self)
+                                            self.rysujobszary()
                                             self.unblurwindow()
                                 else:
                                     Dialog.komunikat('warn', itemstatustxt, self)
+                                    self.rysujobszary()
                                     self.unblurwindow()
                             else:
                                 pass
+                        self.rysujobszary()
                         self.unblurwindow()
                     else:
                         logbaza.itemchange(self.username, 'Assignment Fail during come in', areaid, 0)
@@ -634,8 +656,12 @@ class Magazyn(MainWindow):
                     areaid = barcodetoid(areabarcode, 'int')
                     if slotbaza.isareaexist(areaid):
                         kolejnyprzedmiot = True
+                        self.selected = areaid
+                        self.rysujobszary()
+                        self.selected = 0
                         while kolejnyprzedmiot:
                             kolejnyprzedmiot = False
+
                             itembarcode, itemok = InputDialog.komunikat('barcode', 'Wczytaj kod przedmiotu:', self)
                             if itemok:
                                 itemstatus, itemstatustxt = barcodevalcheck(itembarcode, 'item')
@@ -667,6 +693,7 @@ class Magazyn(MainWindow):
                                                                      'Przerwano proces wydawania przedmiotu.'
                                                                      '\nPrzedmiot nie został wydany',
                                                                      self)
+                                                    self.rysujobszary()
                                                     self.unblurwindow()
                                             else:
                                                 logbaza.itemchange(self.username, 'Override Come Out', areaid, itemid)
@@ -674,6 +701,7 @@ class Magazyn(MainWindow):
                                                                  'Ten przedmiot jest już wydany z magazynu! '
                                                                  'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
                                                                  self)
+                                                self.rysujobszary()
                                                 self.unblurwindow()
                                         else:
                                             Dialog.komunikat('error', 'Próbujesz wydać przedmiot, '
@@ -686,12 +714,16 @@ class Magazyn(MainWindow):
                                                          'Próbujesz wydać przedmiot, który nie znajduje się w bazie! '
                                                          'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
                                                          self)
+                                        self.rysujobszary()
                                         self.unblurwindow()
                                 else:
                                     Dialog.komunikat('warn', itemstatustxt, self)
+                                    self.rysujobszary()
                                     self.unblurwindow()
                             else:
+                                self.rysujobszary()
                                 self.unblurwindow()
+                        self.rysujobszary()
                         self.unblurwindow()
                     else:
                         logbaza.itemchange(self.username, 'Assignment Fail during come out', areaid, 0)
@@ -1019,7 +1051,6 @@ class Magazyn(MainWindow):
             self.viewer.labels = 'number'
         self.rysujobszary()
 
-
     # Funkcja rysująca obszary, po wcześniejszym wyczyszczeniu sceny
     def rysujobszary(self):
         self.wyczyscscene()
@@ -1068,8 +1099,16 @@ class Magazyn(MainWindow):
                         gradient.setColorAt(0, QColor('#EEFF0000'))
                         gradient.setColorAt(1, QColor('#FFFF0000'))
             else:
-                gradient.setColorAt(0, QColor('#220087FF'))
-                gradient.setColorAt(1, QColor('#440048FF'))
+                if self.selected == 0:
+                    gradient.setColorAt(0, QColor('#220087FF'))
+                    gradient.setColorAt(1, QColor('#440048FF'))
+                else:
+                    if obszar['areaid'] == self.selected:
+                        gradient.setColorAt(0, QColor('#AAFFAA22'))
+                        gradient.setColorAt(1, QColor('#FFFF5522'))
+                    else:
+                        gradient.setColorAt(0, QColor('#220087FF'))
+                        gradient.setColorAt(1, QColor('#440048FF'))
             prosto.setBrush(gradient)
 
             # Stworzenie etykiety
