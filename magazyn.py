@@ -203,6 +203,7 @@ class Magazyn(MainWindow):
         self.orchestramodule.btn_orchcomein.clicked.connect(self.orchcomein)
         self.orchestramodule.btn_orchcomeout.clicked.connect(self.orchcomeout)
         self.btn_fillmode.clicked.connect(self.changefillmode)
+        self.btn_labelmode.clicked.connect(self.changelabelmode)
         self.btn_adminpanel.clicked.connect(self.adminpanel)
         self.viewer.rectChanged.connect(self.areadrawend)
 
@@ -1004,14 +1005,20 @@ class Magazyn(MainWindow):
                 self.updateorchcounters()
 
     def changefillmode(self):
-        if self.viewer.mode == 'addarea':
-            pass
-        elif self.viewer.mode == 'normal':
-            self.viewer.mode = 'fill'
+        if self.viewer.fill == 'hide':
+            self.viewer.fill = 'show'
             self.rysujobszary()
-        elif self.viewer.mode == 'fill':
-            self.viewer.mode = 'normal'
+        elif self.viewer.fill == 'show':
+            self.viewer.fill = 'hide'
             self.rysujobszary()
+
+    def changelabelmode(self):
+        if self.viewer.labels == 'number':
+            self.viewer.labels = 'name'
+        elif self.viewer.labels == 'name':
+            self.viewer.labels = 'number'
+        self.rysujobszary()
+
 
     # Funkcja rysująca obszary, po wcześniejszym wyczyszczeniu sceny
     def rysujobszary(self):
@@ -1033,46 +1040,53 @@ class Magazyn(MainWindow):
             prosto = QGraphicsRectItem(QRectF(obszar['posx'], obszar['posy'], obszar['sizex'], obszar['sizey']))
             gradient = QLinearGradient(QPoint(obszar['posx'], obszar['posy']),
                                        QPoint(obszar['posx'], obszar['posy'] + obszar['sizey']))
-            if self.viewer.mode == 'fill':
+            if self.viewer.fill == 'show':
                 if slotbaza.areacountitemsall(obszar['areaid']) == 0:
-                    gradient.setColorAt(0, QColor('#22000000'))
-                    gradient.setColorAt(1, QColor('#44000000'))
+                    gradient.setColorAt(0, QColor('#99000000'))
+                    gradient.setColorAt(1, QColor('#BB000000'))
                 else:
                     procent = (itempresent / itemall) * 100
                     if procent == 0:
-                        gradient.setColorAt(0, QColor('#55ffffb2'))
-                        gradient.setColorAt(1, QColor('#88ffffb2'))
+                        gradient.setColorAt(0, QColor('#22006600'))
+                        gradient.setColorAt(1, QColor('#33006600'))
                     elif procent < 20:
-                        gradient.setColorAt(0, QColor('#55fed976'))
-                        gradient.setColorAt(1, QColor('#88fed976'))
+                        gradient.setColorAt(0, QColor('#44FF5500'))
+                        gradient.setColorAt(1, QColor('#44FF5500'))
                     elif procent < 40:
-                        gradient.setColorAt(0, QColor('#55feb24c'))
-                        gradient.setColorAt(1, QColor('#88feb24c'))
+                        gradient.setColorAt(0, QColor('#66FF4400'))
+                        gradient.setColorAt(1, QColor('#77FF4400'))
                     elif procent < 60:
-                        gradient.setColorAt(0, QColor('#55fd8d3c'))
-                        gradient.setColorAt(1, QColor('#88fd8d3c'))
+                        gradient.setColorAt(0, QColor('#88FF3300'))
+                        gradient.setColorAt(1, QColor('#99FF3300'))
                     elif procent < 80:
-                        gradient.setColorAt(0, QColor('#55fc4e2a'))
-                        gradient.setColorAt(1, QColor('#88fc4e2a'))
+                        gradient.setColorAt(0, QColor('#AAFF2200'))
+                        gradient.setColorAt(1, QColor('#BBFF2200'))
                     elif procent < 100:
-                        gradient.setColorAt(0, QColor('#55e31a1c'))
-                        gradient.setColorAt(1, QColor('#88e31a1c'))
+                        gradient.setColorAt(0, QColor('#CCFF1100'))
+                        gradient.setColorAt(1, QColor('#DDFF1100'))
                     else:
-                        gradient.setColorAt(0, QColor('#55b10026'))
-                        gradient.setColorAt(1, QColor('#88b10026'))
+                        gradient.setColorAt(0, QColor('#EEFF0000'))
+                        gradient.setColorAt(1, QColor('#FFFF0000'))
             else:
                 gradient.setColorAt(0, QColor('#220087FF'))
                 gradient.setColorAt(1, QColor('#440048FF'))
             prosto.setBrush(gradient)
 
             # Stworzenie etykiety
-            etykieta = QGraphicsTextItem(str(obszar['areaid']))
-            etykieta.setDefaultTextColor(Qt.white)
-            etykieta.setFont(font)
+            if self.viewer.labels == 'number':
+                etykieta = QGraphicsTextItem(str(obszar['areaid']))
+                etykieta.setDefaultTextColor(Qt.white)
+                etykieta.setFont(font)
+            elif self.viewer.labels == 'name':
+                font.setPixelSize(12)
+                font.setFamily('arial')
+                font.setBold(False)
+                etykieta = QGraphicsTextItem(obszar['areaname'])
+                etykieta.setDefaultTextColor(Qt.white)
+                etykieta.setFont(font)
             etykieta_br = etykieta.boundingRect()
             etykieta.setPos(obszar['posx'] + obszar['sizex'] / 2 - etykieta_br.width() / 2,
                             obszar['posy'] + obszar['sizey'] / 2 - etykieta_br.height() / 2)
-
             # Dodanie prostokąta i etykiety do grupy
             grupa.addToGroup(prosto)
             grupa.addToGroup(etykieta)

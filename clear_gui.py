@@ -240,14 +240,13 @@ class _QGraphicsView(QGraphicsView):
         # self.setDragMode(QGraphicsView.ScrollHandDrag)
         self.setInteractive(False)  # Wyłączenie funkcji interaktywnych - np. przesuwania obszarów
         self.mode = 'normal'  # deklaracja normalnego trybu pracy
+        self.fill = 'hide'
+        self.labels = 'number'
 
     # Przełączenie na tryb rysowania nowego obszaru
     def addareamode(self):
         self.setInteractive(False)
         self.mode = 'addarea'
-
-    def fillmode(self):
-        self.mode = 'fill'
 
     # Przełączenie na tryb normalny
     def normalmode(self):
@@ -569,6 +568,8 @@ class MainWindow(QMainWindow):
         icon12.addPixmap(QPixmap("images/buttons/btn_maximize.png"), QIcon.Normal, QIcon.Off)
         icon13 = QIcon()
         icon13.addPixmap(QPixmap("images/buttons/btn_close.png"), QIcon.Normal, QIcon.Off)
+        icon14 = QIcon()
+        icon14.addPixmap(QPixmap("images/buttons/btn_labelmode.png"), QIcon.Normal, QIcon.Off)
 
         self.label_2 = QLabel(self.frm_logo)
         self.label_2.setText("")
@@ -719,6 +720,15 @@ class MainWindow(QMainWindow):
         self.btn_fillmode.setObjectName("btn_fillmode")
         self.btn_fillmode.setToolTip('Wyświetl / ukryj zapełnienie obszarów')
 
+        self.btn_labelmode = QPushButton(self.frm_top)
+        self.btn_labelmode.setMinimumSize(QSize(50, 32))
+        self.btn_labelmode.setMaximumSize(QSize(16777215, 50))
+        self.btn_labelmode.setFont(font)
+        self.btn_labelmode.setIcon(icon14)
+        self.btn_labelmode.setIconSize(QSize(24, 24))
+        self.btn_labelmode.setObjectName("btn_labelmode")
+        self.btn_labelmode.setToolTip('Przełącz wyświetlanie numerów / nazw')
+
         self.btn_adminpanel = QPushButton(self.frm_top)
         self.btn_adminpanel.setMinimumSize(QSize(50, 32))
         self.btn_adminpanel.setMaximumSize(QSize(16777215, 50))
@@ -747,6 +757,7 @@ class MainWindow(QMainWindow):
         self.btn_maximize.setToolTip('Full-screen')
 
         self.lt_top.addWidget(self.btn_fillmode)
+        self.lt_top.addWidget(self.btn_labelmode)
         self.lt_top.addItem(spacerItem8)
         self.lt_top.addWidget(self.btn_adminpanel)
         self.lt_top.addWidget(self.btn_settings)
@@ -803,7 +814,7 @@ class MainWindow(QMainWindow):
         self.viewer.setLineWidth(0)
         self.viewer.setObjectName("viewer")
         self.viewer.setScene(self.scena)
-        self.viewer.setRenderHints(QPainter.Antialiasing)
+        self.viewer.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
         self.viewer.fitInView(self.scena.sceneRect(), Qt.KeepAspectRatio)
         # scale = 0.75
         # self.viewer.scale(scale, scale)
