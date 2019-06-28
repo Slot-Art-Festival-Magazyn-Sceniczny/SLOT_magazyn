@@ -1123,9 +1123,12 @@ class Magazyn(MainWindow):
                 etykieta = QGraphicsTextItem(obszar['areaname'])
                 etykieta.setDefaultTextColor(Qt.white)
                 etykieta.setFont(font)
+                # etykieta.setTextWidth(obszar['sizex'])
+
             etykieta_br = etykieta.boundingRect()
             etykieta.setPos(obszar['posx'] + obszar['sizex'] / 2 - etykieta_br.width() / 2,
                             obszar['posy'] + obszar['sizey'] / 2 - etykieta_br.height() / 2)
+
             # Dodanie prostokąta i etykiety do grupy
             grupa.addToGroup(prosto)
             grupa.addToGroup(etykieta)
