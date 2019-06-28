@@ -246,6 +246,9 @@ class _QGraphicsView(QGraphicsView):
         self.setInteractive(False)
         self.mode = 'addarea'
 
+    def fillmode(self):
+        self.mode = 'fill'
+
     # Przełączenie na tryb normalny
     def normalmode(self):
         self.mode = 'normal'
@@ -707,6 +710,15 @@ class MainWindow(QMainWindow):
 
         self.lt_central.addWidget(self.frm_leftside)
 
+        self.btn_fillmode = QPushButton(self.frm_top)
+        self.btn_fillmode.setMinimumSize(QSize(50, 32))
+        self.btn_fillmode.setMaximumSize(QSize(16777215, 50))
+        self.btn_fillmode.setFont(font)
+        self.btn_fillmode.setIcon(icon0)
+        self.btn_fillmode.setIconSize(QSize(24, 24))
+        self.btn_fillmode.setObjectName("btn_fillmode")
+        self.btn_fillmode.setToolTip('Wyświetl / ukryj zapełnienie obszarów')
+
         self.btn_adminpanel = QPushButton(self.frm_top)
         self.btn_adminpanel.setMinimumSize(QSize(50, 32))
         self.btn_adminpanel.setMaximumSize(QSize(16777215, 50))
@@ -734,6 +746,7 @@ class MainWindow(QMainWindow):
         self.btn_maximize.setObjectName("btn_maximize")
         self.btn_maximize.setToolTip('Full-screen')
 
+        self.lt_top.addWidget(self.btn_fillmode)
         self.lt_top.addItem(spacerItem8)
         self.lt_top.addWidget(self.btn_adminpanel)
         self.lt_top.addWidget(self.btn_settings)
@@ -1194,7 +1207,6 @@ class AdminModule(QWidget):
         sizePolicy.setVerticalStretch(5)
         self.setSizePolicy(sizePolicy)
         self.setMinimumSize(QSize(500, 150))
-
 
     def setcentralwidget(self):
         self.admin_centralwidget = QWidget(self)

@@ -391,6 +391,20 @@ def saveorch(orchdict):
         pass
 
 
+# funkcja zliczająca obiekty na obszarze o zadanym ID
+def areacountitemsall(areaid):
+    lista = Item.select().where(Item.areaass == areaid)
+    dlugosc = len(lista)
+    return dlugosc
+
+
+# funkcja zliczajaca obiekty obecne na obszarze o zadanym ID
+def areacountitemspresent(areaid):
+    lista = Item.select().where((Item.areaass == areaid) & (Item.itemstate == True))
+    dlugosc = len(lista)
+    return dlugosc
+
+
 # SLOT Orkiestra - zliczenie wszystkich obszarów
 def orchcountall():
     lista = Orchestra.select()

@@ -202,6 +202,7 @@ class Magazyn(MainWindow):
         self.orchestramodule.btn_orchfirstcomein.clicked.connect(self.orchfirstcomein)
         self.orchestramodule.btn_orchcomein.clicked.connect(self.orchcomein)
         self.orchestramodule.btn_orchcomeout.clicked.connect(self.orchcomeout)
+        self.btn_fillmode.clicked.connect(self.changefillmode)
         self.btn_adminpanel.clicked.connect(self.adminpanel)
         self.viewer.rectChanged.connect(self.areadrawend)
 
@@ -236,7 +237,6 @@ class Magazyn(MainWindow):
             Dialog.komunikat('ok', 'Pomyslnie zalogowano')
             self.unblurwindow()
             self.adminmodule.toggleshow()
-
 
     # Moduł logowania do programu
     def logowanie(self):
@@ -1003,6 +1003,16 @@ class Magazyn(MainWindow):
                 self.unblurwindow()
                 self.updateorchcounters()
 
+    def changefillmode(self):
+        if self.viewer.mode == 'addarea':
+            pass
+        elif self.viewer.mode == 'normal':
+            self.viewer.mode = 'fill'
+            self.rysujobszary()
+        elif self.viewer.mode == 'fill':
+            self.viewer.mode = 'normal'
+            self.rysujobszary()
+
     # Funkcja rysująca obszary, po wcześniejszym wyczyszczeniu sceny
     def rysujobszary(self):
         self.wyczyscscene()
@@ -1020,8 +1030,37 @@ class Magazyn(MainWindow):
             prosto = QGraphicsRectItem(QRectF(obszar['posx'], obszar['posy'], obszar['sizex'], obszar['sizey']))
             gradient = QLinearGradient(QPoint(obszar['posx'], obszar['posy']),
                                        QPoint(obszar['posx'], obszar['posy'] + obszar['sizey']))
-            gradient.setColorAt(0, QColor('#220087FF'))
-            gradient.setColorAt(1, QColor('#440048FF'))
+            if self.viewer.mode == 'fill':
+                if slotbaza.areacountitemsall(obszar['areaid']) == 0:
+                    gradient.setColorAt(0, QColor('#00000000'))
+                    gradient.setColorAt(1, QColor('#00000000'))
+                else:
+                    procent = (slotbaza.areacountitemspresent(obszar['areaid']) / slotbaza.areacountitemsall(
+                        obszar['areaid'])) * 100
+                    if procent == 0:
+                        gradient.setColorAt(0, QColor('#55ffffb2'))
+                        gradient.setColorAt(1, QColor('#88ffffb2'))
+                    elif procent < 20:
+                        gradient.setColorAt(0, QColor('#55fed976'))
+                        gradient.setColorAt(1, QColor('#88fed976'))
+                    elif procent < 40:
+                        gradient.setColorAt(0, QColor('#55feb24c'))
+                        gradient.setColorAt(1, QColor('#88feb24c'))
+                    elif procent < 60:
+                        gradient.setColorAt(0, QColor('#55fd8d3c'))
+                        gradient.setColorAt(1, QColor('#88fd8d3c'))
+                    elif procent < 80:
+                        gradient.setColorAt(0, QColor('#55fc4e2a'))
+                        gradient.setColorAt(1, QColor('#88fc4e2a'))
+                    elif procent < 100:
+                        gradient.setColorAt(0, QColor('#55e31a1c'))
+                        gradient.setColorAt(1, QColor('#88e31a1c'))
+                    else:
+                        gradient.setColorAt(0, QColor('#55b10026'))
+                        gradient.setColorAt(1, QColor('#88b10026'))
+            else:
+                gradient.setColorAt(0, QColor('#220087FF'))
+                gradient.setColorAt(1, QColor('#440048FF'))
             prosto.setBrush(gradient)
 
             # Stworzenie etykiety
