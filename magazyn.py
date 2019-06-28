@@ -1025,18 +1025,20 @@ class Magazyn(MainWindow):
 
         for obszar in obszary:
             grupa = QGraphicsItemGroup()  # Tworzy grupę
-
+            itempresent = slotbaza.areacountitemspresent(obszar['areaid'])
+            itemall = slotbaza.areacountitemsall(obszar['areaid'])
+            tooltiptxt = obszar['areaname'] + '\n' + str(itempresent) + ' / ' + str(itemall)
+            grupa.setToolTip(tooltiptxt)
             # Stworzenie prostokąta
             prosto = QGraphicsRectItem(QRectF(obszar['posx'], obszar['posy'], obszar['sizex'], obszar['sizey']))
             gradient = QLinearGradient(QPoint(obszar['posx'], obszar['posy']),
                                        QPoint(obszar['posx'], obszar['posy'] + obszar['sizey']))
             if self.viewer.mode == 'fill':
                 if slotbaza.areacountitemsall(obszar['areaid']) == 0:
-                    gradient.setColorAt(0, QColor('#00000000'))
-                    gradient.setColorAt(1, QColor('#00000000'))
+                    gradient.setColorAt(0, QColor('#22000000'))
+                    gradient.setColorAt(1, QColor('#44000000'))
                 else:
-                    procent = (slotbaza.areacountitemspresent(obszar['areaid']) / slotbaza.areacountitemsall(
-                        obszar['areaid'])) * 100
+                    procent = (itempresent / itemall) * 100
                     if procent == 0:
                         gradient.setColorAt(0, QColor('#55ffffb2'))
                         gradient.setColorAt(1, QColor('#88ffffb2'))
