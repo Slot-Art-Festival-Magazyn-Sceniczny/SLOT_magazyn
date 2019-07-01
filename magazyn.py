@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem, QGra
 import slotbaza
 import logbaza
 from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall, \
-    AreaList, ItemList, OrchList, OrchestraModule, OrchEditDialog, AdminModule, _QGraphicsItemGroup
+    AreaList, ItemList, OrchList, OrchestraModule, OrchEditDialog, AdminModule, _QGraphicsItemGroup, CreateUserDialog
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,9 +207,41 @@ class Magazyn(MainWindow):
         self.btn_labelmode.clicked.connect(self.changelabelmode)
         self.btn_adminpanel.clicked.connect(self.adminpanel)
         self.viewer.rectChanged.connect(self.areadrawend)
+        self.adminmodule.btn_adduser.clicked.connect(self.createuser)
+        self.adminmodule.btn_changeuserpassword.clicked.connect(self.changepassword)
 
     def userlist(self):
         print('user list')
+
+    def createuser(self):
+        self.blurwindow()
+        login, haslo, ok = CreateUserDialog.getloginhaslo(self)
+        if not ok:
+            self.unblurwindow()
+            return
+        if slotbaza.isuserexist(login):
+            Dialog.komunikat('warn', 'Użytkownik o podanej nazwie już istnieje!')
+            self.unblurwindow()
+            return
+        slotbaza.createuser('user', login, hashpassword(haslo))
+        Dialog.komunikat('ok', 'Pomyślnie dodano użytkownika!')
+        self.unblurwindow()
+
+    def changepassword(self):
+        self.blurwindow()
+        login, haslo, ok = CreateUserDialog.getloginhaslo(self)
+        if not ok:
+            self.unblurwindow()
+            return
+        if not slotbaza.isuserexist(login):
+            Dialog.komunikat('warn', 'Użytkownik o podanej nazwie nie istnieje!')
+            self.unblurwindow()
+            return
+        uzytkownik = slotbaza.loaduser(login)
+        uzytkownik['password'] = hashpassword(haslo)
+        slotbaza.saveuser(uzytkownik)
+        Dialog.komunikat('ok', 'Pomyślnie zmieniono haslo!')
+        self.unblurwindow()
 
     def adminpanel(self):
         if self.adminmodule.isVisible():
@@ -1060,7 +1092,38 @@ class Magazyn(MainWindow):
         font = QFont()
         font.setPixelSize(18)
         font.setBold(True)
+        orkiestra = {}
+        orkiestra['posx'] = 370
+        orkiestra['posy'] = 750
+        orkiestra['sizex'] = 260
+        orkiestra['sizey'] = 100
 
+        orchgrupa = QGraphicsItemGroup()
+        orchprosto = QGraphicsRectItem(
+            QRectF(orkiestra['posx'], orkiestra['posy'], orkiestra['sizex'], orkiestra['sizey']))
+        orchgradient = QLinearGradient(QPoint(orkiestra['posx'], orkiestra['posy']),
+                                       QPoint(orkiestra['posx'], orkiestra['posy'] + orkiestra['sizey']))
+        orchgradient.setColorAt(0, QColor('#33FF48FF'))
+        orchgradient.setColorAt(1, QColor('#55BB48FF'))
+        orchprosto.setBrush(orchgradient)
+
+        orchlabel = QGraphicsTextItem('SLOT Orkiestra')
+        orchlabel.setDefaultTextColor(Qt.white)
+        orchlabel.setFont(font)
+
+        orchlabel_br = orchlabel.boundingRect()
+        orchlabel.setPos(orkiestra['posx'] + orkiestra['sizex'] / 2 - orchlabel_br.width() / 2,
+                         orkiestra['posy'] + orkiestra['sizey'] / 2 - orchlabel_br.height() / 2)
+
+        # Dodanie prostokąta i etykiety do grupy
+        orchgrupa.addToGroup(orchprosto)
+        orchgrupa.addToGroup(orchlabel)
+
+        orchgrupa.setFlag(QGraphicsItem.ItemIsMovable, True)  # Ustawienie grupy jako możliwej do przesunięcia
+        self.scena.addItem(orchgrupa)  # dodanie grupy do sceny
+        
+        
+        
         for obszar in obszary:
             grupa = QGraphicsItemGroup()  # Tworzy grupę
             itempresent = slotbaza.areacountitemspresent(obszar['areaid'])

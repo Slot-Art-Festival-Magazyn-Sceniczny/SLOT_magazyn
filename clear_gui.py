@@ -1529,6 +1529,23 @@ class LoginDialog(SlotDialog):
         return login, haslo, ok == QDialog.Accepted
 
 
+class CreateUserDialog(LoginDialog):
+    def __init__(self, parent=None):
+        super(CreateUserDialog, self).__init__(parent)
+        self.haslo.setStyleSheet('background-color: #5500FF00; color: white; border-style: none; border-radius: 5px;')
+        self.login.setStyleSheet('background-color: #5500FF00; color: white; border-style: none; border-radius: 5px;')
+        print('createuser')
+
+    def getloginhaslo(parent=None):
+        # parent.blurwindow()
+        dialog = CreateUserDialog(parent)
+        dialog.login.setFocus()
+        ok = dialog.exec_()
+        # parent.unblurwindow()
+        login, haslo = dialog.loginHaslo()
+        return login, haslo, ok == QDialog.Accepted
+
+
 class AreaEditDialog(QDialog):
     def __init__(self, obszar, parent=None):
         super(AreaEditDialog, self).__init__(parent)

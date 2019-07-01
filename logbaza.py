@@ -4,7 +4,7 @@ from PyQt5.QtSql import QSqlTableModel, QSqlDatabase
 from PyQt5.QtCore import Qt
 from peewee import *
 
-db_filename = 'logger.db'
+db_filename = 'slot_database.db'
 
 baza = SqliteDatabase(db_filename)
 qbaza = QSqlDatabase("QSQLITE")
