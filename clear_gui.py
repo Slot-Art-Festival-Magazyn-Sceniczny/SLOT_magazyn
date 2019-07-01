@@ -7,7 +7,7 @@ from PyQt5.QtGui import QFont, QPixmap, QIcon, QPainter
 from PyQt5.QtWidgets import QMainWindow, QFrame, QWidget, QPushButton, \
     QVBoxLayout, QHBoxLayout, QLabel, QGraphicsView, QGraphicsScene, QDialog, QLineEdit, \
     QGridLayout, QSizePolicy, QSpacerItem, QLayout, QGraphicsBlurEffect, QRubberBand, QPlainTextEdit, QListWidget, \
-    QTableView, QItemDelegate, QGraphicsItemGroup, QDesktopWidget
+    QTableView, QItemDelegate, QGraphicsItemGroup
 
 
 def mainstylesheet():

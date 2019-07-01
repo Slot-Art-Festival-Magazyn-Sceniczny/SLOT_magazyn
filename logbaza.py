@@ -1,10 +1,9 @@
 import datetime
 
-from PyQt5.QtSql import QSqlTableModel, QSqlDatabase
-from PyQt5.QtCore import Qt
+from PyQt5.QtSql import QSqlDatabase
 from peewee import *
 
-db_filename = 'slot_database.db'
+db_filename = 'logger.db'
 
 baza = SqliteDatabase(db_filename)
 qbaza = QSqlDatabase("QSQLITE")

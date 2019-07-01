@@ -12,10 +12,10 @@ from PyQt5.QtCore import Qt, QPoint, QRectF
 from PyQt5.QtGui import QFont, QLinearGradient, QColor, QPolygonF, QBrush, QPen
 from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem, QGraphicsItemGroup, QGraphicsTextItem
 
-import slotbaza
 import logbaza
+import slotbaza
 from clear_gui import MainWindow, LoginDialog, Dialog, InputDialog, QuestionDialog, AreaEditDialog, AreaListSmall, \
-    AreaList, ItemList, OrchList, OrchestraModule, OrchEditDialog, AdminModule, _QGraphicsItemGroup, CreateUserDialog
+    AreaList, ItemList, OrchList, OrchEditDialog, CreateUserDialog
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1121,9 +1121,7 @@ class Magazyn(MainWindow):
 
         orchgrupa.setFlag(QGraphicsItem.ItemIsMovable, True)  # Ustawienie grupy jako możliwej do przesunięcia
         self.scena.addItem(orchgrupa)  # dodanie grupy do sceny
-        
-        
-        
+
         for obszar in obszary:
             grupa = QGraphicsItemGroup()  # Tworzy grupę
             itempresent = slotbaza.areacountitemspresent(obszar['areaid'])
