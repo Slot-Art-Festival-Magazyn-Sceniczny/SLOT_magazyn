@@ -611,7 +611,8 @@ class Magazyn(MainWindow):
                                         if nowyprzedmiotok:
                                             nazwaprzedmiotu, nazwaprzedmiotuok = InputDialog.komunikat('txt',
                                                                                                        'Podaj nazwę '
-                                                                                                       'nowego przedmiotu:',
+                                                                                                       'nowego '
+                                                                                                       'przedmiotu:',
                                                                                                        self)
                                             if nazwaprzedmiotuok:
                                                 slotbaza.createitem(itemid, idtobarcode(itemid, 'item'),
@@ -912,8 +913,8 @@ class Magazyn(MainWindow):
                                 self.unblurwindow()
                             else:
                                 orchitembarcode, orchitemok = InputDialog.komunikat('barcode',
-                                                                                    'Wczytaj kod kreskowy z naklejki na '
-                                                                                    'przedmiocie',
+                                                                                    'Wczytaj kod kreskowy '
+                                                                                    'z naklejki na przedmiocie',
                                                                                     self)
                                 if orchitemok:
                                     orchitemstatus, orchitemstatustxt = barcodevalcheck(orchitembarcode, 'orch')
@@ -932,8 +933,8 @@ class Magazyn(MainWindow):
                                         else:
                                             logbaza.orchchange(self.username, 'Differential during come in', orchid)
                                             Dialog.komunikat('error',
-                                                             'Kod naklejony na plakietkę i na przedmiot Różnią się! Jeśli '
-                                                             'nie wiesz dlaczego, wezwij szefa ekipy!',
+                                                             'Kod naklejony na plakietkę i na przedmiot Różnią się! '
+                                                             'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
                                                              self)
                                             self.unblurwindow()
                                             self.updateorchcounters()
@@ -1004,8 +1005,8 @@ class Magazyn(MainWindow):
                                 self.unblurwindow()
                             else:
                                 orchitembarcode, orchitemok = InputDialog.komunikat('barcode',
-                                                                                    'Wczytaj kod kreskowy z naklejki na '
-                                                                                    'przedmiocie',
+                                                                                    'Wczytaj kod kreskowy z '
+                                                                                    'naklejki na przedmiocie',
                                                                                     self)
                                 if orchitemok:
                                     orchitemstatus, orchitemstatustxt = barcodevalcheck(orchitembarcode, 'orch')
@@ -1023,8 +1024,8 @@ class Magazyn(MainWindow):
                                         else:
                                             logbaza.orchchange(self.username, 'Differential during come out', orchid)
                                             Dialog.komunikat('error',
-                                                             'Kod naklejony na plakietkę i na przedmiot Różnią się! Jeśli '
-                                                             'nie wiesz dlaczego, wezwij szefa ekipy!',
+                                                             'Kod naklejony na plakietkę i na przedmiot Różnią się! '
+                                                             'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
                                                              self)
                                             self.unblurwindow()
                                             self.updateorchcounters()
@@ -1092,12 +1093,7 @@ class Magazyn(MainWindow):
         font = QFont()
         font.setPixelSize(18)
         font.setBold(True)
-        orkiestra = {}
-        orkiestra['posx'] = 370
-        orkiestra['posy'] = 750
-        orkiestra['sizex'] = 260
-        orkiestra['sizey'] = 100
-
+        orkiestra = {'posx': 370, 'posy': 750, 'sizex': 260, 'sizey': 100}
         orchgrupa = QGraphicsItemGroup()
         orchprosto = QGraphicsRectItem(
             QRectF(orkiestra['posx'], orkiestra['posy'], orkiestra['sizex'], orkiestra['sizey']))

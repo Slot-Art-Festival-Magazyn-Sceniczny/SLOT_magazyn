@@ -528,7 +528,6 @@ class MainWindow(QMainWindow):
         spacerItem6 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)
         spacerItem7 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)
         spacerItem8 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Fixed)
-        spacerItem9 = QSpacerItem(50, 20, QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         font = QFont()
         font.setFamily("Arial")
@@ -2744,10 +2743,10 @@ class CheckBoxDelegate(QItemDelegate):
         self.drawCheck(painter, option, option.rect, Qt.Unchecked if int(index.data()) == 0 else Qt.Checked)
 
     def editorEvent(self, event, model, option, index):
-        '''
+        """
         Change the data in the model and the state of the checkbox
         if the user presses the left mousebutton and this cell is editable. Otherwise do nothing.
-        '''
+        """
         if not int(index.flags() & Qt.ItemIsEditable) > 0:
             return False
 
@@ -2759,7 +2758,7 @@ class CheckBoxDelegate(QItemDelegate):
         return False
 
     def setModelData(self, editor, model, index):
-        '''
+        """
         The user wanted to change the old state in the opposite.
-        '''
+        """
         model.setData(index, 1 if int(index.data()) == 0 else 0, Qt.EditRole)
