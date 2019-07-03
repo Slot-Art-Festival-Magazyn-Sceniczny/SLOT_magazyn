@@ -7,7 +7,7 @@ from PyQt5.QtGui import QFont, QPixmap, QIcon, QPainter
 from PyQt5.QtWidgets import QMainWindow, QFrame, QWidget, QPushButton, \
     QVBoxLayout, QHBoxLayout, QLabel, QGraphicsView, QGraphicsScene, QDialog, QLineEdit, \
     QGridLayout, QSizePolicy, QSpacerItem, QLayout, QGraphicsBlurEffect, QRubberBand, QPlainTextEdit, QListWidget, \
-    QTableView, QItemDelegate, QGraphicsItemGroup
+    QTableView, QItemDelegate, QGraphicsItemGroup, QStyledItemDelegate
 
 
 def mainstylesheet():
@@ -2128,6 +2128,14 @@ class AreaList(QDialog):
         return ok == QDialog.Accepted
 
 
+class DateFormatDelegate(QStyledItemDelegate):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def displayText(self, Any, QLocale):
+        return Any[0:16]
+
+
 class ItemList(QDialog):
     def __init__(self, model, parent=None):
         super(ItemList, self).__init__(parent)
@@ -2258,15 +2266,21 @@ class ItemList(QDialog):
         self.buttoncancel.setObjectName('buttoncancel')
 
     def settable(self):
-        delegate = CheckBoxDelegate(None)
+        self.delegate = CheckBoxDelegate(None)
+        self.datedelegate = DateFormatDelegate()
         self.table = QTableView(self.fr_content)
         self.table.setModel(self.model)
+        self.table.setItemDelegateForColumn(4, self.datedelegate)
+        self.table.setItemDelegateForColumn(6, self.datedelegate)
+        self.table.setItemDelegateForColumn(8, self.datedelegate)
         self.table.resizeColumnsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setSortingEnabled(True)
 
+
         self.table.hideColumn(11)
-        self.table.setItemDelegateForColumn(3, delegate)
+        self.table.setItemDelegateForColumn(3, self.delegate)
+
 
         self.table.setFrameShape(QFrame.NoFrame)
         self.table.setFrameShadow(QFrame.Plain)
