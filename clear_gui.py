@@ -804,7 +804,7 @@ class MainWindow(QMainWindow):
 
     def setscena(self):
         self.scena = _QGraphicsScene(self)
-        self.scena.setSceneRect(0, 0, 1000, 950)
+        self.scena.setSceneRect(0, 0, 300, 800)
 
     def setviewer(self):
         self.viewer = _QGraphicsView(self.frm_rightside)

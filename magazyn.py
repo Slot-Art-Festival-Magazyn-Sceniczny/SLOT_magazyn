@@ -1093,7 +1093,7 @@ class Magazyn(MainWindow):
         font = QFont()
         font.setPixelSize(18)
         font.setBold(True)
-        orkiestra = {'posx': 370, 'posy': 750, 'sizex': 260, 'sizey': 100}
+        orkiestra = {'posx': 0, 'posy': 700, 'sizex': 300, 'sizey': 100}
         orchgrupa = QGraphicsItemGroup()
         orchprosto = QGraphicsRectItem(
             QRectF(orkiestra['posx'], orkiestra['posy'], orkiestra['sizex'], orkiestra['sizey']))
@@ -1202,9 +1202,8 @@ class Magazyn(MainWindow):
     def pomieszczeniedosceny(self):
         # self.scena.setBackgroundBrush(Qt.darkGray)
         pomieszczenie_poly = QPolygonF(
-            [QPoint(0, 100), QPoint(700, 100), QPoint(700, 0), QPoint(900, 0), QPoint(900, 100), QPoint(1000, 100),
-             QPoint(1000, 850), QPoint(880, 850), QPoint(880, 950), QPoint(630, 950), QPoint(630, 850),
-             QPoint(370, 850), QPoint(370, 950), QPoint(120, 950), QPoint(120, 850), QPoint(0, 850)])
+            [QPoint(0, 0), QPoint(100, 0), QPoint(100, -40), QPoint(200, -40), QPoint(200, 0), QPoint(300, 0),
+             QPoint(300, 800), QPoint(0, 800)])
         pomieszczenie = self.scena.addPolygon(pomieszczenie_poly)
         pomieszczenie.setBrush(QBrush(QColor('#22000000')))
         pen = QPen()
