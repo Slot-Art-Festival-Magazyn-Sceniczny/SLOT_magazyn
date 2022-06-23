@@ -844,7 +844,7 @@ class MainWindow(QMainWindow):
     def moveAdminModule(self):
         pozycjax = self.frameGeometry().center().x() - (self.adminmodule.rect().width() / 2)
         pozycjay = self.frameGeometry().center().y() - (self.adminmodule.rect().height() / 2)
-        self.adminmodule.move(pozycjax, pozycjay)
+        self.adminmodule.move(int(pozycjax), int(pozycjay))
 
     def maximize_btn_action(self):
         if self.isFullScreen():
