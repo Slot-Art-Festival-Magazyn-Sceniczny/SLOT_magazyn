@@ -1391,8 +1391,6 @@ class Dialog(SlotDialog):
             se = QSoundEffect()
             se.setSource(QUrl.fromLocalFile(filepath))
             se.play()
-            print(se.source())
-            print("play sound")
         ok = dialog.exec_()
         # parent.unblurwindow()
 
@@ -1439,8 +1437,6 @@ class QuestionDialog(SlotDialog):
             se = QSoundEffect()
             se.setSource(QUrl.fromLocalFile(filepath))
             se.play()
-            print(se.source())
-            print("play sound")
         ok = dialog.exec_()
         # parent.unblurwindow()
         return ok == QDialog.Accepted
@@ -1501,8 +1497,6 @@ class InputDialog(SlotDialog):
             se = QSoundEffect()
             se.setSource(QUrl.fromLocalFile(filepath))
             se.play()
-            print(se.source())
-            print("play sound")
         dialog.input.setFocus()
         ok = dialog.exec_()
         output = dialog.inputtext()
