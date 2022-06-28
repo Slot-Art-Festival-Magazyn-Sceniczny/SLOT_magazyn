@@ -1386,7 +1386,7 @@ class Dialog(SlotDialog):
         else:
             filenumber = str(audio).zfill(2)
             filename = filenumber + '.wav'
-            filepath = 'audio/jg/' + filename
+            filepath = 'audio/kk/' + filename
             global se
             se = QSoundEffect()
             se.setSource(QUrl.fromLocalFile(filepath))
@@ -1432,7 +1432,7 @@ class QuestionDialog(SlotDialog):
         else:
             filenumber = str(audio).zfill(2)
             filename = filenumber + '.wav'
-            filepath = 'audio/jg/' + filename
+            filepath = 'audio/kk/' + filename
             global se
             se = QSoundEffect()
             se.setSource(QUrl.fromLocalFile(filepath))
@@ -1492,7 +1492,7 @@ class InputDialog(SlotDialog):
         else:
             filenumber = str(audio).zfill(2)
             filename = filenumber + '.wav'
-            filepath = 'audio/jg/' + filename
+            filepath = 'audio/kk/' + filename
             global se
             se = QSoundEffect()
             se.setSource(QUrl.fromLocalFile(filepath))
