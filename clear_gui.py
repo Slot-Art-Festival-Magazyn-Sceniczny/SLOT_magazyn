@@ -2,13 +2,16 @@
 
 import time
 
-from PyQt5.QtCore import QRect, Qt, QSize, QMetaObject, QPropertyAnimation, QEasingCurve, QPoint, pyqtSignal, QEvent
+from PyQt5.QtCore import QRect, Qt, QSize, QMetaObject, QPropertyAnimation, QEasingCurve, QPoint, pyqtSignal, QEvent, \
+    QUrl, QCoreApplication
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QPainter
+from PyQt5.QtMultimedia import QSoundEffect
 from PyQt5.QtWidgets import QMainWindow, QFrame, QWidget, QPushButton, \
     QVBoxLayout, QHBoxLayout, QLabel, QGraphicsView, QGraphicsScene, QDialog, QLineEdit, \
     QGridLayout, QSizePolicy, QSpacerItem, QLayout, QGraphicsBlurEffect, QRubberBand, QPlainTextEdit, QListWidget, \
     QTableView, QItemDelegate, QGraphicsItemGroup, QStyledItemDelegate
 
+se=None
 
 def mainstylesheet():
     stylesheet = "QDialog\n" \
@@ -1375,9 +1378,19 @@ class Dialog(SlotDialog):
         self.lt_content.addWidget(self.txtlabel)
 
     @staticmethod
-    def komunikat(typ, tekst, parent=None):
+    def komunikat(typ, tekst, parent=None, audio=0):
         # parent.blurwindow()
         dialog = Dialog(typ, tekst, parent)
+        if audio==0:
+            pass
+        else:
+            filenumber = str(audio).zfill(2)
+            filename = filenumber + '.wav'
+            filepath = 'audio/kk/' + filename
+            global se
+            se = QSoundEffect()
+            se.setSource(QUrl.fromLocalFile(filepath))
+            se.play()
         ok = dialog.exec_()
         # parent.unblurwindow()
 
@@ -1411,9 +1424,19 @@ class QuestionDialog(SlotDialog):
         self.lt_content.addWidget(self.txtlabel)
 
     @staticmethod
-    def pytanie(tekst, parent=None):
+    def pytanie(tekst, parent=None, audio=0):
         # parent.blurwindow()
         dialog = QuestionDialog(tekst, parent)
+        if audio==0:
+            pass
+        else:
+            filenumber = str(audio).zfill(2)
+            filename = filenumber + '.wav'
+            filepath = 'audio/kk/' + filename
+            global se
+            se = QSoundEffect()
+            se.setSource(QUrl.fromLocalFile(filepath))
+            se.play()
         ok = dialog.exec_()
         # parent.unblurwindow()
         return ok == QDialog.Accepted
@@ -1461,9 +1484,19 @@ class InputDialog(SlotDialog):
         return self.input.text()
 
     @staticmethod
-    def komunikat(typ, tekst, parent=None):
+    def komunikat(typ, tekst, parent=None, audio=0):
         # parent.blurwindow()
         dialog = InputDialog(typ, tekst, parent)
+        if audio==0:
+            pass
+        else:
+            filenumber = str(audio).zfill(2)
+            filename = filenumber + '.wav'
+            filepath = 'audio/kk/' + filename
+            global se
+            se = QSoundEffect()
+            se.setSource(QUrl.fromLocalFile(filepath))
+            se.play()
         dialog.input.setFocus()
         ok = dialog.exec_()
         output = dialog.inputtext()
