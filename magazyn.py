@@ -935,7 +935,7 @@ class Magazyn(MainWindow):
                                             Dialog.komunikat('error',
                                                              'Kod naklejony na plakietkę i na przedmiot Różnią się! '
                                                              'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!',
-                                                             self, audio=19)
+                                                             self, audio=1)
                                             self.unblurwindow()
                                             self.updateorchcounters()
                                     else:
@@ -1126,8 +1126,8 @@ class Magazyn(MainWindow):
             grupa.setToolTip(tooltiptxt)
             # Stworzenie prostokąta
             prosto = QGraphicsRectItem(QRectF(obszar['posx'], obszar['posy'], obszar['sizex'], obszar['sizey']))
-            gradient = QLinearGradient(QPoint(obszar['posx'], obszar['posy']),
-                                       QPoint(obszar['posx'], obszar['posy'] + obszar['sizey']))
+            gradient = QLinearGradient(QPoint(int(obszar['posx']), int(obszar['posy'])),
+                                       QPoint(int(obszar['posx']), int(obszar['posy'] + obszar['sizey'])))
             if self.viewer.fill == 'show':
                 if slotbaza.areacountitemsall(obszar['areaid']) == 0:
                     gradient.setColorAt(0, QColor('#99000000'))
