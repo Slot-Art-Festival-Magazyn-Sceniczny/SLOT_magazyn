@@ -3,15 +3,16 @@
 import time
 
 from PyQt5.QtCore import QRect, Qt, QSize, QMetaObject, QPropertyAnimation, QEasingCurve, QPoint, pyqtSignal, QEvent, \
-    QUrl, QCoreApplication
-from PyQt5.QtGui import QFont, QPixmap, QIcon, QPainter
+    QUrl, QCoreApplication, QPointF
+from PyQt5.QtGui import QFont, QPixmap, QIcon, QPainter, QTransform, QMouseEvent
 from PyQt5.QtMultimedia import QSoundEffect
 from PyQt5.QtWidgets import QMainWindow, QFrame, QWidget, QPushButton, \
     QVBoxLayout, QHBoxLayout, QLabel, QGraphicsView, QGraphicsScene, QDialog, QLineEdit, \
     QGridLayout, QSizePolicy, QSpacerItem, QLayout, QGraphicsBlurEffect, QRubberBand, QPlainTextEdit, QListWidget, \
     QTableView, QItemDelegate, QGraphicsItemGroup, QStyledItemDelegate
 
-se=None
+se = None
+
 
 def mainstylesheet():
     stylesheet = "QDialog\n" \
@@ -332,6 +333,11 @@ class MainWindow(QMainWindow):
         self.showFullScreen()
         self.moveOrchestraModule()
         self.moveAdminModule()
+        self.viewangle = QTransform()
+
+    def applyrotation(self, angle):
+        self.viewangle.rotate(angle)
+        self.viewer.setTransform(self.viewangle)
 
     def blurwindow(self):
         try:
@@ -576,6 +582,8 @@ class MainWindow(QMainWindow):
         icon13.addPixmap(QPixmap("images/buttons/btn_close.png"), QIcon.Normal, QIcon.Off)
         icon14 = QIcon()
         icon14.addPixmap(QPixmap("images/buttons/btn_labelmode.png"), QIcon.Normal, QIcon.Off)
+        icon15 = QIcon()
+        icon15.addPixmap(QPixmap("images/buttons/btn_rotate.png"), QIcon.Normal, QIcon.Off)
 
         self.label_2 = QLabel(self.frm_logo)
         self.label_2.setText("")
@@ -735,6 +743,15 @@ class MainWindow(QMainWindow):
         self.btn_labelmode.setObjectName("btn_labelmode")
         self.btn_labelmode.setToolTip('Przełącz wyświetlanie numerów / nazw')
 
+        self.btn_rotateview = QPushButton(self.frm_top)
+        self.btn_rotateview.setMinimumSize(QSize(50, 32))
+        self.btn_rotateview.setMaximumSize(QSize(16777215, 50))
+        self.btn_rotateview.setFont(font)
+        self.btn_rotateview.setIcon(icon15)
+        self.btn_rotateview.setIconSize(QSize(24, 24))
+        self.btn_rotateview.setObjectName("btn_rotateview")
+        self.btn_rotateview.setToolTip('Obróć mapę')
+
         self.btn_adminpanel = QPushButton(self.frm_top)
         self.btn_adminpanel.setMinimumSize(QSize(50, 32))
         self.btn_adminpanel.setMaximumSize(QSize(16777215, 50))
@@ -764,6 +781,7 @@ class MainWindow(QMainWindow):
 
         self.lt_top.addWidget(self.btn_fillmode)
         self.lt_top.addWidget(self.btn_labelmode)
+        self.lt_top.addWidget(self.btn_rotateview)
         self.lt_top.addItem(spacerItem8)
         self.lt_top.addWidget(self.btn_adminpanel)
         self.lt_top.addWidget(self.btn_settings)
@@ -1381,7 +1399,7 @@ class Dialog(SlotDialog):
     def komunikat(typ, tekst, parent=None, audio=0):
         # parent.blurwindow()
         dialog = Dialog(typ, tekst, parent)
-        if audio==0:
+        if audio == 0:
             pass
         else:
             filenumber = str(audio).zfill(2)
@@ -1427,7 +1445,7 @@ class QuestionDialog(SlotDialog):
     def pytanie(tekst, parent=None, audio=0):
         # parent.blurwindow()
         dialog = QuestionDialog(tekst, parent)
-        if audio==0:
+        if audio == 0:
             pass
         else:
             filenumber = str(audio).zfill(2)
@@ -1487,7 +1505,7 @@ class InputDialog(SlotDialog):
     def komunikat(typ, tekst, parent=None, audio=0):
         # parent.blurwindow()
         dialog = InputDialog(typ, tekst, parent)
-        if audio==0:
+        if audio == 0:
             pass
         else:
             filenumber = str(audio).zfill(2)
@@ -2310,10 +2328,8 @@ class ItemList(QDialog):
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setSortingEnabled(True)
 
-
         self.table.hideColumn(11)
         self.table.setItemDelegateForColumn(3, self.delegate)
-
 
         self.table.setFrameShape(QFrame.NoFrame)
         self.table.setFrameShadow(QFrame.Plain)

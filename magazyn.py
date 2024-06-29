@@ -9,7 +9,7 @@ import hashlib
 import sys
 
 from PyQt5.QtCore import Qt, QPoint, QRectF
-from PyQt5.QtGui import QFont, QLinearGradient, QColor, QPolygonF, QBrush, QPen
+from PyQt5.QtGui import QFont, QLinearGradient, QColor, QPolygonF, QBrush, QPen, QTransform
 from PyQt5.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsItem, QGraphicsItemGroup, QGraphicsTextItem
 
 import logbaza
@@ -171,7 +171,10 @@ class Magazyn(MainWindow):
     # Konstruktor klasy
     def __init__(self):
         super().__init__()
+        self.config = {}
+        self.loadconfig()
         self.setupUI()
+        self.applyrotation(int(self.config['viewangle']))
         self.selected = 0
         self.rysujobszary()
         # Domyślnie po włączeniu programu nikt nie jest zalogowany
@@ -184,6 +187,22 @@ class Magazyn(MainWindow):
 
         # Połączenie przycisków z odpowiednimi funkcjami
         self.connectbuttons()
+
+    def loadconfig(self):
+        with open('data/config.cfg') as configfile:
+            for line in configfile:
+                try:
+                    (key, val) = line.split('=')
+                    key = key.strip()
+                    val = val.strip()
+                    self.config[key] = val
+                except ValueError:
+                    pass
+
+    def saveconfig(self):
+        with open('data/config.cfg', 'w') as configfile:
+            for key, val in self.config.items():
+                configfile.write(f"{key} = {val}\n")
 
     # Połączenie przycisków z odpowiednimi funkcjami
     def connectbuttons(self):
@@ -205,6 +224,7 @@ class Magazyn(MainWindow):
         self.orchestramodule.btn_orchcomeout.clicked.connect(self.orchcomeout)
         self.btn_fillmode.clicked.connect(self.changefillmode)
         self.btn_labelmode.clicked.connect(self.changelabelmode)
+        self.btn_rotateview.clicked.connect(self.rotateview)
         self.btn_adminpanel.clicked.connect(self.adminpanel)
         self.viewer.rectChanged.connect(self.areadrawend)
         self.adminmodule.btn_adduser.clicked.connect(self.createuser)
@@ -484,12 +504,13 @@ class Magazyn(MainWindow):
                                          '\nID obszaru: ' + str(areaid) +
                                          '\nNazwa obszaru: ' + area['areaname'] +
                                          '\n' +
-                                         '\nStan: ' + stan,audio=25)
+                                         '\nStan: ' + stan, audio=25)
                         self.rysujobszary()
                         self.unblurwindow()
                     else:
                         Dialog.komunikat('error', 'Wczytany przedmiot nie znajduje się w bazie. '
-                                                  'Jeśli nie wiesz dlaczego, skontaktuj się z szefem ekipy', self, audio=11)
+                                                  'Jeśli nie wiesz dlaczego, skontaktuj się z szefem ekipy', self,
+                                         audio=11)
                         self.unblurwindow()
                 else:
                     Dialog.komunikat('warn', itemstatustxt, self)
@@ -552,7 +573,8 @@ class Magazyn(MainWindow):
                         self.selected = 0
                         while kolejnyprzedmiot:
                             kolejnyprzedmiot = False
-                            itembarcode, itemok = InputDialog.komunikat('barcode', 'Wczytaj kod przedmiotu:', self, audio=54)
+                            itembarcode, itemok = InputDialog.komunikat('barcode', 'Wczytaj kod przedmiotu:', self,
+                                                                        audio=54)
                             if itemok:
                                 itemstatus, itemstatustxt = barcodevalcheck(itembarcode, 'item')
                                 if itemstatus == 0:
@@ -564,7 +586,8 @@ class Magazyn(MainWindow):
                                                 logbaza.itemchange(self.username, 'Override Come In', areaid, itemid)
                                                 Dialog.komunikat('error',
                                                                  'Ten przedmiot jest już przyjęty na stan magazynu! '
-                                                                 'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!', self, audio=7)
+                                                                 'Jeśli nie wiesz dlaczego, wezwij szefa ekipy!', self,
+                                                                 audio=7)
                                                 self.rysujobszary()
                                                 self.unblurwindow()
                                             else:
@@ -578,7 +601,8 @@ class Magazyn(MainWindow):
                                                                                                            'comments']
                                                                                                + '\n\nCzy chcesz '
                                                                                                  'przyjąć '
-                                                                                                 'przedmiot?', self, audio=63)
+                                                                                                 'przedmiot?', self,
+                                                                                               audio=63)
                                                 if istniejacyprzedmiotok:
                                                     przedmiot['itemstate'] = True
                                                     przedmiot['dateoflastincome'] = datetime.datetime.now()
@@ -595,7 +619,8 @@ class Magazyn(MainWindow):
                                                 else:
                                                     logbaza.itemchange(self.username, 'Failed Come In', areaid, itemid)
                                                     Dialog.komunikat('warn', 'Przerwano proces przyjmowania przedmiotu.'
-                                                                             '\nPrzedmiot nie został przyjęty', self, audio=41)
+                                                                             '\nPrzedmiot nie został przyjęty', self,
+                                                                     audio=41)
                                                     self.rysujobszary()
                                                     self.unblurwindow()
                                         else:
@@ -695,7 +720,8 @@ class Magazyn(MainWindow):
                         while kolejnyprzedmiot:
                             kolejnyprzedmiot = False
 
-                            itembarcode, itemok = InputDialog.komunikat('barcode', 'Wczytaj kod przedmiotu:', self, audio=54)
+                            itembarcode, itemok = InputDialog.komunikat('barcode', 'Wczytaj kod przedmiotu:', self,
+                                                                        audio=54)
                             if itemok:
                                 itemstatus, itemstatustxt = barcodevalcheck(itembarcode, 'item')
                                 if itemstatus == 0:
@@ -708,14 +734,16 @@ class Magazyn(MainWindow):
                                                     'Ten przedmiot znajduje się w bazie:\nNazwa przedmiotu: ' +
                                                     przedmiot[
                                                         'itemname'] + '\nStan: Przyjęty\nUwagi: ' + przedmiot[
-                                                        'itemcomments'] + '\n\nCzy chcesz wydać przedmiot?', self, audio=62)
+                                                        'itemcomments'] + '\n\nCzy chcesz wydać przedmiot?', self,
+                                                    audio=62)
                                                 if istniejacyprzedmiotok:
                                                     przedmiot['itemstate'] = False
                                                     przedmiot['dateoflastoutcome'] = datetime.datetime.now()
                                                     przedmiot['useroflastoutcome'] = self.username
                                                     slotbaza.saveitem(przedmiot)
                                                     logbaza.itemchange(self.username, 'Come Out', areaid, itemid)
-                                                    Dialog.komunikat('ok', 'Przedmiot został wydany z magazynu', self, audio=24)
+                                                    Dialog.komunikat('ok', 'Przedmiot został wydany z magazynu', self,
+                                                                     audio=24)
                                                     kolejnyprzedmiot = QuestionDialog.pytanie(
                                                         'Czy chcesz wydać kolejny przedmiot z obszaru ' + str(
                                                             areaid) + '?',
@@ -844,7 +872,8 @@ class Magazyn(MainWindow):
                                         nowyorchitem['useroflastincome'] = self.username
                                         slotbaza.saveorch(nowyorchitem)
                                         logbaza.orchchange(self.username, 'First Come In', orchid)
-                                        Dialog.komunikat('ok', 'Poprawnie przyjęto przedmiot do SLOT Orkiestry', self, audio=19)
+                                        Dialog.komunikat('ok', 'Poprawnie przyjęto przedmiot do SLOT Orkiestry', self,
+                                                         audio=19)
                                         self.unblurwindow()
                                         self.updateorchcounters()
                                     else:
@@ -882,7 +911,8 @@ class Magazyn(MainWindow):
                     self.unblurwindow()
                     self.updateorchcounters()
             else:
-                Dialog.komunikat('warn', 'Przerwano proces edycji obszaru! Żadne zmiany nie zostały zapisane.', self, audio=39)
+                Dialog.komunikat('warn', 'Przerwano proces edycji obszaru! Żadne zmiany nie zostały zapisane.', self,
+                                 audio=39)
                 self.unblurwindow()
                 self.updateorchcounters()
 
@@ -894,7 +924,8 @@ class Magazyn(MainWindow):
             self.unblurwindow()
         else:
             self.blurwindow()
-            orchbarcode, orchok = InputDialog.komunikat('barcode', 'Wczytaj kod kreskowy z plakietki uczestnika:', self, audio=52)
+            orchbarcode, orchok = InputDialog.komunikat('barcode', 'Wczytaj kod kreskowy z plakietki uczestnika:', self,
+                                                        audio=52)
             if orchok:
                 orchstatus, orchstatustxt = barcodevalcheck(orchbarcode, 'orch')
                 if orchstatus == 0:
@@ -986,7 +1017,8 @@ class Magazyn(MainWindow):
             self.unblurwindow()
         else:
             self.blurwindow()
-            orchbarcode, orchok = InputDialog.komunikat('barcode', 'Wczytaj kod kreskowy z plakietki uczestnika:', self, audio=52)
+            orchbarcode, orchok = InputDialog.komunikat('barcode', 'Wczytaj kod kreskowy z plakietki uczestnika:', self,
+                                                        audio=52)
             if orchok:
                 orchstatus, orchstatustxt = barcodevalcheck(orchbarcode, 'orch')
                 if orchstatus == 0:
@@ -1018,7 +1050,8 @@ class Magazyn(MainWindow):
                                             nowyorchitem['useroflastoutcome'] = self.username
                                             slotbaza.saveorch(nowyorchitem)
                                             logbaza.orchchange(self.username, 'Come Out', orchid)
-                                            Dialog.komunikat('ok', 'Poprawnie wydano przedmiot ze SLOT Orkiestry', self, audio=21)
+                                            Dialog.komunikat('ok', 'Poprawnie wydano przedmiot ze SLOT Orkiestry', self,
+                                                             audio=21)
                                             self.unblurwindow()
                                             self.updateorchcounters()
                                         else:
@@ -1185,13 +1218,20 @@ class Magazyn(MainWindow):
             etykieta_br = etykieta.boundingRect()
             etykieta.setPos(obszar['posx'] + obszar['sizex'] / 2 - etykieta_br.width() / 2,
                             obszar['posy'] + obszar['sizey'] / 2 - etykieta_br.height() / 2)
-
+            etykieta.setTransformOriginPoint(etykieta_br.width() / 2, etykieta_br.height() / 2)
+            etykieta.setRotation(-int(self.config['viewangle']))
             # Dodanie prostokąta i etykiety do grupy
             grupa.addToGroup(prosto)
             grupa.addToGroup(etykieta)
 
             grupa.setFlag(QGraphicsItem.ItemIsMovable, True)  # Ustawienie grupy jako możliwej do przesunięcia
             self.scena.addItem(grupa)  # dodanie grupy do sceny
+
+    def rotateview(self):
+        self.applyrotation(90)
+        self.config['viewangle'] = (int(self.config['viewangle']) + 90) % 360
+        self.saveconfig()
+        self.rysujobszary()
 
     # Funkcja czyszcząca scenę i rysująca pomieszczenie
     def wyczyscscene(self):
