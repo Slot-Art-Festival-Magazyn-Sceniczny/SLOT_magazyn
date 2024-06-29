@@ -1143,7 +1143,8 @@ class Magazyn(MainWindow):
         orchlabel_br = orchlabel.boundingRect()
         orchlabel.setPos(orkiestra['posx'] + orkiestra['sizex'] / 2 - orchlabel_br.width() / 2,
                          orkiestra['posy'] + orkiestra['sizey'] / 2 - orchlabel_br.height() / 2)
-
+        orchlabel.setTransformOriginPoint(orchlabel_br.width() / 2, orchlabel_br.height() / 2)
+        orchlabel.setRotation(round((-int(self.config['viewangle']))/180)*180)
         # Dodanie prostokąta i etykiety do grupy
         orchgrupa.addToGroup(orchprosto)
         orchgrupa.addToGroup(orchlabel)
