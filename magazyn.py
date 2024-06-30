@@ -225,6 +225,13 @@ class Magazyn(MainWindow):
         self.btn_fillmode.clicked.connect(self.changefillmode)
         self.btn_labelmode.clicked.connect(self.changelabelmode)
         self.btn_rotateview.clicked.connect(self.rotateview)
+        self.btn_sound_ok.clicked.connect(self.changesoundconfig)
+        self.btn_sound_warn.clicked.connect(self.changesoundconfig)
+        self.btn_sound_error.clicked.connect(self.changesoundconfig)
+        self.btn_sound_info.clicked.connect(self.changesoundconfig)
+        self.btn_sound_other.clicked.connect(self.changesoundconfig)
+        self.btn_sound_txt.clicked.connect(self.changesoundconfig)
+        self.btn_sound_barcode.clicked.connect(self.changesoundconfig)
         self.btn_adminpanel.clicked.connect(self.adminpanel)
         self.viewer.rectChanged.connect(self.areadrawend)
         self.adminmodule.btn_adduser.clicked.connect(self.createuser)
@@ -1116,6 +1123,16 @@ class Magazyn(MainWindow):
         elif self.viewer.labels == 'name':
             self.viewer.labels = 'number'
         self.rysujobszary()
+
+    def changesoundconfig(self):
+        self.config['sound_ok'] = int(self.btn_sound_ok.isChecked())
+        self.config['sound_warn'] = int(self.btn_sound_warn.isChecked())
+        self.config['sound_error'] = int(self.btn_sound_error.isChecked())
+        self.config['sound_info'] = int(self.btn_sound_info.isChecked())
+        self.config['sound_other'] = int(self.btn_sound_other.isChecked())
+        self.config['sound_txt'] = int(self.btn_sound_txt.isChecked())
+        self.config['sound_barcode'] = int(self.btn_sound_barcode.isChecked())
+        self.saveconfig()
 
     # Funkcja rysująca obszary, po wcześniejszym wyczyszczeniu sceny
     def rysujobszary(self):

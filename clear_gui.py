@@ -54,6 +54,9 @@ def mainstylesheet():
                  "QPushButton:pressed\n" \
                  "{background-color: #AA000000}\n" \
                  "\n" \
+                 "QPushButton:checked\n" \
+                 "{background-color: #7700FF00}\n" \
+                 "\n" \
                  "QPushButton#btn_listofareas\n" \
                  "{Text-align:left; padding-left: 30px;}\n" \
                  "\n" \
@@ -537,6 +540,7 @@ class MainWindow(QMainWindow):
         spacerItem6 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)
         spacerItem7 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)
         spacerItem8 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Fixed)
+        spacerItem9 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         font = QFont()
         font.setFamily("Arial")
@@ -584,6 +588,20 @@ class MainWindow(QMainWindow):
         icon14.addPixmap(QPixmap("images/buttons/btn_labelmode.png"), QIcon.Normal, QIcon.Off)
         icon15 = QIcon()
         icon15.addPixmap(QPixmap("images/buttons/btn_rotate.png"), QIcon.Normal, QIcon.Off)
+        icon16 = QIcon()
+        icon16.addPixmap(QPixmap("images/popups/ok.png"), QIcon.Normal, QIcon.Off)
+        icon17 = QIcon()
+        icon17.addPixmap(QPixmap("images/popups/warn.png"), QIcon.Normal, QIcon.Off)
+        icon18 = QIcon()
+        icon18.addPixmap(QPixmap("images/popups/error.png"), QIcon.Normal, QIcon.Off)
+        icon19 = QIcon()
+        icon19.addPixmap(QPixmap("images/popups/info.png"), QIcon.Normal, QIcon.Off)
+        icon20 = QIcon()
+        icon20.addPixmap(QPixmap("images/popups/info.png"), QIcon.Normal, QIcon.Off)
+        icon21 = QIcon()
+        icon21.addPixmap(QPixmap("images/popups/txt.png"), QIcon.Normal, QIcon.Off)
+        icon22 = QIcon()
+        icon22.addPixmap(QPixmap("images/popups/code.png"), QIcon.Normal, QIcon.Off)
 
         self.label_2 = QLabel(self.frm_logo)
         self.label_2.setText("")
@@ -752,6 +770,83 @@ class MainWindow(QMainWindow):
         self.btn_rotateview.setObjectName("btn_rotateview")
         self.btn_rotateview.setToolTip('Obróć mapę')
 
+        self.btn_sound_ok = QPushButton(self.frm_top)
+        self.btn_sound_ok.setCheckable(True)
+        self.btn_sound_ok.setMinimumSize(QSize(50, 32))
+        self.btn_sound_ok.setMaximumSize(QSize(16777215, 50))
+        self.btn_sound_ok.setFont(font)
+        self.btn_sound_ok.setIcon(icon16)
+        self.btn_sound_ok.setIconSize(QSize(24, 24))
+        self.btn_sound_ok.setObjectName("btn_sound_ok")
+        self.btn_sound_ok.setToolTip('Powodzenie')
+        self.btn_sound_ok.setChecked(int(self.config['sound_ok']))
+
+        self.btn_sound_warn = QPushButton(self.frm_top)
+        self.btn_sound_warn.setCheckable(True)
+        self.btn_sound_warn.setMinimumSize(QSize(50, 32))
+        self.btn_sound_warn.setMaximumSize(QSize(16777215, 50))
+        self.btn_sound_warn.setFont(font)
+        self.btn_sound_warn.setIcon(icon17)
+        self.btn_sound_warn.setIconSize(QSize(24, 24))
+        self.btn_sound_warn.setObjectName("btn_sound_warn")
+        self.btn_sound_warn.setToolTip('Ostrzeżenia')
+        self.btn_sound_warn.setChecked(int(self.config['sound_warn']))
+
+        self.btn_sound_error = QPushButton(self.frm_top)
+        self.btn_sound_error.setCheckable(True)
+        self.btn_sound_error.setMinimumSize(QSize(50, 32))
+        self.btn_sound_error.setMaximumSize(QSize(16777215, 50))
+        self.btn_sound_error.setFont(font)
+        self.btn_sound_error.setIcon(icon18)
+        self.btn_sound_error.setIconSize(QSize(24, 24))
+        self.btn_sound_error.setObjectName("btn_sound_error")
+        self.btn_sound_error.setToolTip('Błędy')
+        self.btn_sound_error.setChecked(int(self.config['sound_error']))
+
+        self.btn_sound_info = QPushButton(self.frm_top)
+        self.btn_sound_info.setCheckable(True)
+        self.btn_sound_info.setMinimumSize(QSize(50, 32))
+        self.btn_sound_info.setMaximumSize(QSize(16777215, 50))
+        self.btn_sound_info.setFont(font)
+        self.btn_sound_info.setIcon(icon19)
+        self.btn_sound_info.setIconSize(QSize(24, 24))
+        self.btn_sound_info.setObjectName("btn_sound_info")
+        self.btn_sound_info.setToolTip('Informacje')
+        self.btn_sound_info.setChecked(int(self.config['sound_info']))
+
+        self.btn_sound_other = QPushButton(self.frm_top)
+        self.btn_sound_other.setCheckable(True)
+        self.btn_sound_other.setMinimumSize(QSize(50, 32))
+        self.btn_sound_other.setMaximumSize(QSize(16777215, 50))
+        self.btn_sound_other.setFont(font)
+        self.btn_sound_other.setIcon(icon20)
+        self.btn_sound_other.setIconSize(QSize(24, 24))
+        self.btn_sound_other.setObjectName("btn_sound_other")
+        self.btn_sound_other.setToolTip('Inne')
+        self.btn_sound_other.setChecked(int(self.config['sound_other']))
+
+        self.btn_sound_txt = QPushButton(self.frm_top)
+        self.btn_sound_txt.setCheckable(True)
+        self.btn_sound_txt.setMinimumSize(QSize(50, 32))
+        self.btn_sound_txt.setMaximumSize(QSize(16777215, 50))
+        self.btn_sound_txt.setFont(font)
+        self.btn_sound_txt.setIcon(icon21)
+        self.btn_sound_txt.setIconSize(QSize(24, 24))
+        self.btn_sound_txt.setObjectName("btn_sound_txt")
+        self.btn_sound_txt.setToolTip('Tekst')
+        self.btn_sound_txt.setChecked(int(self.config['sound_txt']))
+
+        self.btn_sound_barcode = QPushButton(self.frm_top)
+        self.btn_sound_barcode.setCheckable(True)
+        self.btn_sound_barcode.setMinimumSize(QSize(50, 32))
+        self.btn_sound_barcode.setMaximumSize(QSize(16777215, 50))
+        self.btn_sound_barcode.setFont(font)
+        self.btn_sound_barcode.setIcon(icon22)
+        self.btn_sound_barcode.setIconSize(QSize(24, 24))
+        self.btn_sound_barcode.setObjectName("btn_sound_barcode")
+        self.btn_sound_barcode.setToolTip('Kody kreskowe')
+        self.btn_sound_barcode.setChecked(int(self.config['sound_barcode']))
+
         self.btn_adminpanel = QPushButton(self.frm_top)
         self.btn_adminpanel.setMinimumSize(QSize(50, 32))
         self.btn_adminpanel.setMaximumSize(QSize(16777215, 50))
@@ -782,7 +877,19 @@ class MainWindow(QMainWindow):
         self.lt_top.addWidget(self.btn_fillmode)
         self.lt_top.addWidget(self.btn_labelmode)
         self.lt_top.addWidget(self.btn_rotateview)
+
+        self.lt_top.addItem(spacerItem9)
+
+        self.lt_top.addWidget(self.btn_sound_ok)
+        self.lt_top.addWidget(self.btn_sound_warn)
+        self.lt_top.addWidget(self.btn_sound_error)
+        self.lt_top.addWidget(self.btn_sound_info)
+        self.lt_top.addWidget(self.btn_sound_other)
+        self.lt_top.addWidget(self.btn_sound_txt)
+        self.lt_top.addWidget(self.btn_sound_barcode)
+
         self.lt_top.addItem(spacerItem8)
+
         self.lt_top.addWidget(self.btn_adminpanel)
         self.lt_top.addWidget(self.btn_settings)
         # self.lt_top.addItem(spacerItem9)
@@ -1363,7 +1470,7 @@ class AdminModule(QWidget):
 
 
 class Dialog(SlotDialog):
-    def __init__(self, typ, tekst, parent=None):
+    def __init__(self, typ, tekst, parent=MainWindow):
         super(Dialog, self).__init__(parent)
         self.setall()
 
@@ -1396,10 +1503,12 @@ class Dialog(SlotDialog):
         self.lt_content.addWidget(self.txtlabel)
 
     @staticmethod
-    def komunikat(typ, tekst, parent=None, audio=0):
+    def komunikat(typ, tekst, parent=MainWindow, audio=0):
         # parent.blurwindow()
         dialog = Dialog(typ, tekst, parent)
         if audio == 0:
+            pass
+        elif int(parent.config['sound_' + typ]) == 0:
             pass
         else:
             filenumber = str(audio).zfill(2)
@@ -1414,7 +1523,7 @@ class Dialog(SlotDialog):
 
 
 class QuestionDialog(SlotDialog):
-    def __init__(self, tekst, parent=None):
+    def __init__(self, tekst, parent=MainWindow):
         super(QuestionDialog, self).__init__(parent)
         self.setall()
         obrazek = QPixmap('images/popups/question.png')
@@ -1442,10 +1551,12 @@ class QuestionDialog(SlotDialog):
         self.lt_content.addWidget(self.txtlabel)
 
     @staticmethod
-    def pytanie(tekst, parent=None, audio=0):
+    def pytanie(tekst, parent=MainWindow, audio=0):
         # parent.blurwindow()
         dialog = QuestionDialog(tekst, parent)
         if audio == 0:
+            pass
+        elif int(parent.config['sound_' + typ]) == 0:
             pass
         else:
             filenumber = str(audio).zfill(2)
@@ -1461,7 +1572,7 @@ class QuestionDialog(SlotDialog):
 
 
 class InputDialog(SlotDialog):
-    def __init__(self, typ, tekst, parent=None):
+    def __init__(self, typ, tekst, parent=MainWindow):
         super(InputDialog, self).__init__(parent)
         self.setall()
 
@@ -1502,10 +1613,12 @@ class InputDialog(SlotDialog):
         return self.input.text()
 
     @staticmethod
-    def komunikat(typ, tekst, parent=None, audio=0):
+    def komunikat(typ, tekst, parent=MainWindow, audio=0):
         # parent.blurwindow()
         dialog = InputDialog(typ, tekst, parent)
         if audio == 0:
+            pass
+        elif int(parent.config['sound_' + typ]) == 0:
             pass
         else:
             filenumber = str(audio).zfill(2)
@@ -1523,12 +1636,11 @@ class InputDialog(SlotDialog):
 
 
 class LoginDialog(SlotDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=MainWindow):
         super(LoginDialog, self).__init__(parent)
         self.setall()
         obrazek = QPixmap('images/popups/txt.png')
         self.icon.setPixmap(obrazek)
-
         self.buttonok = QPushButton(self.fr_bottom)
         self.buttonok.setText('OK')
         self.buttonok.setFocus()
