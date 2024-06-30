@@ -247,11 +247,11 @@ class Magazyn(MainWindow):
             self.unblurwindow()
             return
         if slotbaza.isuserexist(login):
-            Dialog.komunikat('warn', 'Użytkownik o podanej nazwie już istnieje!', audio=45)
+            Dialog.komunikat('warn', 'Użytkownik o podanej nazwie już istnieje!', self, audio=45)
             self.unblurwindow()
             return
         slotbaza.createuser('user', login, hashpassword(haslo))
-        Dialog.komunikat('ok', 'Pomyślnie dodano użytkownika!', audio=14)
+        Dialog.komunikat('ok', 'Pomyślnie dodano użytkownika!', self, audio=14)
         self.unblurwindow()
 
     def changepassword(self):
@@ -261,13 +261,13 @@ class Magazyn(MainWindow):
             self.unblurwindow()
             return
         if not slotbaza.isuserexist(login):
-            Dialog.komunikat('warn', 'Użytkownik o podanej nazwie nie istnieje!', audio=46)
+            Dialog.komunikat('warn', 'Użytkownik o podanej nazwie nie istnieje!', self, audio=46)
             self.unblurwindow()
             return
         uzytkownik = slotbaza.loaduser(login)
         uzytkownik['password'] = hashpassword(haslo)
         slotbaza.saveuser(uzytkownik)
-        Dialog.komunikat('ok', 'Pomyślnie zmieniono haslo!', audio=17)
+        Dialog.komunikat('ok', 'Pomyślnie zmieniono haslo!', self, audio=17)
         self.unblurwindow()
 
     def adminpanel(self):
@@ -281,21 +281,21 @@ class Magazyn(MainWindow):
                 return
             if not slotbaza.isuserexist(login):
                 logbaza.userchange(self.username, 'Admin Login Fail', login)
-                Dialog.komunikat('warn', 'Logowanie Administratora nieudane', audio=26)
+                Dialog.komunikat('warn', 'Logowanie Administratora nieudane', self, audio=26)
                 self.unblurwindow()
                 return
             if not login == 'admin':
                 logbaza.userchange(self.username, 'Admin Login Fail', login)
-                Dialog.komunikat('warn', 'Logowanie Administratora nieudane', audio=26)
+                Dialog.komunikat('warn', 'Logowanie Administratora nieudane', self, audio=26)
                 self.unblurwindow()
                 return
             if not slotbaza.loginvalidate(login, hashpassword(haslo))['login']:
                 logbaza.userchange(self.username, 'Admin Login Fail', login)
-                Dialog.komunikat('warn', 'Logowanie Administratora nieudane', audio=26)
+                Dialog.komunikat('warn', 'Logowanie Administratora nieudane', self, audio=26)
                 self.unblurwindow()
                 return
             logbaza.userchange(self.username, 'Admin Login Succes')
-            Dialog.komunikat('ok', 'Pomyslnie zalogowano', audio=13)
+            Dialog.komunikat('ok', 'Pomyslnie zalogowano', self, audio=13)
             self.unblurwindow()
             self.adminmodule.toggleshow()
 
@@ -352,7 +352,7 @@ class Magazyn(MainWindow):
     def listofareas(self):
         if not (self.loginstatus or self.loginbypass):
             self.blurwindow()
-            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', audio=28)
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', self, audio=28)
             self.unblurwindow()
         else:
             self.blurwindow()
@@ -364,7 +364,7 @@ class Magazyn(MainWindow):
     def addarea(self):
         if not (self.loginstatus or self.loginbypass):
             self.blurwindow()
-            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', audio=28)
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', self, audio=28)
             self.unblurwindow()
         else:
             self.blurwindow()
@@ -380,8 +380,7 @@ class Magazyn(MainWindow):
                     else:
                         areaname, nameok = InputDialog.komunikat('txt', 'Podaj nazwę nowego obszaru:', self, audio=57)
                         if nameok:
-                            Dialog.komunikat('info', 'Narysuj obszar na mapie magazynu', audio=12)
-
+                            Dialog.komunikat('info', 'Narysuj obszar na mapie magazynu', self, audio=12)
                             # Zapisanie danych podanych przez użytkownika - rozwiązane brzydko, ale lepiej nie umiem
                             self.newareaname = areaname
                             self.newareaid = areaid
@@ -446,7 +445,7 @@ class Magazyn(MainWindow):
     def editarea(self):
         if not (self.loginstatus or self.loginbypass):
             self.blurwindow()
-            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', audio=28)
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', self, audio=28)
             self.unblurwindow()
         else:
             obszary = slotbaza.loadallareas()
@@ -484,7 +483,7 @@ class Magazyn(MainWindow):
     def finditem(self):
         if not (self.loginstatus or self.loginbypass):
             self.blurwindow()
-            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', audio=28)
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', self, audio=28)
             self.unblurwindow()
         else:
             self.blurwindow()
@@ -530,7 +529,7 @@ class Magazyn(MainWindow):
     def lookinside(self):
         if not (self.loginstatus or self.loginbypass):
             self.blurwindow()
-            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', audio=28)
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', self, audio=28)
             self.unblurwindow()
         else:
             obszary = slotbaza.loadallareas()
@@ -564,7 +563,7 @@ class Magazyn(MainWindow):
     def comein(self):
         if not (self.loginstatus or self.loginbypass):
             self.blurwindow()
-            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', audio=28)
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', self, audio=28)
             self.unblurwindow()
         else:
             self.blurwindow()
@@ -710,7 +709,7 @@ class Magazyn(MainWindow):
     def comeout(self):
         if not (self.loginstatus or self.loginbypass):
             self.blurwindow()
-            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', audio=28)
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', self, audio=28)
             self.unblurwindow()
         else:
             self.blurwindow()
@@ -809,7 +808,7 @@ class Magazyn(MainWindow):
     def orchestra(self):
         if not (self.loginstatus or self.loginbypass):
             self.blurwindow()
-            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', audio=28)
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', self, audio=28)
             self.unblurwindow()
         else:
             self.orchestramodule.toggleshow()
@@ -828,7 +827,7 @@ class Magazyn(MainWindow):
     def orchtable(self):
         if not (self.loginstatus or self.loginbypass):
             self.blurwindow()
-            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', audio=28)
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', self, audio=28)
             self.unblurwindow()
         else:
             self.blurwindow()
@@ -840,7 +839,7 @@ class Magazyn(MainWindow):
     def orchfirstcomein(self):
         if not (self.loginstatus or self.loginbypass):
             self.blurwindow()
-            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', audio=28)
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', self, audio=28)
             self.unblurwindow()
         else:
             self.blurwindow()
@@ -927,7 +926,7 @@ class Magazyn(MainWindow):
     def orchcomein(self):
         if not (self.loginstatus or self.loginbypass):
             self.blurwindow()
-            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', audio=28)
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', self, audio=28)
             self.unblurwindow()
         else:
             self.blurwindow()
@@ -1020,7 +1019,7 @@ class Magazyn(MainWindow):
     def orchcomeout(self):
         if not (self.loginstatus or self.loginbypass):
             self.blurwindow()
-            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', audio=28)
+            Dialog.komunikat('warn', 'Musisz być zalogowany aby korzystać z programu!', self, audio=28)
             self.unblurwindow()
         else:
             self.blurwindow()
