@@ -1556,7 +1556,7 @@ class QuestionDialog(SlotDialog):
         dialog = QuestionDialog(tekst, parent)
         if audio == 0:
             pass
-        elif int(parent.config['sound_' + typ]) == 0:
+        elif int(parent.config['sound_' + 'other']) == 0:
             pass
         else:
             filenumber = str(audio).zfill(2)
