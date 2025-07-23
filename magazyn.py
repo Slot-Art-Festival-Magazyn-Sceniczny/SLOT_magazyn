@@ -750,10 +750,24 @@ class Magazyn(MainWindow):
                                                     logbaza.itemchange(self.username, 'Come Out', areaid, itemid)
                                                     Dialog.komunikat('ok', 'Przedmiot został wydany z magazynu', self,
                                                                      audio=24)
+
+                                                    pozostale_przedmioty = slotbaza.getitemsinarea(areaid)
+                                                    pozostale_niewydane = [
+                                                        item for item in pozostale_przedmioty if item['itemstate'] == True
+                                                    ]
+                                                    if not pozostale_niewydane:
+                                                        Dialog.komunikat(
+                                                            'ok',
+                                                            f'Wydano wszystkie przedmioty z obszaru {areaid}',
+                                                            self,
+                                                        )
+                                                        kolejny przedmiot = False
+                                                    else:
                                                     kolejnyprzedmiot = QuestionDialog.pytanie(
-                                                        'Czy chcesz wydać kolejny przedmiot z obszaru ' + str(
-                                                            areaid) + '?',
-                                                        self, audio=61)
+                                                        f'Czy chcesz wydać kolejny przedmiot z obszaru {areaid}?',
+                                                        self,
+                                                        audio=61
+                                                    )
                                                 else:
                                                     logbaza.itemchange(self.username, 'Failed Come Out', areaid, itemid)
                                                     Dialog.komunikat('warn',

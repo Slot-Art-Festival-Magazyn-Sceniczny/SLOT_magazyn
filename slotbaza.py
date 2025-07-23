@@ -308,6 +308,11 @@ def loadallitems():
         itemdict = {}
     return itemdictlist
 
+#zwraca liste wszystkich przedmiotow przypisanych do danego obszaru
+def getitemsinarea(areaid: int):
+    wszystkie = loadallitems()
+    return [item for item in wszystkie if item['areaass'].areaid == areaid]
+
 
 # wczytanie listy przedmiotow z danego obszaru
 def loaditemsinarea(areaid):
