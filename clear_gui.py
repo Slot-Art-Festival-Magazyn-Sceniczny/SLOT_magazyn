@@ -1969,6 +1969,8 @@ class AreaListSmall(QDialog):
         self.buttonok.clicked.connect(self.accept)
         self.buttoncancel.clicked.connect(self.reject)
 
+        self.lista.itemDoubleClicked.connect(self.accept_from_double_click)
+
     def setwindow(self):
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(100)
@@ -2116,6 +2118,10 @@ class AreaListSmall(QDialog):
         except:
             obiektnum = 0
         return obiektnum
+
+    def accept_from_double_click(self, item):
+        if item:
+            self.accept()
 
     # metoda statyczna, tworzy dialog i wybrany ID, ok
     @staticmethod
